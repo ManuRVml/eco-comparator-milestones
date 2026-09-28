@@ -1,0 +1,17 @@
+# Nada de datos locales, bases SQLite, capturas ni artefactos de prueba en el despliegue.
+data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+docs/screens/
+seed/
+scripts/
+drizzle/
+test-results/
+playwright-report/
+.env*
+!.env.example
+*.log
+*.tsbuildinfo
+.next/
