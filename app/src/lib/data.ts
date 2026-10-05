@@ -11,6 +11,8 @@ import { hoyIso } from "@/lib/dates";
 import { loadRaw } from "@/lib/load";
 import { computeModel, type Model, vistaCliente } from "@/lib/model";
 import { loadWorkflow } from "@/lib/workflow/load";
+import { loadSprintPlans } from "@/lib/sprint-plan";
+import { prepararTimeline } from "@/lib/timeline-model";
 
 export interface Session {
   role: UserRole;
@@ -51,10 +53,13 @@ export async function getBitacora(session: Session, f: { tipo?: string | null; e
  */
 export async function getModel(session: Session): Promise<Model> {
   await connection();
-  const raw = await loadRaw(db);
+  const [raw, planesSprint] = await Promise.all([loadRaw(db), loadSprintPlans(db)]);
   const hoy = hoyIso();
-  if (!session.canEdit) return vistaCliente(computeModel(raw, hoy, "oficial"));
+  if (!session.canEdit) {
+    const oficial = { ...computeModel(raw, hoy, "oficial"), planesSprint };
+    return vistaCliente(prepararTimeline(oficial));
+  }
   const tecnico = computeModel(raw, hoy, "tecnica");
   const oficial = computeModel(raw, hoy, "oficial");
-  return { ...tecnico, workflow: await loadWorkflow(db), oficial: { total: oficial.total, kpis: oficial.kpis, areaResumen: oficial.areaResumen } };
+  return prepararTimeline({ ...tecnico, planesSprint, workflow: await loadWorkflow(db), oficial: { total: oficial.total, kpis: oficial.kpis, areaResumen: oficial.areaResumen } });
 }

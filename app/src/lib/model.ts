@@ -28,6 +28,7 @@ import type {
 } from "../db/schema";
 import { addDays, daysBetween, isoWeekday } from "./dates";
 import type { Workflow } from "./workflow/types";
+import type { SprintPlan } from "./sprint-plan";
 
 export type Linea = typeof lineas.$inferSelect;
 export type Area = typeof areas.$inferSelect;
@@ -108,6 +109,7 @@ export interface AreaProgreso {
 }
 
 export interface MilestoneView extends MilestoneRow {
+  cierreVerificado?: boolean;
   linea: Linea | null;
   huIds: string[];
   tareaIds: string[];
@@ -156,6 +158,10 @@ export interface Kpis {
 }
 
 export interface Model {
+  /** Objetivos planificados públicos y cierre del alcance completo, calculados antes del filtro de visibilidad. */
+  planesSprint?: SprintPlan[];
+  cierresSprint?: Record<string, boolean>;
+  resumenesSprint?: Record<string, { total: AreaProgreso; areas: AreaProgreso[] }>;
   /** Solo equipo; nunca se envía a la vista de consulta. */
   workflow?: Workflow | null;
   hoy: string;
@@ -288,8 +294,7 @@ export function readConfig(raw: Partial<Record<string, string>>): Config {
 
 /** Estado que ve el cliente para una tarea: Hecha solo si está publicada; si no, lo que dice el plan. */
 export function estadoOficialTarea(t: Tarea, hoy: string): string {
-  if (t.publicadoCliente) return "Hecha";
-  void hoy;
+  if (t.estado === "Hecha" && t.publicadoCliente && t.fechaPublicacion && t.fechaPublicacion <= hoy && t.notaPublicacion?.trim()) return "Hecha";
   return "Pendiente";
 }
 
@@ -299,15 +304,15 @@ export function aplicarCapaOficial(raw: Raw, hoy: string): Raw {
     ...t,
     estado: estadoOficialTarea(t, hoy),
     estadoOrigen: "plan" as const,
-    evidencia: t.publicadoCliente ? t.notaPublicacion : null,
-    fechaCierre: t.publicadoCliente ? t.fechaPublicacion : null,
-    fechaEstado: t.publicadoCliente ? t.fechaPublicacion : null,
+    evidencia: estadoOficialTarea(t, hoy) === "Hecha" ? t.notaPublicacion : null,
+    fechaCierre: estadoOficialTarea(t, hoy) === "Hecha" ? t.fechaPublicacion : null,
+    fechaEstado: estadoOficialTarea(t, hoy) === "Hecha" ? t.fechaPublicacion : null,
   }));
   const porHu = new Map<string, Tarea[]>();
   for (const t of tareasOf) if (t.historiaId) porHu.set(t.historiaId, [...(porHu.get(t.historiaId) ?? []), t]);
   const historiasOf = raw.historias.map((h) => {
     const ts = porHu.get(h.id) ?? [];
-    const entregada = ts.length > 0 && ts.every((t) => t.publicadoCliente);
+    const entregada = ts.length > 0 && ts.every((t) => t.estado === "Hecha");
     return { ...h, estado: entregada ? "Aceptada" : "No iniciada", estadoOrigen: "plan" as const, evidencia: null, fechaCierre: null, fechaEstado: null };
   });
   return {
@@ -358,7 +363,7 @@ export function computeModel(raw: Raw, hoy: string, capa: Capa = "tecnica"): Mod
       const criticasVencidas = ts
         .filter((t) => t.rutaCritica && t.estado !== "Hecha" && t.fechaFin && t.fechaFin < hoy)
         .map((t) => t.id);
-      const cumplido = hs.length > 0 && completas.length === hs.length;
+      const cumplido = hs.length > 0 && completas.length === hs.length && ts.length > 0 && res.hechas === ts.length;
       let sugerido: EstadoMilestone;
       if (cumplido) sugerido = "Cumplido";
       else if (m.fechaObjetivo && m.fechaObjetivo < hoy) sugerido = "Atrasado";
@@ -505,6 +510,7 @@ export function vistaCliente(m: Model): Model {
   return {
     ...m,
     workflow: undefined,
+    planesSprint: m.planesSprint?.map((p) => ({ ...p, tareaIds: p.tareaIds.filter((id) => idsT.has(id)) })),
     milestones: milestonesCliente,
     milestoneById: new Map(milestonesCliente.map((x) => [x.id, x])),
     historias: huVisibles,

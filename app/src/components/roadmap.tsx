@@ -7,6 +7,8 @@ import { colorEstado, colorLinea, fmtPct } from "@/lib/format";
 import type { MilestoneView, Model } from "@/lib/model";
 import { SprintCheckpointRow } from "@/components/sprint-checkpoint-row";
 import { progresoLinea } from "@/lib/line-progress";
+import { milestoneCompletado } from "@/lib/completion";
+import { CompletionCheck } from "@/components/completion-check";
 
 const INICIO = "2026-09-21";
 const FIN = "2026-12-20";
@@ -156,6 +158,7 @@ export function Roadmap({ model, areaId, inicial, canEdit }: { model: Model; are
                           <Ring value={n.pct} size={44} stroke={5} color={color} track="var(--color-border-default)">
                             <span className="rm-dot-inner">{n.m.id.replace("M-", "M")}</span>
                           </Ring>
+                          <CompletionCheck complete={n.m.cierreVerificado ?? milestoneCompletado(n.m, model)} label={`${n.m.id}: entrega completa verificada`} id={n.m.id} />
                         </span>
                         <span className="rm-label">
                           <span className="rm-date">
