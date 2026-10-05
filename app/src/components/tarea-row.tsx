@@ -5,6 +5,8 @@ import { VisibilidadToggle } from "@/components/editor/visibilidad-toggle";
 import { AreaDot, CriticalBadge, StatusBadge } from "@/components/ui";
 import { fmtCorta } from "@/lib/dates";
 import type { Model, Tarea } from "@/lib/model";
+import { tareaCompletada } from "@/lib/completion";
+import { CompletionCheck } from "@/components/completion-check";
 
 export function TareaRow({ t, model, canEdit, showArea = false }: { t: Tarea; model: Model; canEdit: boolean; showArea?: boolean }) {
   const hu = t.historiaId ? model.huById.get(t.historiaId) : null;
@@ -18,6 +20,7 @@ export function TareaRow({ t, model, canEdit, showArea = false }: { t: Tarea; mo
             {t.id}
           </Link>
           <span className="tarea-name">{t.nombre}</span>
+          <CompletionCheck complete={tareaCompletada(t, model)} label={model.capa === "oficial" ? "Tarea completada, aprobada y publicada" : "Implementación completada con evidencia"} id={t.id} />
         </div>
         <div className="tarea-meta">
           <StatusBadge estado={t.estado} size="sm" />
@@ -27,7 +30,7 @@ export function TareaRow({ t, model, canEdit, showArea = false }: { t: Tarea; mo
             </Link>
           )}
           <span className={vencida ? "meta-late" : ""} title={t.estado === "Hecha" ? "Fecha de cierre" : "Fecha fin planificada"}>
-            {t.estado === "Hecha" ? `Cerrada ${fmtCorta(t.fechaCierre ?? t.fechaFin)}` : `Fin ${fmtCorta(t.fechaFin)}`}
+            {t.estado === "Hecha" ? (t.fechaCierre ? `Cerrada ${fmtCorta(t.fechaCierre)}` : "Cierre sin fecha registrada") : `Fin ${fmtCorta(t.fechaFin)}`}
           </span>
           {t.rutaCritica && <CriticalBadge />}
           {canEdit && !t.visibleCliente && <span className="chip tone-slate">Oculta a Ecopetrol</span>}

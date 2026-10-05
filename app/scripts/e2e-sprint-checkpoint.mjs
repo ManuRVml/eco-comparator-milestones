@@ -28,6 +28,9 @@ try {
     assert.match(await panel.innerText(), /Una semana/); passed++;
     assert.equal(await panel.locator(".tarea-row").count(), 7); passed++;
     assert.ok(!(await node.innerText()).includes("Cumplido")); passed++;
+    assert.match(await panel.getByTestId("expected-S0").innerText(), /H-01/); passed++;
+    assert.equal(await page.getByTestId("check-S0").count(), 0); passed++;
+    assert.match(await panel.getByTestId("checkpoint-progress").innerText(), /Peso en el nodo[\s\S]*Aporte al total/i); passed++;
     if (role === "cliente") { assert.equal(await panel.locator(".tarea-edit,.tarea-evidencia").count(), 0); passed++; }
     else { assert.match(await panel.innerText(), /H-01/); passed++; }
     await page.keyboard.press("Escape");
