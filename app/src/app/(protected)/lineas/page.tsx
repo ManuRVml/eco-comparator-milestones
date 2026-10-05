@@ -77,7 +77,7 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
       </div>
 
       <Card className="card-flush">
-        <Roadmap model={model} areaId={areaId} inicial={typeof sp.m === "string" ? sp.m : null} canEdit={session.canEdit} />
+        <Roadmap model={model} areaId={areaId} inicial={typeof sp.m === "string" ? sp.m : null} canEdit={session.canEdit} isAdmin={session.isAdmin} />
       </Card>
 
       <div className="ms-table-wrap">

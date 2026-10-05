@@ -14,7 +14,6 @@ import { colorArea, colorEstado, colorLinea, fmtPct } from "@/lib/format";
 import { ESTADOS_MILESTONE, type Model, type Tarea } from "@/lib/model";
 import { MetricNote } from "@/components/metric-note";
 import { MilestoneDelivery } from "@/components/milestone-delivery";
-import { MilestoneContractEditor } from "@/components/editor/milestone-contract-editor";
 import { CheckpointProgress } from "@/components/checkpoint-progress";
 
 function ordenar(ts: Tarea[]) {
@@ -113,7 +112,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
       </section>
       <MilestoneDelivery m={m} model={model} />
       <MetricNote capa={model.capa} hoy={model.hoy} alcance={`${m.id} completo; el desglose por área usa las tareas de cada disciplina`} />
-      {session.canEdit && model.contratosMilestone?.[m.id] && <MilestoneContractEditor id={m.id} contract={model.contratosMilestone[m.id]} isAdmin={session.isAdmin} />}
+      {session.isAdmin && <Link className="btn btn-sm" href={`/editor?vista=configuracion&ms=${m.id}`}>Configurar valor, métricas y aceptación</Link>}
       <CheckpointProgress total={m.trabajo} areas={m.areas} completo={!!m.cierreVerificado} areaId={areaFoco} alcance="milestone" />
 
       {m.criticasVencidas.length > 0 && (
@@ -137,10 +136,10 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
       )}
 
       <div className="grid-2 value-grid">
-        <Card kicker="QUÉ RECIBE EL EQUIPO ECOPETROL" className="quote-card">
+        <Card kicker="VALOR DE REFERENCIA DEL PLAN" className="quote-card">
           <blockquote>{m.valorCliente ?? "—"}</blockquote>
         </Card>
-        <Card kicker="CRITERIO DE ACEPTACIÓN" className="criterio-card">
+        <Card kicker="CRITERIO ORIGINAL DEL PLAN" className="criterio-card">
           <p>{m.criterio ?? "—"}</p>
         </Card>
       </div>
@@ -214,10 +213,10 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
               <label className="field-label">Seguimiento del trabajo (automático o manual)</label>
               <EstadoControl tipo="milestone" id={m.id} estado={m.override ? m.estado : "Automático"} estados={["Automático", ...ESTADOS_MILESTONE]} />
               <p className="muted small">Sugerido hoy: {m.estadoSugerido}</p>
-              <div className="field-row">
+              {session.isAdmin && <div className="field-row">
                 <span className="field-label">Aprobar y publicar el milestone</span>
                 <PublicarControl tipo="milestone" id={m.id} estado={m.estado} publicada={m.publicado} fecha={m.fechaCierre} nota={m.evidencia} />
-              </div>
+              </div>}
               <div className="field-row">
                 <span className="field-label">Visible para Ecopetrol</span>
                 <VisibilidadToggle tipo="milestone" id={m.id} visible={m.visibleCliente} />

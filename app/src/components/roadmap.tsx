@@ -48,7 +48,7 @@ function ubicar(ms: MilestoneView[], areaId: string | null): { nodos: Nodo[]; fi
   return { nodos, filas: Math.max(1, ultimos.length) };
 }
 
-export function Roadmap({ model, areaId, inicial, canEdit }: { model: Model; areaId: string | null; inicial: string | null; canEdit: boolean }) {
+export function Roadmap({ model, areaId, inicial, canEdit, isAdmin = false }: { model: Model; areaId: string | null; inicial: string | null; canEdit: boolean; isAdmin?: boolean }) {
   const lineaDe = Object.fromEntries(model.milestones.map((m) => [m.id, m.lineaId ?? ""]));
   for (const sprint of model.sprints) lineaDe[`S${sprint.numero}`] = "CP";
   const jueves: string[] = [];
@@ -175,7 +175,7 @@ export function Roadmap({ model, areaId, inicial, canEdit }: { model: Model; are
                     );
                   })}
                 </div>
-                <LaneSlot lineaId={l.id} panels={Object.fromEntries(ms.map((m) => [m.id, <MilestonePanel key={m.id} m={m} model={model} canEdit={canEdit} areaId={areaId} />]))} />
+                <LaneSlot lineaId={l.id} panels={Object.fromEntries(ms.map((m) => [m.id, <MilestonePanel key={m.id} m={m} model={model} canEdit={canEdit} isAdmin={isAdmin} areaId={areaId} />]))} />
               </div>
             );
           })}
