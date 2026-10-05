@@ -1,23 +1,31 @@
-import type { MilestoneView } from "@/lib/model";
+import type { MilestoneView, Model } from "@/lib/model";
+import { definitionPending } from "@/lib/milestone-contract/domain";
+import { fmtCorta } from "@/lib/dates";
 import { CompletionCheck } from "./completion-check";
 
-export function MilestoneDelivery({ m }: { m: MilestoneView }) {
-  return <section className="checkpoint-expectation" data-testid={`delivery-${m.id}`} aria-label="Cumplimiento del hito de entrega">
-    <h4>Milestone (hito) · {m.id} <CompletionCheck complete={!!m.cierreVerificado} label="Entrega verificada, aceptada y publicada" id={`delivery-${m.id}`} /></h4>
-    <p><b>Cumplimiento: {m.cierreVerificado ? "Cumplido y confirmado" : "Pendiente de confirmación"}.</b> El porcentaje mide trabajo hacia este milestone; el estado de seguimiento indica su situación y no sustituye la aceptación del resultado.</p>
-    <p><b>Resultado para el cliente:</b> {m.valorCliente || m.nombre}</p>
-    <p><b>Criterio de aceptación:</b> {m.criterio || "Por definir; el hito no puede certificarse."}</p>
-    <p><b>Evidencia de aceptación:</b> {m.publicado && m.evidencia ? m.evidencia : "Sin registro de aceptación publicado."}</p>
-    <p className="muted small">Definición de valor pendiente: job del usuario, outcome medible, fuera de alcance y nombres del responsable y aprobador todavía no están registrados en la ficha.</p>
-    <details>
-      <summary>Contexto de valor y definición del milestone</summary>
-      <p><b>Alcance relacionado:</b> {m.huIds.length} historias de usuario · {m.tareaIds.length} tareas · {m.epicas?.replaceAll(";", " · ") || "Épicas no registradas"}.</p>
-      <p><b>Job del usuario (JTBD):</b> por registrar explícitamente; el resultado para el cliente es la referencia disponible.</p>
-      <p><b>Outcome medible:</b> por registrar con su métrica y objetivo; el porcentaje de tareas no mide el beneficio del usuario.</p>
-      <p><b>Fuera de alcance:</b> no registrado en la ficha actual.</p>
-      <p><b>Responsable del milestone y aprobador:</b> nombres no registrados en la ficha actual. El permiso de publicar no identifica al aprobador del negocio.</p>
-      <p className="muted small">Completar esta definición permite evaluar el resultado desde la perspectiva del usuario.</p>
+export function MilestoneDelivery({ m, model }: { m: MilestoneView; model: Model }) {
+  const contract = model.contratosMilestone?.[m.id], d = contract?.definicion;
+  const pending = d ? definitionPending(d) : ["definición"];
+  return <section className="milestone-delivery" data-testid={`delivery-${m.id}`} aria-label="Cumplimiento del milestone">
+    <div className="delivery-heading"><h3>{m.cierreVerificado ? "Milestone cumplido" : "Milestone pendiente"}</h3><CompletionCheck complete={!!m.cierreVerificado} label="Criterios aceptados y cumplimiento publicado" id={`delivery-${m.id}`} /><span className={`chip tone-${m.cierreVerificado ? "green" : "slate"}`}>{m.id}</span></div>
+    <p className="delivery-result"><b>Resultado esperado:</b> {m.valorCliente || m.nombre}</p>
+    <dl className="delivery-dates"><div><dt>Fecha comprometida</dt><dd>{fmtCorta(m.fechaObjetivo)}</dd></div><div><dt>Previsión actual</dt><dd>{d?.fechaPrevision ? fmtCorta(d.fechaPrevision) : "Sin previsión registrada"}</dd></div><div><dt>Aceptación publicada</dt><dd>{m.cierreVerificado ? fmtCorta(m.fechaCierre) : "Pendiente"}</dd></div></dl>
+    {d?.fechaPrevision && <p><b>Motivo de la previsión:</b> {d.motivoPrevision}</p>}
+    {pending.length > 0 && <p className="definition-pending" role="status">Definición de valor pendiente: {pending.length} campo(s) por completar. El cumplimiento no se certifica hasta completar la ficha y aceptar los criterios obligatorios.</p>}
+    <h4>Criterios de aceptación y evidencia</h4>
+    <ol className="acceptance-list">
+      {(contract?.criterios ?? []).map((c) => <li key={c.id} data-testid={`criterion-${c.id}`}>
+        <div className="delivery-heading"><b>{c.descripcion}</b><span className={`chip tone-${c.estado === "Verificado" ? "green" : "slate"}`}>{c.estado === "Verificado" ? "Aceptado" : "Pendiente"}</span><small>{c.obligatorio ? "Obligatorio" : "Complementario"}</small></div>
+        {c.estado === "Verificado" ? <p><b>Evidencia:</b> {c.evidencia} · <b>Aprobó:</b> {c.aprobador} · <b>Fecha:</b> {fmtCorta(c.fecha)}</p> : <p className="muted small">Sin aceptación vigente. {c.evidencia && "Hay una evidencia anterior pendiente de revisión."}</p>}
+      </li>)}
+    </ol>
+    {!contract?.criterios.length && <p>Por definir; el milestone no puede certificarse.</p>}
+    <details className="delivery-context"><summary>Job, outcome, responsables y alcance</summary>
+      <dl className="definition-grid">
+        {[["Job del usuario (JTBD)", d?.job], ["Outcome medible", d?.outcome], ["Métrica y meta acordada", d?.meta], ["Responsable", d?.responsable], ["Aprobador del negocio", d?.aprobador], ["Fuera de alcance", d?.fueraAlcance]].map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value || "Por definir"}</dd></div>)}
+        <div><dt>Alcance relacionado</dt><dd>{m.huIds.length} historias · {m.tareaIds.length} tareas · {m.epicas?.replaceAll(";", " · ") || "Épicas sin registrar"}</dd></div>
+      </dl>
     </details>
-    <p className="muted small">El check requiere criterio definido, tareas verificadas, historias aceptadas y registro de aprobación y publicación con fecha y evidencia.</p>
+    {m.publicado && <p className="muted small"><b>{m.cierreVerificado ? "Registro de publicación" : "Registro anterior; aceptación por criterios pendiente de confirmar"}:</b> {m.evidencia}</p>}
   </section>;
 }

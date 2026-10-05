@@ -21,6 +21,8 @@ import { ejecucionLegada } from "@/lib/workflow/domain";
 import { HttpError } from "@/lib/http-error";
 import { loadWorkflow } from "@/lib/workflow/load";
 import { insumosPendientes } from "@/lib/workflow/readiness";
+import { loadMilestoneContracts } from "@/lib/milestone-contract/load";
+import { acceptanceDate, contractAccepted } from "@/lib/milestone-contract/domain";
 export { HttpError } from "@/lib/http-error";
 
 const ahora = sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))`;
@@ -258,6 +260,12 @@ export async function cambiarPublicacion(rol: UserRole, body: Record<string, unk
     } else {
       const [m] = await tx.select({ estado: milestones.estado, origen: milestones.estadoOrigen, ev: milestones.evidencia, cierre: milestones.fechaCierre }).from(milestones).where(eq(milestones.id, id));
       if (!m) throw new HttpError(404, `${id} no existe`);
+      if (publicar) {
+        if (rol !== "admin") throw new HttpError(403, "Solo el administrador publica la aceptación del milestone");
+        const contratos = await loadMilestoneContracts(tx as unknown as typeof db, [{ id, criterio: null }]);
+        if (!contractAccepted(contratos[id], hoy)) throw new HttpError(422, "Completa la ficha y verifica cada criterio obligatorio con evidencia y aprobador antes de publicar");
+        if (fecha < acceptanceDate(contratos[id])) throw new HttpError(422, "La fecha de cumplimiento no puede ser anterior a la aceptación de sus criterios");
+      }
       const publicado = m.origen === "editor" && m.estado === "Cumplido" && !!m.cierre;
       if (publicar === publicado) return { cambiado: false };
       antes = m.ev ?? "";

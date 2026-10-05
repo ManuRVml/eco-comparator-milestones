@@ -14,6 +14,8 @@ import { colorArea, colorEstado, colorLinea, fmtPct } from "@/lib/format";
 import { ESTADOS_MILESTONE, type Model, type Tarea } from "@/lib/model";
 import { MetricNote } from "@/components/metric-note";
 import { MilestoneDelivery } from "@/components/milestone-delivery";
+import { MilestoneContractEditor } from "@/components/editor/milestone-contract-editor";
+import { CheckpointProgress } from "@/components/checkpoint-progress";
 
 function ordenar(ts: Tarea[]) {
   const hechas = ts.filter((t) => t.estado === "Hecha").sort((a, b) => (a.fechaCierre ?? "").localeCompare(b.fechaCierre ?? "") || a.id.localeCompare(b.id));
@@ -39,7 +41,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
     <main className="page" data-testid="milestone">
       <Breadcrumb items={[{ label: "Timeline de milestones", href: "/lineas" }, { label: `${m.id}` }]} />
 
-      <section className="ms-hero" style={{ "--linea": colorLinea(m.lineaId), "--c": color } as CSSProperties}>
+      <section className="ms-hero milestone-focused" style={{ "--linea": colorLinea(m.lineaId), "--c": color } as CSSProperties}>
         <div className="ms-hero-main">
           <div className="ms-hero-tags">
             <span className="line-pill" style={{ background: colorLinea(m.lineaId) }}>
@@ -50,6 +52,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
             <span className="muted small">{m.override ? "Estado ajustado por el editor" : "Estado sugerido automáticamente"}</span>
           </div>
           <h2>{m.nombre}</h2>
+          <span className={`chip tone-${m.cierreVerificado ? "green" : "slate"}`}>{m.cierreVerificado ? "Cumplido y confirmado" : "Cumplimiento pendiente"}</span>
           <dl className="ms-meta">
             <div>
               <dt>Fecha objetivo</dt>
@@ -108,8 +111,10 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
           </div>
         </div>
       </section>
+      <MilestoneDelivery m={m} model={model} />
       <MetricNote capa={model.capa} hoy={model.hoy} alcance={`${m.id} completo; el desglose por área usa las tareas de cada disciplina`} />
-      <MilestoneDelivery m={m} />
+      {session.canEdit && model.contratosMilestone?.[m.id] && <MilestoneContractEditor id={m.id} contract={model.contratosMilestone[m.id]} isAdmin={session.isAdmin} />}
+      <CheckpointProgress total={m.trabajo} areas={m.areas} completo={!!m.cierreVerificado} areaId={areaFoco} alcance="milestone" />
 
       {m.criticasVencidas.length > 0 && (
         <div className="alert tone-amber" role="status">
@@ -125,7 +130,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
         </div>
       )}
 
-      {m.publicado && (
+      {m.cierreVerificado && (
         <div className="alert tone-green" role="status">
           <strong>Entregado el {fmtLarga(m.fechaCierre)}:</strong> {m.evidencia}
         </div>

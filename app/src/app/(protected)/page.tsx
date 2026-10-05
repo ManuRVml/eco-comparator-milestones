@@ -11,6 +11,7 @@ import { MetricNote } from "@/components/metric-note";
 import { DeliveryNote } from "@/components/delivery-note";
 import { SprintReviews } from "@/components/sprint-reviews";
 import { CompletionCheck } from "@/components/completion-check";
+import { MilestoneOverview } from "@/components/milestone-overview";
 
 const HU_ORDEN = ["Aceptada", "Lista para demo", "En curso", "No iniciada", "Bloqueada"];
 
@@ -36,6 +37,8 @@ export default async function DashboardPage() {
 
   return (
     <main className="page" data-testid="dashboard">
+      <MilestoneOverview model={model} />
+      <details className="work-summary"><summary>Trabajo hacia los milestones · {fmtPct(of.pctReal)} publicado{tec && ` · ${fmtPct(tec.pctReal)} técnico`}</summary>
       <section className="hero">
         <div className="hero-copy">
           <span className="hero-kicker">
@@ -111,6 +114,7 @@ export default async function DashboardPage() {
           </div>
         </section>
       )}
+      </details>
 
       <MetricNote capa={model.capa} hoy={model.hoy} alcance="Proyecto completo; cabecera oficial y detalle según la capa indicada" />
       <DeliveryNote />

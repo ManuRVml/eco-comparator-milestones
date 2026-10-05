@@ -1,5 +1,6 @@
 import type { MilestoneView, Model, Tarea } from "./model";
 import { insumosPendientes } from "./workflow/readiness";
+import { acceptanceDate, contractAccepted } from "./milestone-contract/domain";
 
 export function tareaCompletada(t: Tarea, model: Pick<Model, "capa" | "hoy">): boolean {
   if (t.estado !== "Hecha") return false;
@@ -22,9 +23,7 @@ export function tareaVerificada(t: Tarea, model: Model): boolean {
 }
 
 export function milestoneCompletado(m: MilestoneView, model: Model): boolean {
-  const tasks = m.tareaIds.map((id) => model.tareaById.get(id));
-  const hus = m.huIds.map((id) => model.huById.get(id));
-  return !!m.criterio?.trim() && m.publicado && !!m.fechaCierre && m.fechaCierre <= model.hoy && !!m.evidencia?.trim() &&
-    tasks.length > 0 && tasks.every((t) => !!t && tareaVerificada(t, model)) &&
-    hus.every((h) => !!h && h.estado === "Aceptada");
+  const contract = model.contratosMilestone?.[m.id];
+  return m.publicado && !!m.fechaCierre && m.fechaCierre <= model.hoy && !!m.evidencia?.trim() &&
+    contractAccepted(contract, model.hoy) && !!contract && m.fechaCierre >= acceptanceDate(contract);
 }

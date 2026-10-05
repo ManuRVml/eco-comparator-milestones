@@ -742,3 +742,53 @@
 .sprint-reviews a { display: grid; gap: 10px; height: 100%; padding: 14px; border: 1px solid var(--color-border-default); border-radius: var(--radius-md); font-size: 12px; }
 .sprint-reviews a:hover { border-color: var(--color-brand-primary); }
 .ms-panel > .checkpoint-expectation { margin: 12px 20px; }
+.milestone-overview, .milestone-delivery { padding: 22px; border: 1px solid var(--color-border-default); border-radius: var(--radius-card); background: var(--color-surface-card); min-width: 0; }
+.milestone-overview { border-top: 4px solid var(--color-brand-primary); }
+.milestone-overview h2 { margin: 8px 0 16px; font-size: clamp(20px, 2vw, 28px); }
+.milestone-counts { display: flex; gap: 36px; margin-bottom: 16px; }
+.milestone-counts div { display: grid; gap: 3px; }
+.milestone-counts strong { font-size: 32px; color: var(--color-brand-primary); }
+.milestone-counts span { font-size: 12px; }
+.next-milestone h3 { margin: 10px 0; font-size: 18px; }
+.next-milestone p { margin: 8px 0; }
+.work-summary { border: 1px solid var(--color-border-default); border-radius: var(--radius-card); padding: 12px 16px; background: var(--color-surface-card); }
+.work-summary > summary { cursor: pointer; font-weight: 600; font-size: 13px; }
+.work-summary .hero, .work-summary .internal-band { margin-top: 14px; }
+.milestone-delivery h3, .milestone-delivery h4 { margin: 0; }
+.delivery-heading { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.delivery-result { font-size: 15px; line-height: 1.5; }
+.delivery-dates, .definition-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); gap: 12px; }
+.delivery-dates dt, .definition-grid dt { font-size: 11px; color: var(--color-text-muted); }
+.delivery-dates dd, .definition-grid dd { margin: 5px 0 0; font-size: 13px; overflow-wrap: anywhere; }
+.definition-pending { font-size: 12px; padding: 10px; background: var(--color-brand-primary-faint); border-radius: var(--radius-control); }
+.acceptance-list { display: grid; gap: 10px; padding-left: 20px; font-size: 13px; line-height: 1.5; }
+.acceptance-list li { padding: 10px; border-bottom: 1px solid var(--color-border-default); overflow-wrap: anywhere; }
+.delivery-context { margin-top: 12px; }
+.sprint-milestone-links ul { padding-left: 18px; font-size: 13px; }
+.sprint-milestone-links small { display: block; color: var(--color-text-muted); margin: 5px 0 12px; }
+.ms-panel > .milestone-delivery { margin-top: 16px; }
+.ms-hero.milestone-focused { grid-template-columns: 1fr; padding: 18px 22px; gap: 12px; }
+.milestone-focused .ms-hero-gauge { display: none; }
+.rm-milestone-dot::before { content: ''; position: absolute; inset: -3px; border: 1px solid var(--color-border-default); border-radius: 5px; transform: rotate(45deg); pointer-events: none; }
+.agenda-card, .agenda-ms, .agenda-ms-item, .agenda-ms-head { min-width: 0; overflow-wrap: anywhere; }
+.agenda-ms-head { flex-wrap: wrap; }
+@media (max-width: 760px) {
+  .milestone-overview, .milestone-delivery { padding: 16px; }
+  .milestone-overview h2 { font-size: 20px; }
+  .next-milestone h3 { font-size: 16px; }
+  .milestone-counts { gap: 28px; }
+  .milestone-focused .ms-meta { display: none; }
+  .milestone-focused h2 { font-size: 20px; margin: 10px 0; }
+  .milestone-focused .ms-hero-tags .muted { display: none; }
+  .delivery-dates { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .agenda-item { grid-template-columns: 1fr; gap: 10px; }
+  .agenda-date { width: auto; flex-direction: row; gap: 10px; justify-content: flex-start; padding: 8px 12px; }
+  .agenda-date .agenda-day { font-size: 24px; }
+  .agenda-card { padding: 14px; }
+  .contribution-table thead { display: none; }
+  .contribution-table, .contribution-table tbody { display: block; width: 100%; }
+  .contribution-table tr { display: block; padding: 10px; border: 1px solid var(--color-border-default); margin-bottom: 10px; border-radius: var(--radius-control); }
+  .contribution-table td { display: flex; justify-content: space-between; gap: 8px; white-space: normal; padding: 5px 0; border: 0; }
+  .contribution-table td:first-child { display: block; }
+  .contribution-table td[data-label]::before { content: attr(data-label); color: var(--color-text-muted); font-size: 12px; }
+}

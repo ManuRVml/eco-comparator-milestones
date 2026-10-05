@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import { index, integer, primaryKey, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
 export * from "./workflow-schema";
+export * from "./milestone-schema";
 
 /**
  * Columnas "de plan": vienen del Excel y el import las sobrescribe.

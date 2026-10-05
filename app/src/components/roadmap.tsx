@@ -152,9 +152,9 @@ export function Roadmap({ model, areaId, inicial, canEdit }: { model: Model; are
                         href={`/lineas?${areaId ? `area=${areaId}&` : ""}m=${n.m.id}`}
                         className={`rm-node ${align} ${n.sinTareas ? "is-muted" : ""}`}
                         style={{ left: `${n.x}%`, "--fila": n.fila, "--c": color, "--p": `${n.pct}%` } as CSSProperties}
-                        title={`${n.m.id} · ${n.m.nombre} (clic para ver entregables)`}
+                        title={`${n.m.id} · ${n.m.nombre} (clic para ver criterio y aceptación)`}
                       >
-                        <span className="rm-dot">
+                        <span className="rm-dot rm-milestone-dot">
                           <Ring value={n.pct} size={44} stroke={5} color={color} track="var(--color-border-default)">
                             <span className="rm-dot-inner">{n.m.id.replace("M-", "M")}</span>
                           </Ring>

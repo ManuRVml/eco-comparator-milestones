@@ -69,13 +69,13 @@ export function MilestonePanel({ m, model, canEdit, areaId = null }: { m: Milest
         </div>
       </header>
 
+      <MilestoneDelivery m={m} model={model} />
       <MetricNote capa={model.capa} hoy={model.hoy} alcance={`${m.id}${areaId ? ` · ${model.areaById.get(areaId)?.nombre}` : " · tareas de este milestone"}`} />
-      <MilestoneDelivery m={m} />
 
       <div className="ms-panel-body">
         <div className="ms-panel-col">
           {canEdit && <MilestoneWorkflow id={m.id} model={model} editar />}
-          {m.publicado && (
+          {m.cierreVerificado && (
             <p className="ms-entregado" data-testid={`entregado-${m.id}`}>
               <b>Entregado el {fmtCorta(m.fechaCierre)}</b> · {m.evidencia}
             </p>
