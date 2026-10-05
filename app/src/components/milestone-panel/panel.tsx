@@ -47,6 +47,7 @@ export function MilestonePanel({ m, model, canEdit, areaId = null }: { m: Milest
             <span className={`chip tone-${p.tono}`}>{p.texto}</span>
           </div>
           <h3>{m.nombre}</h3>
+          <p className="muted small">{areaId ? "Trabajo del área hacia el milestone" : "Trabajo hacia el milestone"}: {Math.round(porcentaje)} %. Cumplimiento: {m.cierreVerificado ? "confirmado" : "pendiente"}.</p>
           <p className="ms-panel-meta">
             <b>
               {fmtDiaSemana(m.fechaObjetivo ?? model.hoy, true)} {fmtCorta(m.fechaObjetivo)}
@@ -86,7 +87,7 @@ export function MilestonePanel({ m, model, canEdit, areaId = null }: { m: Milest
           <div className="ms-panel-block">
             <h4>Dependencias</h4>
             {deps.length === 0 ? (
-              <p className="muted small">Sin dependencias con otros milestones.</p>
+              <p className="muted small">Sin dependencias con otros milestones (hitos).</p>
             ) : (
               <ul className="panel-deps">
                 {deps.map((d) => {

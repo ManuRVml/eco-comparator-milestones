@@ -47,7 +47,7 @@ export default async function LoginPage() {
             que verás en cada weekly, en un solo entorno.
           </p>
           <ul className="flex flex-col gap-16">
-            <Feature icon={<TrendUpIcon size={18} />} title="Líneas de tiempo" subtitle="Milestones y entregables por línea de valor" />
+            <Feature icon={<TrendUpIcon size={18} />} title="Timeline de milestones" subtitle="Resultados, criterios y avance por línea de valor" />
             <Feature icon={<BarChartIcon size={18} />} title="Avance oficial" subtitle="Lo entregado y publicado en cada weekly" />
             <Feature icon={<ClockIcon size={18} />} title="Qué verás y cuándo" subtitle="Agenda de demos por jueves de weekly" />
           </ul>

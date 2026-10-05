@@ -167,8 +167,9 @@ export function Roadmap({ model, areaId, inicial, canEdit }: { model: Model; are
                           <span className="rm-name">{n.m.nombre}</span>
                           <span className="rm-stat">
                             <i style={{ background: color }} />
-                            {n.sinTareas ? `Sin tareas de ${areaNombre}` : `${fmtPct(n.pct)} · ${n.m.estadoFinal}`}
+                            {n.sinTareas ? `Sin tareas de ${areaNombre}` : `Trabajo ${fmtPct(n.pct)}`}
                           </span>
+                          <span className="rm-comparison">{n.m.cierreVerificado ? "Milestone cumplido" : "Milestone pendiente"}</span>
                         </span>
                       </RoadmapNode>
                     );

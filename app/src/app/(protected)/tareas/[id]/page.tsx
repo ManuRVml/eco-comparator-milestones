@@ -102,7 +102,7 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
               <TareaLinks ids={model.sucesoras.get(t.id) ?? []} model={model} vacio="Ninguna tarea depende de esta." />
             </Card>
           </div>
-          <Card kicker="CONTEXTO" title="Historia y milestone">
+          <Card kicker="CONTEXTO" title="Trabajo que habilita el milestone">
             <ul className="dep-list">
               {hu && (
                 <li>
@@ -124,7 +124,7 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
                   </Link>
                 </li>
               ))}
-              {!hu && ms.length === 0 && <Empty>Sin HU ni milestone asociados.</Empty>}
+              {!hu && ms.length === 0 && <Empty>Sin historia ni milestone (hito) asociados.</Empty>}
             </ul>
           </Card>
         </div>

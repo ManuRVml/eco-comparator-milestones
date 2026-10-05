@@ -55,3 +55,13 @@ El resumen distingue hitos de entrega confirmados de sus estados de seguimiento.
 Los siete puntos de revisión aparecen también en el resumen, con resultado esperado y comparación de ejecución prevista/real. Los paneles y detalles de hitos explican el resultado para el cliente, el criterio y el cumplimiento confirmado. Terminar un periodo no certifica un hito, y un hito puede abarcar varios sprints. Se eliminó otra sustitución de fecha real de cierre por fecha planificada en entregas recientes.
 
 Validación de esta ampliación: seis casos de correlación en un archivo y 38 comprobaciones de interfaz en otro; lint de archivos modificados y compilación con TypeScript correctos. Se reutiliza la evidencia de las tres pruebas de ponderación, cuyo código no cambió. No hay migraciones ni escrituras sobre datos de producción.
+
+## Alineación con la guía de milestones aportada
+
+Referencia preservada: `guia-milestones-contexto.md`, copia del documento proporcionado por el usuario. Sus ejemplos no se convierten en compromisos del proyecto.
+
+La navegación, el resumen, el timeline, las fichas, la agenda y las vistas de áreas usan el término milestone (hito). Los porcentajes se identifican como trabajo hacia el milestone, separado del cumplimiento binario. La tabla muestra seguimiento y cumplimiento en columnas distintas. Las revisiones de sprint conservan sus siete nodos, incluido Sprint 0.
+
+Las fichas exponen resultado, criterio y evidencia disponible, y señalan que faltan job/outcome explícitos, fuera de alcance y nombres de responsable/aprobador. No se deducen estos datos de permisos de publicación ni de ejemplos. La agenda dejó de declarar una fecha pasada como realizada y usa ponderación por esfuerzo para el trabajo hacia cada milestone.
+
+Validación: 44 comprobaciones de interfaz en un archivo; lint de fuentes modificadas y compilación TypeScript correctos. Se conserva la evidencia de pruebas de cálculo y cumplimiento cuyos módulos no cambiaron. Revisión de diseño sobre los archivos modificados: se reutilizan componentes y reglas existentes; sin nuevas dependencias ni duplicación de reglas de cumplimiento. Los datos guardados permanecen intactos.

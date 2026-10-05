@@ -23,8 +23,8 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
 
   return (
     <main className="page" data-testid="timeline">
-      <PageHeading kicker="ROADMAP 21 SEP – 18 DIC 2026" title="Líneas de tiempo">
-        Siete puntos de revisión al cierre de sprint, incluido Sprint 0, y diez hitos de entrega en tres líneas de valor.{" "}
+      <PageHeading kicker="ROADMAP 21 SEP – 18 DIC 2026" title="Timeline de milestones">
+        Siete puntos de revisión al cierre de sprint, incluido Sprint 0, y diez milestones (hitos) en tres líneas de valor.{" "}
         {model.capa === "oficial"
           ? "Los nodos muestran el avance oficial entregado y su estado. Haz clic en un nodo para ver sus entregables."
           : "Vista de equipo: los nodos muestran el avance técnico interno (no visible para el equipo Ecopetrol). Haz clic en un nodo para ver sus entregables."}
@@ -81,15 +81,15 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
       </Card>
 
       <div className="ms-table-wrap">
-        <Card kicker={areaId ? `FILTRO: ${model.areaById.get(areaId)?.nombre?.toUpperCase()}` : "DETALLE"} title="Hitos de entrega por fecha">
+        <Card kicker={areaId ? `FILTRO: ${model.areaById.get(areaId)?.nombre?.toUpperCase()}` : "DETALLE"} title="Milestones: fecha y cumplimiento">
           <table className="table ms-table">
             <thead>
               <tr>
-                <th>Hito de entrega</th>
+                <th>Milestone (hito)</th>
                 <th>Línea</th>
-                <th>Fecha</th>
-                <th>Estado</th>
-                <th className="w-bar">{areaId ? "Avance del área" : model.capa === "oficial" ? "Avance oficial" : "Avance técnico"}</th>
+                <th>Fecha objetivo</th>
+                <th>Seguimiento</th><th>Cumplimiento</th>
+                <th className="w-bar">{areaId ? "Trabajo del área" : model.capa === "oficial" ? "Trabajo publicado" : "Trabajo técnico"}</th>
                 <th className="num">SP</th>
               </tr>
             </thead>
@@ -116,6 +116,7 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
                     <td>
                       <StatusBadge estado={m.estadoFinal} size="sm" />
                     </td>
+                    <td><span className={`chip tone-${m.cierreVerificado ? "green" : "slate"}`}>{m.cierreVerificado ? "Cumplido" : "Pendiente"}</span></td>
                     <td>
                       {areaId && !a ? (
                         <span className="muted">Sin tareas del área</span>
