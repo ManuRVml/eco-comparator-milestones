@@ -22,7 +22,7 @@ export default async function ProtectedLayout({ children }: { children: ReactNod
         <header className="app-header">
           <div className="app-header-strip" aria-hidden="true" />
           <div className="app-header-bar">
-            <HeaderTitle />
+            <HeaderTitle isAdmin={role === "admin"} />
             <div className="app-header-right">
               <LiveSync />
               <span className="partner-logo" title="Ecopetrol">
@@ -38,7 +38,8 @@ export default async function ProtectedLayout({ children }: { children: ReactNod
             </div>
           </div>
         </header>
-        <div className="app-content">{children}</div>
+        <a className="skip-link" href="#main-content">Saltar al contenido</a>
+        <div className="app-content" id="main-content" tabIndex={-1}>{children}</div>
         <footer className="app-footer">
           <span>BenchHub · MVP Ecopetrol</span>
           <span>{canEdit ? "Vista de equipo: incluye elementos internos" : "Vista Equipo Ecopetrol"}</span>

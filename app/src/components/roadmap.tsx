@@ -3,7 +3,7 @@ import { MilestonePanel } from "@/components/milestone-panel/panel";
 import { Ring } from "@/components/ui";
 import { LaneSlot, PanelProvider, RoadmapNode } from "@/components/milestone-panel/panel-client";
 import { addDays, daysBetween, fmtCorta, fmtDiaSemana, isoWeekday, mesLargo } from "@/lib/dates";
-import { colorEstado, colorLinea, fmtPct } from "@/lib/format";
+import { colorEstado, colorLinea, fmtPct, textoLinea } from "@/lib/format";
 import type { MilestoneView, Model } from "@/lib/model";
 import { SprintCheckpointRow } from "@/components/sprint-checkpoint-row";
 import { progresoLinea } from "@/lib/line-progress";
@@ -132,7 +132,7 @@ export function Roadmap({ model, areaId, inicial, canEdit, isAdmin = false }: { 
             const { nodos, filas } = ubicar(ms, areaId);
             const progreso = progresoLinea(model, l.id, areaId);
             return (
-              <div className="rm-row rm-lane" key={l.id} style={{ "--filas": filas, "--linea": colorLinea(l.id) } as CSSProperties}>
+              <div className="rm-row rm-lane" key={l.id} style={{ "--filas": filas, "--linea": colorLinea(l.id), "--linea-text": textoLinea(l.id) } as CSSProperties}>
                 <div className="rm-lane-label">
                   <span className="rm-lane-id">{l.id}</span>
                   <strong>{l.nombre}</strong>
@@ -145,6 +145,8 @@ export function Roadmap({ model, areaId, inicial, canEdit, isAdmin = false }: { 
                   {nodos.map((n) => {
                     const color = colorEstado(n.m.estadoFinal);
                     const align = n.x > 93 ? "is-right" : n.x < 7 ? "is-left" : "";
+                    const area = areaId ? n.m.areas.find((a) => a.areaId === areaId) : null;
+                    const aporteArea = area && n.m.trabajo.dias ? (area.diasHechos / n.m.trabajo.dias) * 100 : 0;
                     return (
                       <RoadmapNode
                         key={n.m.id}
@@ -167,8 +169,9 @@ export function Roadmap({ model, areaId, inicial, canEdit, isAdmin = false }: { 
                           <span className="rm-name">{n.m.nombre}</span>
                           <span className="rm-stat">
                             <i style={{ background: color }} />
-                            {n.sinTareas ? `Sin tareas de ${areaNombre}` : `Trabajo ${fmtPct(n.pct)}`}
+                            {n.sinTareas ? `Sin tareas de ${areaNombre}` : areaId ? `${areaNombre} · ${fmtPct(area?.pctReal ?? 0)}` : `Trabajo ${fmtPct(n.m.pctPonderado)}`}
                           </span>
+                          {areaId && <span className="rm-comparison">Total milestone {fmtPct(n.m.pctPonderado)} · aporte del área {aporteArea.toFixed(1).replace(".", ",")} pts</span>}
                           <span className="rm-comparison">{n.m.cierreVerificado ? "Milestone cumplido" : "Milestone pendiente"}</span>
                         </span>
                       </RoadmapNode>

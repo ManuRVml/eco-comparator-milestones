@@ -128,7 +128,7 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
             </ul>
           </Card>
         </div>
-        <aside className="detail-side">
+        <div className="detail-side">
           {session.canEdit && (
             <Card kicker="EDITOR" title="Estado de la tarea" className="editor-card">
               <EstadoControl tipo="tarea" id={t.id} estado={t.estado} estados={ESTADOS_TAREA} evidencia={t.evidencia} />
@@ -150,7 +150,7 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
           )}
           <Notas model={model} entidadTipo="tarea" entidadId={t.id} canEdit={session.canEdit} />
           {session.canEdit && <Historial rows={log} />}
-        </aside>
+        </div>
       </div>
     </main>
   );

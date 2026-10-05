@@ -91,7 +91,7 @@ export default async function HistoriaPage({ params }: PageProps<"/historias/[id
                 const ah = at.filter((t) => t.estado === "Hecha").length;
                 return (
                   <div key={a.id} className="hu-area">
-                    <h5>
+                    <h4>
                       <AreaDot areaId={a.id} /> {a.nombre}
                       <span className="hu-area-bar">
                         <ProgressBar value={(ah / at.length) * 100} color={colorArea(a.id)} height={6} label={a.nombre} />
@@ -99,7 +99,7 @@ export default async function HistoriaPage({ params }: PageProps<"/historias/[id
                       <em>
                         {ah}/{at.length}
                       </em>
-                    </h5>
+                    </h4>
                     <ul className="tarea-list">
                       {at.map((t) => (
                         <TareaRow key={t.id} t={t} model={model} canEdit={session.canEdit} />
@@ -115,7 +115,7 @@ export default async function HistoriaPage({ params }: PageProps<"/historias/[id
             </Card>
           )}
         </div>
-        <aside className="detail-side">
+        <div className="detail-side">
           {session.canEdit && (
             <Card kicker="EDITOR" title="Estado de la HU" className="editor-card">
               <EstadoControl tipo="historia" id={h.id} estado={h.estado} estados={ESTADOS_HISTORIA} evidencia={h.evidencia} />
@@ -150,7 +150,7 @@ export default async function HistoriaPage({ params }: PageProps<"/historias/[id
           )}
           <Notas model={model} entidadTipo="historia" entidadId={h.id} canEdit={session.canEdit} />
           {session.canEdit && <Historial rows={log} />}
-        </aside>
+        </div>
       </div>
     </main>
   );

@@ -27,10 +27,12 @@ export function AreaBullets({
         const atrasada = a.brecha < 0 && a.pctPlan > 0;
         return (
           <div className="bullet-row" role="row" key={a.areaId}>
-            <Link className="bullet-label" role="rowheader" href={`${linkBase}${a.areaId}`}>
-              <AreaDot areaId={a.areaId} />
-              <span>{a.nombre}</span>
-            </Link>
+            <span className="bullet-row-head" role="rowheader">
+              <Link className="bullet-label" href={`${linkBase}${a.areaId}`}>
+                <AreaDot areaId={a.areaId} />
+                <span>{a.nombre}</span>
+              </Link>
+            </span>
             <div className="bullet-track" role="cell">
               {[25, 50, 75].map((t) => (
                 <span key={t} className="bullet-grid" style={{ left: `${t}%` }} aria-hidden="true" />

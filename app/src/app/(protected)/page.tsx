@@ -4,7 +4,7 @@ import { AreaBullets } from "@/components/area-chart";
 import { AreaDot, Card, Empty, MiniRing, ProgressBar, Ring, StatusBadge } from "@/components/ui";
 import { getModel, requireSession } from "@/lib/data";
 import { daysBetween, fmtCorta, fmtDiaSemana, fmtLarga, relativo } from "@/lib/dates";
-import { colorEstado, colorLinea, fmtPct, TONE_COLOR, tono } from "@/lib/format";
+import { colorEstado, colorLinea, fmtPct, TONE_COLOR, TONE_TEXT_COLOR, tono } from "@/lib/format";
 import { ESTADOS_MILESTONE, type Model } from "@/lib/model";
 import { progresoLinea } from "@/lib/line-progress";
 import { MetricNote } from "@/components/metric-note";
@@ -205,7 +205,7 @@ export default async function DashboardPage() {
           </div>
           <div className="ms-dots">
             {model.milestones.map((m) => (
-              <Link key={m.id} href={`/milestones/${m.id}`} className="ms-dot" style={{ background: colorEstado(m.estadoFinal) }} title={`${m.id} · Seguimiento: ${m.estadoFinal} · ${m.cierreVerificado ? "Entrega confirmada" : "Entrega pendiente de confirmación"}`}>
+              <Link key={m.id} href={`/milestones/${m.id}`} className="ms-dot" style={{ background: colorEstado(m.estadoFinal), color: TONE_TEXT_COLOR[tono(m.estadoFinal)] }} title={`${m.id} · Seguimiento: ${m.estadoFinal} · ${m.cierreVerificado ? "Entrega confirmada" : "Entrega pendiente de confirmación"}`}>
                 {m.id.slice(2)}
               </Link>
             ))}

@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { CSSProperties } from "react";
 import { AreaDot, Ring, StatusBadge } from "@/components/ui";
 import { daysBetween, fmtCorta, fmtDiaSemana } from "@/lib/dates";
-import { colorEstado, colorLinea } from "@/lib/format";
+import { colorEstado, colorLinea, textoLinea } from "@/lib/format";
 import type { MilestoneView, Model, Tarea } from "@/lib/model";
 import { PublicarControl } from "@/components/editor/publicar-control";
 import { PanelClose } from "./panel-client";
@@ -39,14 +39,14 @@ export function MilestonePanel({ m, model, canEdit, isAdmin = false, areaId = nu
         </Ring>
         <div className="ms-panel-title">
           <div className="ms-panel-tags">
-            <span className="line-pill" style={{ background: colorLinea(m.lineaId) }}>
+            <span className="line-pill" style={{ background: colorLinea(m.lineaId), color: textoLinea(m.lineaId) }}>
               {m.lineaId}
             </span>
             <span className="ms-id">{m.id}</span>
             <StatusBadge estado={m.estadoFinal} size="sm" />
             <span className={`chip tone-${p.tono}`}>{p.texto}</span>
           </div>
-          <h3>{m.nombre}</h3>
+          <h3 id={`panel-heading-${m.id}`}>{m.nombre}</h3>
           <p className="muted small">{areaId ? "Trabajo del área hacia el milestone" : "Trabajo hacia el milestone"}: {Math.round(porcentaje)} %. Cumplimiento: {m.cierreVerificado ? "confirmado" : "pendiente"}.</p>
           <p className="ms-panel-meta">
             <b>

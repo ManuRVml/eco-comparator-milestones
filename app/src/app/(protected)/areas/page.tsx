@@ -6,7 +6,7 @@ import { TareaRow } from "@/components/tarea-row";
 import { AreaDot, Card, Empty, PageHeading, ProgressBar, Ring, StatusBadge } from "@/components/ui";
 import { getModel, requireSession } from "@/lib/data";
 import { fmtCorta } from "@/lib/dates";
-import { colorArea, colorLinea, fmtPct } from "@/lib/format";
+import { colorArea, colorLinea, fmtPct, textoLinea } from "@/lib/format";
 import { MetricNote } from "@/components/metric-note";
 
 export default async function AreasPage({ searchParams }: PageProps<"/areas">) {
@@ -176,10 +176,10 @@ function AreaDetalle({ areaId, model, canEdit, verResumen }: { areaId: string; m
             <details key={m.id} className="branch" open style={{ "--a": colorLinea(m.lineaId) } as CSSProperties}>
               <summary>
                 <span className="branch-name">
-                  <span className="line-pill" style={{ background: colorLinea(m.lineaId) }}>
+                  <span className="line-pill" style={{ background: colorLinea(m.lineaId), color: textoLinea(m.lineaId) }}>
                     {m.lineaId}
                   </span>
-                  <Link href={`/milestones/${m.id}?area=${areaId}`}>{m.id}</Link>
+                  <span className="branch-ms-id">{m.id}</span>
                   <span className="branch-ms-name">{m.nombre}</span>
                 </span>
                 <span className="branch-bar">
@@ -192,6 +192,7 @@ function AreaDetalle({ areaId, model, canEdit, verResumen }: { areaId: string; m
                   · {fmtCorta(m.fechaObjetivo)} <StatusBadge estado={m.estadoFinal} size="sm" />
                 </span>
               </summary>
+              <Link className="branch-open" href={`/milestones/${m.id}?area=${areaId}`}>Ver entrega de {m.id}</Link>
               <ul className="tarea-list">
                 {ts.map((t) => (
                   <TareaRow key={t!.id} t={t!} model={model} canEdit={canEdit} />

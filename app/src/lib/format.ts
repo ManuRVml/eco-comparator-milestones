@@ -35,6 +35,16 @@ export function colorEstado(estado: string) {
   return TONE_COLOR[tono(estado)];
 }
 
+/** Contraste AA para la etiqueta sobre el color de cada estado. */
+export const TONE_TEXT_COLOR: Record<Tone, string> = {
+  slate: "var(--color-dark-bg)",
+  cyan: "var(--color-dark-bg)",
+  green: "var(--color-dark-bg)",
+  amber: "var(--color-status-warning-note-text)",
+  red: "var(--color-dark-bg)",
+  purple: "var(--color-text-inverse)",
+};
+
 export const LINEA_COLOR: Record<string, string> = {
   L1: "var(--color-brand-primary)",
   L2: "var(--color-ai-accent)",
@@ -43,6 +53,10 @@ export const LINEA_COLOR: Record<string, string> = {
 
 export function colorLinea(id: string | null | undefined) {
   return (id && LINEA_COLOR[id]) || "var(--color-text-secondary)";
+}
+
+export function textoLinea(id: string | null | undefined) {
+  return id === "L1" ? "var(--color-text-inverse)" : "var(--color-dark-bg)";
 }
 
 /** Áreas: serie de gráficos del arquetipo (tokens brand-*, ai-accent, chart-*, status-*). */

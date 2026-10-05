@@ -18,12 +18,12 @@ export function MilestoneContractEditor({ id, contract }: { id: string; contract
   const metricFields=(m?:MilestoneContract["metricas"][number]):Field[]=>[
     {name:"nombre",label:"Indicador",value:m?.nombre},
     {name:"tipo",label:"Tipo de métrica",options:TIPOS_METRICA,value:m?.tipo},
-    {name:"unidad",label:"Unidad (%, segundos, usuarios…; cuantitativa)",value:m?.unidad,required:false},
-    {name:"comparador",label:"Condición de la meta numérica",options:COMPARADORES_METRICA,value:m?.comparador},
-    {name:"objetivo",label:"Meta numérica (solo cuantitativa)",type:"number",value:m?.objetivo??"",required:false},
-    {name:"objetivoCualitativo",label:"Resultado acordado (solo cualitativa)",value:m?.objetivoCualitativo,required:false},
+    {name:"unidad",label:"Unidad (%, segundos, usuarios…)",value:m?.unidad,required:false,when:{field:"tipo",equals:"Cuantitativa"}},
+    {name:"comparador",label:"Condición de la meta numérica",options:COMPARADORES_METRICA,value:m?.comparador,when:{field:"tipo",equals:"Cuantitativa"}},
+    {name:"objetivo",label:"Meta numérica",type:"number",value:m?.objetivo??"",required:false,when:{field:"tipo",equals:"Cuantitativa"}},
+    {name:"objetivoCualitativo",label:"Resultado acordado",value:m?.objetivoCualitativo,required:false,when:{field:"tipo",equals:"Cualitativa"}},
     {name:"metodo",label:"Cómo se medirá y con qué referencia",multiline:true,value:m?.metodo,required:false},
-    {name:"tolerancia",label:"Tolerancia en la misma unidad de la meta (opcional)",type:"number",value:m?.tolerancia??"",required:false,min:0},
+    {name:"tolerancia",label:"Tolerancia en la misma unidad de la meta (opcional)",type:"number",value:m?.tolerancia??"",required:false,min:0,when:{field:"tipo",equals:"Cuantitativa"}},
     {name:"muestraMinima",label:"Tamaño mínimo de muestra (opcional)",type:"number",value:m?.muestraMinima??"",required:false,min:1,max:1000000,step:1},
     {name:"activa",label:"Métrica vigente para aceptar la entrega",type:"checkbox",value:m?.activa??true},
   ];
@@ -46,9 +46,13 @@ export function MilestoneContractEditor({ id, contract }: { id: string; contract
     {pending.length>0&&<p className="definition-pending" role="status">Pendiente: {pending.join(" · ")}</p>}
     <WorkflowForm title="Ficha del milestone" endpoint="/api/editor/milestone" fixed={{id,accion:"ficha"}} fields={fields.map(f=>({...f,required:false}))}/>
     <p>Las métricas activas deben vincularse a criterios obligatorios. Una tolerancia vacía equivale a cero; una muestra vacía no exige un tamaño mínimo. Cambiar la definición o una métrica devuelve la aceptación a revisión y conserva el historial.</p>
-    {contract.metricas.map(m=><WorkflowForm key={m.id} title={`Métrica: ${m.nombre}`} endpoint="/api/editor/milestone" fixed={{id,accion:"metrica",metricaId:m.id}} fields={metricFields(m)} submit="Guardar métrica"/>)}
-    <WorkflowForm title="Añadir métrica" endpoint="/api/editor/milestone" fixed={{id,accion:"metrica"}} fields={metricFields()} submit="Añadir métrica"/>
-    {contract.criterios.map(c=><WorkflowForm key={c.id} title={`Criterio ${c.id}`} endpoint="/api/editor/milestone" fixed={{id,accion:"criterio",criterioId:c.id}} fields={criterionFields(c)} submit="Guardar criterio y aceptación"/>)}
-    <WorkflowForm title="Añadir criterio" endpoint="/api/editor/milestone" fixed={{id,accion:"criterio"}} fields={criterionFields()} submit="Añadir criterio"/>
+    <div className="configuration-groups" aria-label="Métricas existentes">
+      {contract.metricas.map(m=><details className="configuration-group" key={m.id}><summary>{m.nombre} · {m.tipo}{m.activa?" · Vigente":" · Inactiva"}</summary><WorkflowForm title={`Métrica: ${m.nombre}`} endpoint="/api/editor/milestone" fixed={{id,accion:"metrica",metricaId:m.id}} fields={metricFields(m)} submit="Guardar métrica"/></details>)}
+    </div>
+    <details className="configuration-group"><summary>Añadir métrica</summary><WorkflowForm title="Añadir métrica" endpoint="/api/editor/milestone" fixed={{id,accion:"metrica"}} fields={metricFields()} submit="Añadir métrica"/></details>
+    <div className="configuration-groups" aria-label="Criterios de aceptación">
+      {contract.criterios.map(c=><details className="configuration-group" key={c.id}><summary>Criterio {c.id} · {c.obligatorio?"Obligatorio":"Opcional"}</summary><WorkflowForm title={`Criterio ${c.id}`} endpoint="/api/editor/milestone" fixed={{id,accion:"criterio",criterioId:c.id}} fields={criterionFields(c)} submit="Guardar criterio y aceptación"/></details>)}
+    </div>
+    <details className="configuration-group"><summary>Añadir criterio</summary><WorkflowForm title="Añadir criterio" endpoint="/api/editor/milestone" fixed={{id,accion:"criterio"}} fields={criterionFields()} submit="Añadir criterio"/></details>
   </section>;
 }

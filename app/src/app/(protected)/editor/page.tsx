@@ -11,6 +11,7 @@ import { getModel, requireSession } from "@/lib/data";
 import { fmtCorta } from "@/lib/dates";
 import { colorLinea } from "@/lib/format";
 import { ESTADOS_MILESTONE } from "@/lib/model";
+import { RecordPagination } from "@/components/record-pagination";
 
 const VISTAS = [
   { id: "tareas", label: "Tareas" },
@@ -38,17 +39,26 @@ export default async function EditorPage({ searchParams }: PageProps<"/editor">)
   const areaId = typeof sp.area === "string" && model.areaById.has(sp.area) ? sp.area : null;
   const estado = typeof sp.estado === "string" ? sp.estado : null;
   const ms = typeof sp.ms === "string" && model.milestoneById.has(sp.ms) ? sp.ms : null;
+  const query = typeof sp.q === "string" ? sp.q.trim().slice(0, 120) : "";
+  const rawPage = Number(typeof sp.pagina === "string" ? sp.pagina : 1);
+  const requestedPage = Number.isSafeInteger(rawPage) && rawPage > 0 ? rawPage : 1;
+  const perPage = 20;
   const base = (extra: Record<string, string | null>) => {
     const p = new URLSearchParams();
-    const all = { vista, area: areaId, estado, ms, ...extra };
+    const all = { vista, area: areaId, estado, ms, q: query || null, ...extra };
     for (const [k, v] of Object.entries(all)) if (v) p.set(k, v);
     return `/editor?${p.toString()}`;
   };
 
-  const tareas = model.tareas.filter(
-    (t) => (!areaId || t.areaId === areaId) && (!estado || t.estado === estado) && (!ms || (model.milestonesPorTarea.get(t.id) ?? []).includes(ms)),
+  const filteredTasks = model.tareas.filter(
+    (t) => (!areaId || t.areaId === areaId) && (!estado || t.estado === estado) && (!ms || (model.milestonesPorTarea.get(t.id) ?? []).includes(ms)) && (!query || `${t.id} ${t.nombre}`.toLocaleLowerCase("es").includes(query.toLocaleLowerCase("es"))),
   );
-  const hus = model.historias.filter((h) => (!estado || h.estado === estado) && (!ms || (model.milestonesPorHu.get(h.id) ?? []).includes(ms)));
+  const filteredHus = model.historias.filter((h) => (!estado || h.estado === estado) && (!ms || (model.milestonesPorHu.get(h.id) ?? []).includes(ms)) && (!query || `${h.id} ${h.nombre}`.toLocaleLowerCase("es").includes(query.toLocaleLowerCase("es"))));
+  const taskPageCount = Math.max(1, Math.ceil(filteredTasks.length / perPage)), taskPage = Math.min(requestedPage, taskPageCount);
+  const huPageCount = Math.max(1, Math.ceil(filteredHus.length / perPage)), huPage = Math.min(requestedPage, huPageCount);
+  const tareas = filteredTasks.slice((taskPage - 1) * perPage, taskPage * perPage);
+  const hus = filteredHus.slice((huPage - 1) * perPage, huPage * perPage);
+  const pageHref = (target: number) => `${base({})}${base({}).includes("?") ? "&" : "?"}pagina=${target}`;
   const internas = model.notas.filter((n) => !n.visibleCliente).length;
 
   return (
@@ -78,18 +88,26 @@ export default async function EditorPage({ searchParams }: PageProps<"/editor">)
         {vista === "configuracion" ? "Define el resultado, las métricas y los criterios de cada milestone. Solo el administrador configura, registra la aceptación del negocio y publica el cumplimiento. El cliente consulta los compromisos y las evidencias; cada cambio queda en la bitácora." : "El estado técnico y su evidencia son una sugerencia interna. El equipo Ecopetrol solo ve las tareas aprobadas y publicadas. La aceptación y publicación de milestones corresponde al administrador. Todo queda en la bitácora con rol, fecha y valor anterior y nuevo."}
       </PageHeading>
 
-      <div className="tabs" role="tablist">
+      <nav className="tabs" aria-label="Vistas del panel">
         {VISTAS.filter(v => session.isAdmin || v.id !== "configuracion").map((v) => (
-          <Link key={v.id} href={`/editor?vista=${v.id}`} className={`tab ${vista === v.id ? "is-on" : ""}`} role="tab" aria-selected={vista === v.id}>
+          <Link key={v.id} href={`/editor?vista=${v.id}`} className={`tab ${vista === v.id ? "is-on" : ""}`} aria-current={vista === v.id ? "page" : undefined}>
             {v.label}
           </Link>
         ))}
-      </div>
+      </nav>
 
       {vista === "configuracion" && session.isAdmin && <MilestoneConfiguration model={model} selected={ms} />}
 
       {(vista === "tareas" || vista === "hu") && (
         <div className="toolbar is-stacked">
+          <form className="record-filters" method="get">
+            <input type="hidden" name="vista" value={vista} />
+            {areaId && <input type="hidden" name="area" value={areaId} />}
+            {estado && <input type="hidden" name="estado" value={estado} />}
+            {ms && <input type="hidden" name="ms" value={ms} />}
+            <label>Buscar por ID o nombre <input className="select" type="search" name="q" maxLength={120} defaultValue={query} /></label>
+            <button className="btn btn-ghost" type="submit">Buscar</button>
+          </form>
           {vista === "tareas" && <AreaFilter areas={model.areas} actual={areaId} base={base({ area: null })} />}
           <nav className="filter-chips" aria-label="Filtrar por estado">
             <Link href={base({ estado: null })} className={`fchip ${estado ? "" : "is-on"}`}>
@@ -116,6 +134,8 @@ export default async function EditorPage({ searchParams }: PageProps<"/editor">)
 
       {vista === "tareas" && (
         <Card className="card-flush">
+          <p className="muted small record-count">{filteredTasks.length} tareas con los filtros actuales · máximo {perPage} por página</p>
+          <RecordPagination page={taskPage} pageCount={taskPageCount} total={filteredTasks.length} href={pageHref} />
           <table className="table editor-table" data-testid="editor-tareas">
             <thead>
               <tr>
@@ -159,11 +179,14 @@ export default async function EditorPage({ searchParams }: PageProps<"/editor">)
             </tbody>
           </table>
           {tareas.length === 0 && <Empty>No hay tareas con esos filtros.</Empty>}
+          <RecordPagination page={taskPage} pageCount={taskPageCount} total={filteredTasks.length} href={pageHref} />
         </Card>
       )}
 
       {vista === "hu" && (
         <Card className="card-flush">
+          <p className="muted small record-count">{filteredHus.length} historias con los filtros actuales · máximo {perPage} por página</p>
+          <RecordPagination page={huPage} pageCount={huPageCount} total={filteredHus.length} href={pageHref} />
           <table className="table editor-table">
             <thead>
               <tr>
@@ -176,7 +199,7 @@ export default async function EditorPage({ searchParams }: PageProps<"/editor">)
               </tr>
             </thead>
             <tbody>
-              {hus.map((h) => (
+          {hus.map((h) => (
                 <tr key={h.id}>
                   <td>
                     <Link href={`/historias/${h.id}`} className="ms-cell">
@@ -199,6 +222,7 @@ export default async function EditorPage({ searchParams }: PageProps<"/editor">)
               ))}
             </tbody>
           </table>
+          <RecordPagination page={huPage} pageCount={huPageCount} total={filteredHus.length} href={pageHref} />
           {hus.length === 0 && <Empty>No hay historias con esos filtros.</Empty>}
         </Card>
       )}

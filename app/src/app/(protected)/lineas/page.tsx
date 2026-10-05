@@ -4,7 +4,7 @@ import { Roadmap } from "@/components/roadmap";
 import { Card, PageHeading, ProgressBar, StatusBadge } from "@/components/ui";
 import { getModel, requireSession } from "@/lib/data";
 import { fmtCorta, fmtLarga } from "@/lib/dates";
-import { colorEstado, colorLinea, fmtPct, TONE_COLOR } from "@/lib/format";
+import { colorEstado, colorLinea, fmtPct, TONE_COLOR, textoLinea } from "@/lib/format";
 import { ESTADOS_MILESTONE } from "@/lib/model";
 import { MetricNote } from "@/components/metric-note";
 import { DeliveryNote } from "@/components/delivery-note";
@@ -33,6 +33,8 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
 
       <MetricNote capa={model.capa} hoy={model.hoy} alcance={areaId ? `Área: ${model.areaById.get(areaId)?.nombre}; cada nodo usa sus propias tareas` : "Cada nodo usa sus propias tareas; el total usa el proyecto completo"} checkpoints />
 
+      <details className="timeline-kpis">
+      <summary><span>Proyecto · {model.capa === "oficial" ? "avance publicado" : "avance técnico interno"}: {fmtPct(model.total.pctReal)} vs. {fmtPct(model.total.pctPlan)} previsto</span><span>Desglose de tareas, SP y área</span></summary>
       <section className="strip" aria-label="Avance global">
         <div className="strip-item">
           <span>SP completados vs. planificados a la fecha</span>
@@ -55,6 +57,7 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
           <ProgressBar value={area.pctReal} plan={area.pctPlan} color={TONE_COLOR.cyan} label="Real ponderado" />
         </div>
       </section>
+      </details>
 
       <div className="toolbar">
         <AreaFilter areas={model.areas} actual={areaId} base="/lineas" />
@@ -80,7 +83,9 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
         <Roadmap model={model} areaId={areaId} inicial={typeof sp.m === "string" ? sp.m : null} canEdit={session.canEdit} isAdmin={session.isAdmin} />
       </Card>
 
-      <div className="ms-table-wrap">
+      <p className="muted small timeline-scroll-hint">El timeline se desplaza horizontalmente. Desplaza dentro de esta sección para consultar fechas y entregas posteriores.</p>
+
+      <div className="ms-table-wrap" role="region" aria-label="Milestones: fecha y cumplimiento" tabIndex={0}>
         <Card kicker={areaId ? `FILTRO: ${model.areaById.get(areaId)?.nombre?.toUpperCase()}` : "DETALLE"} title="Milestones: fecha y cumplimiento">
           <table className="table ms-table">
             <thead>
@@ -106,7 +111,7 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
                       </Link>
                     </td>
                     <td>
-                      <span className="line-pill" style={{ background: colorLinea(m.lineaId) }}>
+                      <span className="line-pill" style={{ background: colorLinea(m.lineaId), color: textoLinea(m.lineaId) }}>
                         {m.lineaId}
                       </span>
                     </td>

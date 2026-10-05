@@ -1,11 +1,12 @@
 "use client";
 
-import { createContext, type CSSProperties, type ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, type CSSProperties, type ReactNode, useCallback, useContext, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
 interface PanelCtx {
   sel: string | null;
+  isMobile: boolean;
   ultimoPorLinea: Record<string, string>;
-  toggle: (id: string) => void;
+  toggle: (id: string, trigger?: HTMLElement) => void;
   close: () => void;
 }
 
@@ -21,7 +22,7 @@ function syncUrl(id: string | null) {
   const u = new URL(window.location.href);
   if (id) u.searchParams.set("m", id);
   else u.searchParams.delete("m");
-  window.history.replaceState(null, "", `${u.pathname}${u.search}${u.hash}`);
+  window.history.pushState(window.history.state, "", `${u.pathname}${u.search}${u.hash}`);
 }
 
 function revelar(lineaId: string | undefined) {
@@ -35,6 +36,12 @@ function revelar(lineaId: string | undefined) {
 /** Estado del panel de entregables de la línea de tiempo: selección, Esc, deep link ?m=. */
 export function PanelProvider({ initial, lineaDe, children }: { initial: string | null; lineaDe: Record<string, string>; children: ReactNode }) {
   const [sel, setSel] = useState<string | null>(initial);
+  const [trigger, setTrigger] = useState<HTMLElement | null>(null);
+  const isMobile = useSyncExternalStore(
+    (notify) => { const media = window.matchMedia("(max-width: 760px)"); media.addEventListener("change", notify); return () => media.removeEventListener("change", notify); },
+    () => window.matchMedia("(max-width: 760px)").matches,
+    () => false,
+  );
   const [ultimoPorLinea, setUltimo] = useState<Record<string, string>>(() => (initial && lineaDe[initial] ? { [lineaDe[initial]]: initial } : {}));
 
   const close = useCallback(() => {
@@ -42,10 +49,46 @@ export function PanelProvider({ initial, lineaDe, children }: { initial: string 
     syncUrl(null);
   }, []);
 
+  useEffect(() => {
+    const onPopState = () => {
+      const id = new URLSearchParams(window.location.search).get("m");
+      setSel(id && id in lineaDe ? id : null);
+      setTrigger(null);
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, [lineaDe]);
+
+  useEffect(() => {
+    if (!sel || !isMobile) return;
+    const dialog = document.querySelector<HTMLElement>(`[data-testid="slot-${lineaDe[sel]}"]`);
+    if (!dialog) return;
+    const changed: { node: HTMLElement; inert: boolean }[] = [];
+    let current: HTMLElement | null = dialog;
+    while (current?.parentElement && current !== document.body) {
+      for (const sibling of Array.from(current.parentElement.children)) {
+        if (sibling !== current && sibling instanceof HTMLElement) {
+          changed.push({ node: sibling, inert: sibling.inert });
+          sibling.inert = true;
+        }
+      }
+      current = current.parentElement;
+    }
+    const priorOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    dialog.querySelector<HTMLElement>(".panel-x")?.focus();
+    return () => {
+      for (const item of changed) item.node.inert = item.inert;
+      document.body.style.overflow = priorOverflow;
+      window.requestAnimationFrame(() => trigger?.focus());
+    };
+  }, [isMobile, lineaDe, sel, trigger]);
+
   const toggle = useCallback(
-    (id: string) => {
+    (id: string, element?: HTMLElement) => {
       const next = sel === id ? null : id;
       setSel(next);
+      if (next && element) setTrigger(element);
       syncUrl(next);
       if (next) revelar(lineaDe[next]);
       if (lineaDe[id]) setUltimo((u) => ({ ...u, [lineaDe[id]]: id }));
@@ -68,7 +111,7 @@ export function PanelProvider({ initial, lineaDe, children }: { initial: string 
     return () => window.removeEventListener("keydown", onKey);
   }, [sel, close]);
 
-  const value = useMemo(() => ({ sel, ultimoPorLinea, toggle, close }), [sel, ultimoPorLinea, toggle, close]);
+  const value = useMemo(() => ({ sel, isMobile, ultimoPorLinea, toggle, close }), [sel, isMobile, ultimoPorLinea, toggle, close]);
   return (
     <Ctx.Provider value={value}>
       {children}
@@ -91,7 +134,7 @@ export function RoadmapNode({ id, href, className, style, title, children }: { i
       onClick={(e) => {
         if (e.metaKey || e.ctrlKey || e.shiftKey) return;
         e.preventDefault();
-        toggle(id);
+        toggle(id, e.currentTarget);
       }}
     >
       {children}
@@ -101,13 +144,25 @@ export function RoadmapNode({ id, href, className, style, title, children }: { i
 
 /** Ranura bajo la fila de una línea: se expande con el panel del milestone seleccionado. */
 export function LaneSlot({ lineaId, panels }: { lineaId: string; panels: Record<string, ReactNode> }) {
-  const { sel, ultimoPorLinea } = usePanel();
+  const { sel, isMobile, ultimoPorLinea } = usePanel();
   const abierto = !!sel && sel in panels;
   const mostrado = abierto ? sel : ultimoPorLinea[lineaId];
   return (
     <div
       id={`rm-slot-${lineaId}`}
       className={`rm-panel-wrap ${abierto ? "is-open" : ""}`}
+      role={abierto && isMobile ? "dialog" : undefined}
+      aria-modal={abierto && isMobile ? true : undefined}
+      aria-labelledby={abierto ? `panel-heading-${mostrado}` : undefined}
+      tabIndex={abierto && isMobile ? -1 : undefined}
+      onKeyDown={abierto && isMobile ? (event) => {
+        if (event.key !== "Tab") return;
+        const controls = Array.from(event.currentTarget.querySelectorAll<HTMLElement>('a[href],button:not(:disabled),input:not(:disabled),select:not(:disabled),textarea:not(:disabled),[tabindex]:not([tabindex="-1"])')).filter((el) => el.getClientRects().length > 0);
+        if (!controls.length) { event.preventDefault(); event.currentTarget.focus(); return; }
+        const first = controls[0], last = controls.at(-1)!;
+        if (event.shiftKey && (document.activeElement === first || !event.currentTarget.contains(document.activeElement))) { event.preventDefault(); last.focus(); }
+        else if (!event.shiftKey && (document.activeElement === last || !event.currentTarget.contains(document.activeElement))) { event.preventDefault(); first.focus(); }
+      } : undefined}
       aria-hidden={!abierto}
       inert={!abierto}
       data-testid={`slot-${lineaId}`}

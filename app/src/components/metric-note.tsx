@@ -3,7 +3,7 @@ import { fmtLarga } from "@/lib/dates";
 
 export function MetricNote({ capa, hoy, alcance, checkpoints = false }: { capa: Capa; hoy: string; alcance: string; checkpoints?: boolean }) {
   return (
-    <aside className="metric-note" aria-label="Cómo interpretar las métricas" data-testid="metric-note">
+    <div className="metric-note" role="note" aria-label="Cómo interpretar las métricas" data-testid="metric-note">
       <p><b>Trabajo hacia el milestone:</b> ponderado por días hábiles; no confirma aceptación. {capa === "oficial" ? "Solo cuenta trabajo aprobado y publicado." : "Ejecución técnica interna, pendiente de aceptación."}</p>
       <details>
         <summary>Ver fórmula, alcance y diferencia con valor entregado</summary>
@@ -14,6 +14,6 @@ export function MetricNote({ capa, hoy, alcance, checkpoints = false }: { capa: 
         <p><b>Valor entregado:</b> revisar los entregables aprobados y publicados de los milestones y las HU aceptadas. Los SP describen alcance de historias; se muestran por separado y no representan beneficio financiero. Las fechas y el estado técnico por sí solos no prueban valor entregado.</p>
         {checkpoints && <p><b>Revisiones de sprint y checks:</b> cada nodo corresponde al cierre planificado de un sprint y muestra el resultado esperado. Su porcentaje refleja el estado actual al corte, no una fotografía histórica. El check del cierre exige todo el alcance y sus correspondencias confirmadas; el filtro de área no puede certificar un sprint completo. En la capa técnica exige evidencia, integración y aceptación verificadas; en la oficial, aprobación y publicación. El check de una tarea técnica solo confirma su implementación, no la entrega del sprint. Los milestones conservan fechas y criterios propios.</p>}
       </details>
-    </aside>
+    </div>
   );
 }

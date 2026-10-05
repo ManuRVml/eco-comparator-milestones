@@ -10,7 +10,7 @@ import { TareaRow } from "@/components/tarea-row";
 import { AreaDot, Breadcrumb, Card, Chip, Empty, ProgressBar, Ring, StatusBadge } from "@/components/ui";
 import { getModel, requireSession } from "@/lib/data";
 import { fmtCorta, fmtDiaSemana, fmtLarga, relativo } from "@/lib/dates";
-import { colorArea, colorEstado, colorLinea, fmtPct } from "@/lib/format";
+import { colorArea, colorEstado, colorLinea, fmtPct, textoLinea } from "@/lib/format";
 import { ESTADOS_MILESTONE, type Model, type Tarea } from "@/lib/model";
 import { MetricNote } from "@/components/metric-note";
 import { MilestoneDelivery } from "@/components/milestone-delivery";
@@ -43,7 +43,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
       <section className="ms-hero milestone-focused" style={{ "--linea": colorLinea(m.lineaId), "--c": color } as CSSProperties}>
         <div className="ms-hero-main">
           <div className="ms-hero-tags">
-            <span className="line-pill" style={{ background: colorLinea(m.lineaId) }}>
+            <span className="line-pill" style={{ background: colorLinea(m.lineaId), color: textoLinea(m.lineaId) }}>
               {m.lineaId} · {m.linea?.nombre}
             </span>
             <span className="ms-id">{m.id}</span>
@@ -146,14 +146,14 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
 
       <div className="detail-layout">
         <div className="detail-main">
-          <div className="tabs" role="tablist">
-            <Link href={`/milestones/${m.id}?tab=area${q}`} role="tab" aria-selected={tab === "area"} className={`tab ${tab === "area" ? "is-on" : ""}`}>
+          <nav className="tabs" aria-label={`Información de ${m.id}`}>
+            <Link href={`/milestones/${m.id}?tab=area${q}`} aria-current={tab === "area" ? "page" : undefined} className={`tab ${tab === "area" ? "is-on" : ""}`}>
               Por área <span>{m.areas.length}</span>
             </Link>
-            <Link href={`/milestones/${m.id}?tab=hu${q}`} role="tab" aria-selected={tab === "hu"} className={`tab ${tab === "hu" ? "is-on" : ""}`}>
+            <Link href={`/milestones/${m.id}?tab=hu${q}`} aria-current={tab === "hu" ? "page" : undefined} className={`tab ${tab === "hu" ? "is-on" : ""}`}>
               Por historia de usuario <span>{hus.length}</span>
             </Link>
-          </div>
+          </nav>
 
           {tab === "area" ? (
             <div className="branches">
@@ -207,7 +207,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
           )}
         </div>
 
-        <aside className="detail-side">
+        <div className="detail-side">
           {session.canEdit && (
             <Card kicker="EDITOR" title="Control del milestone (hito)" className="editor-card">
               <label className="field-label">Seguimiento del trabajo (automático o manual)</label>
@@ -267,7 +267,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
           )}
 
           <Notas model={model} entidadTipo="milestone" entidadId={m.id} canEdit={session.canEdit} />
-        </aside>
+        </div>
       </div>
     </main>
   );

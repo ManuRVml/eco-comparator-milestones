@@ -6,14 +6,21 @@ import { getModel, requireSession } from "@/lib/data";
 import { db } from "@/db/client";
 import { fuentesPlan } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { RecordPagination } from "@/components/record-pagination";
 
 export default async function ReconciliacionPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const session = await requireSession();
   if (!session.canEdit) redirect("/lineas");
   const model = await getModel(session), w = model.workflow, params = await searchParams;
   const fuente = typeof params.fuente === "string" ? params.fuente : "", pendientes = params.pendientes === "1";
+  const q = typeof params.q === "string" ? params.q.trim().slice(0, 120) : "";
+  const rawPage = Number(typeof params.pagina === "string" ? params.pagina : 1);
+  const page = Number.isSafeInteger(rawPage) && rawPage > 0 ? rawPage : 1, perPage = 20;
   const [source] = fuente && w?.fuentes.some((f) => f.id === fuente) ? await db.select().from(fuentesPlan).where(eq(fuentesPlan.id, fuente)) : [];
-  const refs = w?.referencias.filter((r) => (!fuente || r.fuenteId === fuente) && (!pendientes || !w.correspondencias.some((c) => c.referenciaId === r.id))) ?? [];
+  const refs = w?.referencias.filter((r) => (!fuente || r.fuenteId === fuente) && (!pendientes || !w.correspondencias.some((c) => c.referenciaId === r.id)) && (!q || `${r.idOrigen} ${r.nombre} ${r.decision}`.toLocaleLowerCase("es").includes(q.toLocaleLowerCase("es")))) ?? [];
+  const pageCount = Math.max(1, Math.ceil(refs.length / perPage)), currentPage = Math.min(page, pageCount);
+  const pageRefs = refs.slice((currentPage - 1) * perPage, currentPage * perPage);
+  const pageHref = (target: number) => { const p = new URLSearchParams(); if (fuente) p.set("fuente", fuente); if (pendientes) p.set("pendientes", "1"); if (q) p.set("q", q); p.set("pagina", String(target)); return `/reconciliacion?${p}`; };
   const descripcion = (contenido: string): string => {
     try { const r = JSON.parse(contenido); return String(r.descripcion ?? r.columnas?.[6] ?? ""); } catch { return "Contenido pendiente de revisión"; }
   };
@@ -35,9 +42,10 @@ export default async function ReconciliacionPage({ searchParams }: { searchParam
         ]} />}
         {w.vinculos.map((v) => <p className="small" key={`${v.compromisoId}:${v.milestoneId}`}>{v.compromisoId.split(":").at(-1)} → {v.milestoneId}: {v.criterio}</p>)}
       </Card>
-      <form className="toolbar" method="get"><label>Fuente <select className="select" name="fuente" defaultValue={fuente}><option value="">Todas</option>{w.fuentes.map((f) => <option key={f.id} value={f.id}>{f.nombre}</option>)}</select></label><label><input type="checkbox" name="pendientes" value="1" defaultChecked={pendientes} /> Solo sin correspondencia</label><button className="btn btn-ghost" type="submit">Filtrar</button></form>
+      <form className="toolbar record-filters" method="get"><label>Fuente <select className="select" name="fuente" defaultValue={fuente}><option value="">Todas</option>{w.fuentes.map((f) => <option key={f.id} value={f.id}>{f.nombre}</option>)}</select></label><label>Buscar por ID o nombre <input className="select" type="search" name="q" defaultValue={q} maxLength={120} /></label><label><input type="checkbox" name="pendientes" value="1" defaultChecked={pendientes} /> Solo sin correspondencia</label><button className="btn btn-ghost" type="submit">Filtrar</button></form>
       <Card title={`Referencias · ${refs.length}`}>
-        {refs.map((r) => <details className="workflow-block" key={r.id}>
+        <RecordPagination page={currentPage} pageCount={pageCount} total={refs.length} href={pageHref} />
+        {pageRefs.map((r) => <details className="workflow-block" key={r.id}>
           <summary><b>{r.idOrigen}</b> · {r.nombre} · {r.decision}</summary>
           <p className="small">Fuente: {w.fuentes.find((f) => f.id === r.fuenteId)?.nombre}</p>
           <p className="small">{descripcion(r.contenido)}</p>
@@ -45,6 +53,7 @@ export default async function ReconciliacionPage({ searchParams }: { searchParam
           {!w.correspondencias.some((c) => c.referenciaId === r.id) && <p className="muted small">Sin asignación confirmada. No se han creado estados ni fechas para esta actividad de origen.</p>}
           {w.activo && <WorkflowForm title={`Confirmar correspondencia ${r.idOrigen}`} endpoint="/api/editor/plan" fixed={{ accion: "correspondencia", referenciaId: r.id }} fields={[{ name: "id", label: "Actividad actual", options: model.tareas.map((t) => ({ value: t.id, label: `${t.id} · ${t.nombre}` })) }, { name: "criterio", label: "Correspondencia por contenido o agrupación", multiline: true }]} submit="Confirmar relación" />}
         </details>)}
+        <RecordPagination page={currentPage} pageCount={pageCount} total={refs.length} href={pageHref} />
       </Card>
     </>}
   </main>;

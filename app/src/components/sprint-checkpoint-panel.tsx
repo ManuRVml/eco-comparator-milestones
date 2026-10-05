@@ -25,7 +25,7 @@ export function SprintCheckpointPanel({ model, numero, areaId, canEdit }: { mode
         </Ring>
         <div className="ms-panel-title">
           <div className="ms-panel-tags"><span className="ms-id">Sprint {numero}</span><StatusBadge estado={estado} size="sm" /><CompletionCheck complete={checkpoint.completo} label="Cierre completo verificado" id={`panel-${id}`} /></div>
-          <h3>{numero === 0 ? "Revisión de alistamiento · Sprint 0" : `Revisión de avance · Sprint ${numero}`}</h3>
+          <h3 id={`panel-heading-${id}`}>{numero === 0 ? "Revisión de alistamiento · Sprint 0" : `Revisión de avance · Sprint ${numero}`}</h3>
           <p className="ms-panel-meta">{fmtCorta(sprint.fechaInicio)} – {fmtCorta(sprint.fechaFin)} · {daysBetween(sprint.fechaInicio, sprint.fechaFin) < 7 ? "Una semana" : "Dos semanas"} · Total: {total.hechas}/{total.total} tareas {model.capa === "oficial" ? "entregadas" : "hechas (técnico interno)"}</p>
         </div>
         <div className="ms-panel-actions"><PanelClose /></div>
@@ -40,7 +40,9 @@ export function SprintCheckpointPanel({ model, numero, areaId, canEdit }: { mode
         <section className="sprint-milestone-links" data-testid={`enables-${id}`}><h4>Milestones que habilita esta revisión</h4><ul>{milestones.map((m) => <li key={m.id}><Link href={`/lineas?m=${m.id}`}><b>{m.id}</b> · {m.nombre}</Link><small>Contribución: {m.tareaIds.filter((id) => scope.has(id)).length} tareas relacionadas con este resultado. Revisar sus criterios para confirmar el valor.</small></li>)}</ul>{!milestones.length && <p>Sin relación confirmada con un milestone visible.</p>}</section>
         <p className="muted small">Esta revisión no certifica automáticamente los milestones relacionados. Fecha objetivo: {fmtCorta(sprint.fechaFin)}.</p>
         <MetricNote capa={model.capa} hoy={model.hoy} alcance={`Sprint ${numero} completo; desglose por área dentro del cierre`} checkpoints />
-        <CheckpointProgress total={total} areas={checkpoint.areas} completo={checkpoint.completo} areaId={areaId} />
+        <div className="table-scroll checkpoint-table-scroll" role="region" aria-label={`Avance total y por área del Sprint ${numero}`} tabIndex={0}>
+          <CheckpointProgress total={total} areas={checkpoint.areas} completo={checkpoint.completo} areaId={areaId} />
+        </div>
         <h4>{areaId ? `Tareas de ${model.areaById.get(areaId)?.nombre}` : `Tareas del Sprint ${numero}`}</h4>
         {tareas.length ? <ul className="tarea-list">{tareas.map((t) => <TareaRow key={t.id} t={t} model={model} canEdit={canEdit} showArea />)}</ul> : <p className="muted">Sin tareas de esta área en este sprint.</p>}
       </div>

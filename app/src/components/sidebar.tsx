@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { type ComponentType, useSyncExternalStore } from "react";
+import { type ComponentType, useEffect, useSyncExternalStore } from "react";
 import { logout } from "@/app/login/actions";
 import { AreasIcon, CalendarIcon, CheckIcon, EditIcon, HomeIcon, LogoutIcon, ReportIcon, TimelineIcon } from "@/components/icons";
 
@@ -11,7 +11,7 @@ type Item = { href: string; label: string; icon: ComponentType<{ size?: number }
 const ITEMS: Item[] = [
   { href: "/", label: "Resumen de milestones", icon: HomeIcon, match: (p) => p === "/" },
   { href: "/lineas", label: "Timeline de milestones", icon: TimelineIcon, match: (p) => p.startsWith("/lineas") || p.startsWith("/milestones") },
-  { href: "/areas", label: "Aporte por área", icon: AreasIcon, match: (p) => p.startsWith("/areas") },
+  { href: "/areas", label: "Avance por área", icon: AreasIcon, match: (p) => p.startsWith("/areas") },
   { href: "/agenda", label: "Agenda de milestones", icon: CalendarIcon, match: (p) => p.startsWith("/agenda") },
   { href: "/editor", label: "Panel del editor", icon: EditIcon, match: (p) => p.startsWith("/editor"), equipo: true },
   { href: "/flujo", label: "Trabajo por equipo", icon: AreasIcon, match: (p) => p.startsWith("/flujo"), equipo: true },
@@ -60,6 +60,11 @@ export function Sidebar({ canEdit, isAdmin }: { canEdit: boolean; isAdmin: boole
   const pathname = usePathname();
   const collapsed = useSyncExternalStore(suscribir, leerColapsado, () => false);
 
+  useEffect(() => {
+    if (!window.matchMedia("(max-width: 760px)").matches) return;
+    document.querySelector<HTMLElement>(".app-sidebar-nav [aria-current='page']")?.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }, [pathname]);
+
   function toggle() {
     try {
       window.localStorage.setItem(CLAVE, collapsed ? "0" : "1");
@@ -70,7 +75,7 @@ export function Sidebar({ canEdit, isAdmin }: { canEdit: boolean; isAdmin: boole
   }
 
   return (
-    <aside id="app-sidebar" className={`app-sidebar ${collapsed ? "is-collapsed" : ""}`} data-collapsed={collapsed}>
+    <aside id="app-sidebar" className={`app-sidebar ${collapsed ? "is-collapsed" : ""}`} data-collapsed={collapsed} aria-label="Menú principal de BenchHub">
       <div className="app-sidebar-inner">
       <div className="app-sidebar-brand">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -83,9 +88,9 @@ export function Sidebar({ canEdit, isAdmin }: { canEdit: boolean; isAdmin: boole
             const Icon = it.icon;
             return (
               <li key={it.href}>
-                <Link href={it.href} className={`app-nav-row ${active ? "is-active" : ""}`} aria-current={active ? "page" : undefined} title={collapsed ? it.label : undefined}>
+                <Link href={it.href} className={`app-nav-row ${active ? "is-active" : ""}`} aria-current={active ? "page" : undefined} title={collapsed ? (isAdmin && it.href === "/editor" ? "Administración" : it.label) : undefined}>
                   <Icon size={20} />
-                  <span className="app-nav-label">{it.label}</span>
+                  <span className="app-nav-label">{isAdmin && it.href === "/editor" ? "Administración" : it.label}</span>
                 </Link>
               </li>
             );
@@ -110,9 +115,9 @@ export function Sidebar({ canEdit, isAdmin }: { canEdit: boolean; isAdmin: boole
   );
 }
 
-export function HeaderTitle() {
+export function HeaderTitle({ isAdmin }: { isAdmin: boolean }) {
   const pathname = usePathname();
-  const titulo = TITULOS.find(([re]) => re.test(pathname))?.[1] ?? "Seguimiento";
+  const titulo = pathname.startsWith("/editor") && isAdmin ? "Administración" : TITULOS.find(([re]) => re.test(pathname))?.[1] ?? "Seguimiento";
   return (
     <h1 className="app-title" data-testid="app-title">
       {titulo}

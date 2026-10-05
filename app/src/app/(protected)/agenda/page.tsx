@@ -3,7 +3,7 @@ import type { CSSProperties } from "react";
 import { PageHeading, StatusBadge } from "@/components/ui";
 import { getModel, requireSession } from "@/lib/data";
 import { daysBetween, fmtDiaSemana, fmtLarga, mesCorto, relativo } from "@/lib/dates";
-import { colorEstado, colorLinea } from "@/lib/format";
+import { colorEstado, colorLinea, textoLinea } from "@/lib/format";
 
 export default async function AgendaPage() {
   const session = await requireSession();
@@ -67,7 +67,7 @@ export default async function AgendaPage() {
                     {ms.map((m) => (
                       <Link key={m.id} href={`/milestones/${m.id}`} className="agenda-ms-item" style={{ "--linea": colorLinea(m.lineaId) } as CSSProperties}>
                         <span className="agenda-ms-head">
-                          <span className="line-pill" style={{ background: colorLinea(m.lineaId) }}>
+                          <span className="line-pill" style={{ background: colorLinea(m.lineaId), color: textoLinea(m.lineaId) }}>
                             {m.lineaId}
                           </span>
                           <b>{m.id}</b>
