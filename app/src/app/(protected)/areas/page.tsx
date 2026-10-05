@@ -7,6 +7,7 @@ import { AreaDot, Card, Empty, PageHeading, ProgressBar, Ring, StatusBadge } fro
 import { getModel, requireSession } from "@/lib/data";
 import { fmtCorta } from "@/lib/dates";
 import { colorArea, colorLinea, fmtPct } from "@/lib/format";
+import { MetricNote } from "@/components/metric-note";
 
 export default async function AreasPage({ searchParams }: PageProps<"/areas">) {
   const session = await requireSession();
@@ -21,6 +22,8 @@ export default async function AreasPage({ searchParams }: PageProps<"/areas">) {
       <PageHeading kicker="EQUIPO POR DISCIPLINA" title="Avance por área">
         Siete áreas de ejecución. El avance real se pondera por días hábiles y se compara con lo planificado a la fecha en el cronograma.
       </PageHeading>
+
+      <MetricNote capa={model.capa} hoy={model.hoy} alcance={areaId ? `Área: ${model.areaById.get(areaId)?.nombre}` : "Cada área usa sus tareas; el total usa el proyecto completo"} />
 
       <AreaFilter areas={model.areas} actual={areaId} base="/areas" />
 
@@ -180,7 +183,7 @@ function AreaDetalle({ areaId, model, canEdit, verResumen }: { areaId: string; m
                   <span className="branch-ms-name">{m.nombre}</span>
                 </span>
                 <span className="branch-bar">
-                  <ProgressBar value={ap.pctTareas} color={colorArea(areaId)} height={8} label={`Avance ${m.id}`} />
+                  <ProgressBar value={ap.pctReal} color={colorArea(areaId)} height={8} label={`Avance ponderado ${m.id}`} />
                 </span>
                 <span className="branch-stats">
                   <b>

@@ -12,6 +12,7 @@ import { getModel, requireSession } from "@/lib/data";
 import { fmtCorta, fmtDiaSemana, fmtLarga, relativo } from "@/lib/dates";
 import { colorArea, colorEstado, colorLinea, fmtPct } from "@/lib/format";
 import { ESTADOS_MILESTONE, type Model, type Tarea } from "@/lib/model";
+import { MetricNote } from "@/components/metric-note";
 
 function ordenar(ts: Tarea[]) {
   const hechas = ts.filter((t) => t.estado === "Hecha").sort((a, b) => (a.fechaCierre ?? "").localeCompare(b.fechaCierre ?? "") || a.id.localeCompare(b.id));
@@ -72,8 +73,8 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
           </dl>
         </div>
         <div className="ms-hero-gauge">
-          <Ring value={m.pctTareas} size={148} stroke={13} color={color}>
-            <span className="gauge-pct is-dark">{Math.round(m.pctTareas)}%</span>
+          <Ring value={m.pctPonderado} size={148} stroke={13} color={color}>
+            <span className="gauge-pct is-dark">{Math.round(m.pctPonderado)}%</span>
             <span className="gauge-sub is-dark">
               {m.tareasHechas}/{m.tareasTotal} tareas
             </span>
@@ -106,6 +107,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
           </div>
         </div>
       </section>
+      <MetricNote capa={model.capa} hoy={model.hoy} alcance={`${m.id} completo; el desglose por área usa las tareas de cada disciplina`} />
 
       {m.criticasVencidas.length > 0 && (
         <div className="alert tone-amber" role="status">
@@ -160,7 +162,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
                         {a.nombre}
                       </span>
                       <span className="branch-bar">
-                        <ProgressBar value={a.pctTareas} color={colorArea(a.areaId)} height={8} label={`Avance ${a.nombre}`} />
+                        <ProgressBar value={a.pctReal} color={colorArea(a.areaId)} height={8} label={`Avance ponderado ${a.nombre}`} />
                       </span>
                       <span className="branch-stats">
                         <b>

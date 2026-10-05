@@ -102,7 +102,7 @@ export interface AreaProgreso {
   pctTareas: number;
   /** días hábiles hechos / días hábiles (ponderado) */
   pctReal: number;
-  /** tareas con fecha fin <= hoy / total */
+  /** días hábiles de tareas con fecha fin <= hoy / días hábiles del alcance */
   pctPlan: number;
   brecha: number;
 }
@@ -239,18 +239,20 @@ export function resumir(areaId: string, nombre: string, ts: Tarea[], hoy: string
   let hechas = 0;
   let enCurso = 0;
   let planHoy = 0;
-  for (const t of ts) {
+  let diasPlanificados = 0;
+  const unicas = [...new Map(ts.map((t) => [t.id, t])).values()];
+  for (const t of unicas) {
     const d = t.diasHabiles ?? diasHabiles(t.fechaInicio ?? "", t.fechaFin ?? "", festivosSet);
     dias += d;
     if (t.estado === "Hecha") {
       hechas++;
       diasHechos += d;
     } else if (t.estado === "En curso") enCurso++;
-    if (t.fechaFin && t.fechaFin <= hoy) planHoy++;
+    if (t.fechaFin && t.fechaFin <= hoy) { planHoy++; diasPlanificados += d; }
   }
-  const total = ts.length;
+  const total = unicas.length;
   const pctReal = pct(diasHechos, dias);
-  const pctPlan = pct(planHoy, total);
+  const pctPlan = pct(diasPlanificados, dias);
   return {
     areaId,
     nombre,

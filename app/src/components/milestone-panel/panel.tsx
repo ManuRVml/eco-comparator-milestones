@@ -7,6 +7,7 @@ import type { MilestoneView, Model, Tarea } from "@/lib/model";
 import { PublicarControl } from "@/components/editor/publicar-control";
 import { PanelClose } from "./panel-client";
 import { MilestoneWorkflow } from "../workflow/milestone-panel";
+import { MetricNote } from "../metric-note";
 
 function plazo(hoy: string, fecha: string | null, cumplido: boolean) {
   if (!fecha) return { texto: "Sin fecha", tono: "slate" };
@@ -17,9 +18,12 @@ function plazo(hoy: string, fecha: string | null, cumplido: boolean) {
 }
 
 /** Entregables de un milestone para el panel en línea de /lineas (datos ya filtrados por rol). */
-export function MilestonePanel({ m, model, canEdit }: { m: MilestoneView; model: Model; canEdit: boolean }) {
+export function MilestonePanel({ m, model, canEdit, areaId = null }: { m: MilestoneView; model: Model; canEdit: boolean; areaId?: string | null }) {
   const hus = m.huIds.map((id) => model.huById.get(id)).filter((h) => !!h);
-  const tareas = m.tareaIds.map((id) => model.tareaById.get(id)).filter((t): t is Tarea => !!t);
+  const tareas = m.tareaIds.map((id) => model.tareaById.get(id)).filter((t): t is Tarea => !!t && (!areaId || t.areaId === areaId));
+  const area = areaId ? m.areas.find((a) => a.areaId === areaId) : null;
+  const porcentaje = areaId ? (area?.pctReal ?? 0) : m.pctPonderado;
+  const hechas = tareas.filter((t) => t.estado === "Hecha").length;
   const p = plazo(model.hoy, m.fechaObjetivo, m.estadoFinal === "Cumplido");
   const color = colorEstado(m.estadoFinal);
   const riesgos = m.riesgoIds.map((id) => model.riesgoById.get(id)).filter((r) => !!r);
@@ -29,8 +33,8 @@ export function MilestonePanel({ m, model, canEdit }: { m: MilestoneView; model:
     <section className="ms-panel" style={{ "--linea": colorLinea(m.lineaId) } as CSSProperties} data-testid={`ms-panel-${m.id}`} aria-label={`Entregables de ${m.id}`}>
       <span className="ms-panel-grip" aria-hidden="true" />
       <header className="ms-panel-head">
-        <Ring value={m.pctTareas} size={84} stroke={8} color={color}>
-          <span className="mini-ring-label is-lg">{Math.round(m.pctTareas)}%</span>
+        <Ring value={porcentaje} size={84} stroke={8} color={color}>
+          <span className="mini-ring-label is-lg">{Math.round(porcentaje)}%</span>
         </Ring>
         <div className="ms-panel-title">
           <div className="ms-panel-tags">
@@ -48,9 +52,10 @@ export function MilestonePanel({ m, model, canEdit }: { m: MilestoneView; model:
             </b>{" "}
             · {m.linea?.nombre} ·{" "}
             {model.capa === "oficial"
-              ? `${m.tareasHechas}/${m.tareasTotal} tareas entregadas`
-              : `${m.tareasHechas}/${m.tareasTotal} hechas (técnico interno) · ${m.tareasPublicadas} publicadas`}{" "}
+              ? `${hechas}/${tareas.length} tareas entregadas`
+              : `${hechas}/${tareas.length} hechas (técnico interno) · ${tareas.filter((t) => t.publicadoCliente).length} publicadas`}{" "}
             · {m.spTotal} SP
+            {areaId && <> · Área: {model.areaById.get(areaId)?.nombre}</>}
           </p>
         </div>
         <div className="ms-panel-actions">
@@ -61,6 +66,8 @@ export function MilestonePanel({ m, model, canEdit }: { m: MilestoneView; model:
           <PanelClose />
         </div>
       </header>
+
+      <MetricNote capa={model.capa} hoy={model.hoy} alcance={`${m.id}${areaId ? ` · ${model.areaById.get(areaId)?.nombre}` : " · tareas de este milestone"}`} />
 
       <div className="ms-panel-body">
         <div className="ms-panel-col">

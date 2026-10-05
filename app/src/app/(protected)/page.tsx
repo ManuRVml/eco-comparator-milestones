@@ -6,6 +6,8 @@ import { getModel, requireSession } from "@/lib/data";
 import { daysBetween, fmtCorta, fmtDiaSemana, fmtLarga, relativo } from "@/lib/dates";
 import { colorEstado, colorLinea, fmtPct, TONE_COLOR, tono } from "@/lib/format";
 import { ESTADOS_MILESTONE, type Model } from "@/lib/model";
+import { progresoLinea } from "@/lib/line-progress";
+import { MetricNote } from "@/components/metric-note";
 
 const HU_ORDEN = ["Aceptada", "Lista para demo", "En curso", "No iniciada", "Bloqueada"];
 
@@ -39,7 +41,7 @@ export default async function DashboardPage() {
           <h2 data-testid="hero-titulo">
             <span className="hero-num">{of.hechas}</span> de {of.total} tareas entregadas al equipo Ecopetrol
           </h2>
-          <p>Solo cuenta lo entregado y publicado en los weeklies; el resto se muestra según el plan. El avance se pondera por los días hábiles planificados.</p>
+          <p>Solo cuenta lo entregado y publicado en los weeklies; las fechas planificadas no certifican entregas. El avance y el plan se ponderan por los días hábiles de las tareas.</p>
           <div className="hero-stats" data-testid="hero-stats">
             <div>
               <span>Avance oficial ponderado</span>
@@ -59,8 +61,8 @@ export default async function DashboardPage() {
           </div>
         </div>
         <div className="hero-gauge">
-          <Ring value={of.pctTareas} size={228} stroke={10} color="var(--color-ai-accent)" track="color-mix(in srgb, var(--color-surface-card) 16%, transparent)" plan={of.pctPlan}>
-            <span className="gauge-pct">{Math.round(of.pctTareas)}%</span>
+          <Ring value={of.pctReal} size={228} stroke={10} color="var(--color-ai-accent)" track="color-mix(in srgb, var(--color-surface-card) 16%, transparent)" plan={of.pctPlan}>
+            <span className="gauge-pct">{Math.round(of.pctReal)}%</span>
             <span className="gauge-sub">
               {of.hechas}/{of.total} tareas entregadas
             </span>
@@ -106,6 +108,8 @@ export default async function DashboardPage() {
           </div>
         </section>
       )}
+
+      <MetricNote capa={model.capa} hoy={model.hoy} alcance="Proyecto completo; cabecera oficial y detalle según la capa indicada" />
 
       <section className="kpi-grid" aria-label="Indicadores clave">
         <article className="kpi">
@@ -231,7 +235,7 @@ export default async function DashboardPage() {
               {proximos.map((m) => (
                 <li key={m.id}>
                   <Link href={`/milestones/${m.id}`} className="upcoming-item">
-                    <MiniRing value={m.pctTareas} estado={m.estadoFinal} size={52} />
+                    <MiniRing value={m.pctPonderado} estado={m.estadoFinal} size={52} />
                     <div className="upcoming-body">
                       <span className="upcoming-top">
                         <b style={{ color: colorLinea(m.lineaId) }}>{m.lineaId}</b> {m.id} · {fmtDiaSemana(m.fechaObjetivo ?? "")} {fmtCorta(m.fechaObjetivo)}
@@ -271,7 +275,7 @@ export default async function DashboardPage() {
                       </span>
                       <span className="line-ms-name">{m.nombre}</span>
                       <span className="line-ms-bar">
-                        <ProgressBar value={m.pctTareas} color={colorLinea(l.id)} height={6} label={`Avance ${m.id}`} />
+                        <ProgressBar value={m.pctPonderado} color={colorLinea(l.id)} height={6} label={`Avance ponderado ${m.id}`} />
                         <em>
                           {m.tareasHechas}/{m.tareasTotal}
                         </em>
@@ -317,10 +321,7 @@ function LineasResumen({ model }: { model: Model }) {
   return (
     <ul className="line-summary">
       {model.lineas.map((l) => {
-        const ms = model.milestones.filter((m) => m.lineaId === l.id);
-        const h = ms.reduce((s, m) => s + m.tareasHechas, 0);
-        const t = ms.reduce((s, m) => s + m.tareasTotal, 0);
-        const p = t ? (h / t) * 100 : 0;
+        const p = progresoLinea(model, l.id).pctReal;
         return (
           <li key={l.id}>
             <span>
