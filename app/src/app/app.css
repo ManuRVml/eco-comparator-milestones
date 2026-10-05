@@ -228,7 +228,7 @@
 .rm-festivo i { position: absolute; bottom: 10px; left: 50%; writing-mode: vertical-rl; transform: translateX(-50%) rotate(180deg); color: var(--color-status-danger-text); font-size: 9.5px; font-style: normal; font-weight: 600; white-space: nowrap; opacity: .85; }
 .rm-hoy { position: absolute; top: 0; bottom: 0; z-index: 3; width: 2px; margin-left: -1px; background: var(--color-status-danger-base); box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-status-danger-base) 12%, transparent); }
 .rm-hoy b { position: absolute; top: -8px; left: 50%; padding: 3px 8px; transform: translateX(-50%); border-radius: 999px; color: var(--color-surface-card); background: var(--color-status-danger-base); font-size: 10.5px; font-weight: 700; white-space: nowrap; box-shadow: 0 4px 10px color-mix(in srgb, var(--color-status-danger-base) 30%, transparent); }
-.rm-lane { position: relative; min-height: calc(var(--filas) * var(--fila-h) + 22px); border-top: 1px solid var(--color-border-subtle); }
+.rm-lane { position: relative; min-height: 0; border-top: 1px solid var(--color-border-subtle); }
 .rm-body > .rm-lane:nth-child(2) { border-top: 0; }
 .checkpoint-content { margin-top: 18px; display: grid; gap: 14px; }
 .checkpoint-content p { margin: 0; color: var(--color-text-secondary); font-size: 13px; line-height: 1.6; }
@@ -251,10 +251,10 @@
 .rm-lane-id { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 10px; color: var(--color-surface-card); background: var(--linea); font-size: 12.5px; font-weight: 800; box-shadow: 0 6px 14px color-mix(in srgb, var(--linea) 35%, transparent); }
 .rm-lane-label strong { color: var(--color-text-heading); font-size: 13.5px; font-weight: 650; line-height: 1.3; }
 .rm-lane-meta { color: var(--color-text-muted); font-size: 11.5px; }
-.rm-track { position: relative; z-index: 2; }
+.rm-track { position: relative; z-index: 2; display: grid; grid-template-columns: minmax(0, 1fr); row-gap: 18px; padding: 18px 0 22px; }
 .rm-line { position: absolute; top: 40px; right: 0; left: 0; height: 2px; background: color-mix(in srgb, var(--linea) 35%, transparent); }
-.rm-node { position: absolute; top: calc(18px + var(--fila) * var(--fila-h)); display: flex; flex-direction: column; align-items: center; width: 134px; margin-left: -67px; color: inherit; text-decoration: none; }
-.rm-node.is-right { align-items: flex-end; margin-left: -112px; }
+.rm-node { position: relative; grid-column: 1; grid-row: calc(var(--fila) + 1); align-self: start; display: flex; flex-direction: column; align-items: center; width: 164px; margin-left: -82px; color: inherit; text-decoration: none; }
+.rm-node.is-right { align-items: flex-end; margin-left: -142px; }
 .rm-node.is-right .rm-label { text-align: right; }
 .rm-node.is-left { align-items: flex-start; margin-left: -22px; }
 .rm-node.is-left .rm-label { text-align: left; }
@@ -265,7 +265,7 @@
 .rm-node.is-muted { opacity: .38; filter: grayscale(.6); }
 .rm-label { display: grid; gap: 2px; margin-top: 7px; padding: 5px 7px; border-radius: 9px; background: color-mix(in srgb, var(--color-surface-card) 88%, transparent); text-align: center; }
 .rm-date { color: var(--color-text-muted); font-size: 10.5px; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; }
-.rm-name { overflow: hidden; color: var(--color-text-heading); font-size: 11.5px; font-weight: 600; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.rm-name { display: block; color: var(--color-text-heading); font-size: 12px; font-weight: 600; line-height: 1.4; overflow-wrap: anywhere; }
 .rm-checkpoint { --fila-h: 158px; }
 .rm-stat { display: inline-flex; align-items: center; justify-self: center; gap: 5px; color: var(--color-text-secondary); font-size: 10.5px; font-weight: 600; }
 .rm-node.is-right .rm-stat { justify-self: end; }
@@ -631,7 +631,7 @@
 @media (prefers-reduced-motion: reduce) {
   .rm-panel-wrap, .rm-backdrop { transition: none !important; }
 }.rm-lane { min-height: 0; }
-.rm-track { min-height: calc(var(--filas) * var(--fila-h) + 22px); }
+.rm-track { min-height: 0; }
 .panel-hu, .panel-deps, .panel-risks, .panel-areas, .panel-area ul { grid-template-columns: minmax(0, 1fr); }
 .panel-area, .panel-area li, .panel-hu li { min-width: 0; }
 /* ---------- capa técnica interna (solo equipo) y publicación ---------- */

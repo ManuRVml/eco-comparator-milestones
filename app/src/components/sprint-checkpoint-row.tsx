@@ -12,7 +12,7 @@ export function SprintCheckpointRow({ model, areaId, canEdit, position }: { mode
   const checkpoints = model.sprints.map((s) => sprintCheckpoint(model, s.numero, areaId)).filter((c) => c !== null);
   if (!checkpoints.length) return null;
   return (
-    <div className="rm-row rm-lane rm-checkpoint" style={{ "--filas": 1, "--linea": "var(--color-brand-primary)" } as CSSProperties}>
+    <div className="rm-row rm-lane rm-checkpoint" style={{ "--filas": 2, "--linea": "var(--color-brand-primary)" } as CSSProperties}>
       <div className="rm-lane-label">
         <span className="rm-lane-id">CP</span>
         <strong>Revisión de sprints</strong>
@@ -20,11 +20,11 @@ export function SprintCheckpointRow({ model, areaId, canEdit, position }: { mode
       </div>
       <div className="rm-track">
         <span className="rm-line" />
-        {checkpoints.map((c) => {
+        {checkpoints.map((c, index) => {
           const left = position(c.sprint.fechaFin), color = colorEstado(c.estado);
           const align = left > 93 ? "is-right" : left < 7 ? "is-left" : "";
           return (
-            <RoadmapNode key={c.id} id={c.id} href={`/lineas?${areaId ? `area=${areaId}&` : ""}m=${c.id}`} className={`rm-node ${align} ${c.tareas.length ? "" : "is-muted"}`} style={{ left: `${left}%`, "--fila": 0, "--c": color } as CSSProperties} title={`Sprint ${c.sprint.numero} · Revisión del avance hacia milestones (clic para ver tareas)`}>
+            <RoadmapNode key={c.id} id={c.id} href={`/lineas?${areaId ? `area=${areaId}&` : ""}m=${c.id}`} className={`rm-node ${align} ${c.tareas.length ? "" : "is-muted"}`} style={{ left: `${left}%`, "--fila": index % 2, "--c": color } as CSSProperties} title={`Sprint ${c.sprint.numero} · Revisión del avance hacia milestones (clic para ver tareas)`}>
               <span className="rm-dot"><Ring value={c.total.pctReal} plan={c.completo ? undefined : c.total.pctPlan} size={44} stroke={5} color={color} track="var(--color-border-default)"><span className="rm-dot-inner">{c.id}</span></Ring><CompletionCheck complete={c.completo} label={`Sprint ${c.sprint.numero}: cierre completo verificado`} id={c.id} /></span>
               <span className="rm-label">
                 <span className="rm-date">{fmtDiaSemana(c.sprint.fechaFin)} {fmtCorta(c.sprint.fechaFin)}</span>
