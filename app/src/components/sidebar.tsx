@@ -14,6 +14,8 @@ const ITEMS: Item[] = [
   { href: "/areas", label: "Áreas", icon: AreasIcon, match: (p) => p.startsWith("/areas") },
   { href: "/agenda", label: "Qué verás y cuándo", icon: CalendarIcon, match: (p) => p.startsWith("/agenda") },
   { href: "/editor", label: "Panel del editor", icon: EditIcon, match: (p) => p.startsWith("/editor"), equipo: true },
+  { href: "/flujo", label: "Trabajo por equipo", icon: AreasIcon, match: (p) => p.startsWith("/flujo"), equipo: true },
+  { href: "/reconciliacion", label: "Fuentes y compromisos", icon: ReportIcon, match: (p) => p.startsWith("/reconciliacion"), equipo: true },
   { href: "/verificacion", label: "Verificación", icon: CheckIcon, match: (p) => p.startsWith("/verificacion"), equipo: true },
   { href: "/bitacora", label: "Bitácora", icon: ReportIcon, match: (p) => p.startsWith("/bitacora"), equipo: true },
 ];
@@ -25,6 +27,8 @@ const TITULOS: [RegExp, string][] = [
   [/^\/areas/, "Avance por área"],
   [/^\/agenda/, "Qué verás y cuándo"],
   [/^\/editor/, "Panel del editor"],
+  [/^\/flujo/, "Trabajo por equipo"],
+  [/^\/reconciliacion/, "Fuentes y compromisos"],
   [/^\/bitacora/, "Bitácora"],
   [/^\/verificacion/, "Pendiente de verificación"],
   [/^\/historias/, "Historia de usuario"],

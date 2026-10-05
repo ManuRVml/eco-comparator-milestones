@@ -3,7 +3,7 @@ import "server-only";
 import { NextResponse } from "next/server";
 import { getRole } from "@/lib/auth";
 import type { UserRole } from "@/lib/auth-constants";
-import { HttpError } from "@/lib/mutations";
+import { HttpError } from "@/lib/http-error";
 
 const noStore = { "Cache-Control": "no-store" };
 

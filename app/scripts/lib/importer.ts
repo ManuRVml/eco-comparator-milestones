@@ -3,6 +3,7 @@ import { getTableColumns, sql, type SQL } from "drizzle-orm";
 import type { SQLiteColumn, SQLiteTable, SQLiteUpdateSetSource } from "drizzle-orm/sqlite-core";
 import * as XLSX from "xlsx";
 import type { Db } from "../../src/db/client";
+import { normalizarIdentidad } from "../../src/lib/workflow/domain";
 import {
   areas,
   festivos,
@@ -168,6 +169,15 @@ export async function upsertById<T extends SQLiteTable>(
   opts: { reportMissing?: boolean; label?: string; insertOnly?: string[] } = {},
 ) {
   const label = opts.label ?? tableName(table);
+  if (["tareas", "historias"].includes(tableName(table))) {
+    const identities = await tx.all<{ id: string; nombre: string }>(sql.raw(`select id, nombre from "${tableName(table)}"`));
+    const byId = new Map(identities.map((r) => [r.id, r.nombre]));
+    const conflicts = rows.filter((row) => {
+      const r = row as Row, old = byId.get(String(r[pk.key]));
+      return old !== undefined && typeof r.nombre === "string" && normalizarIdentidad(old) !== normalizarIdentidad(r.nombre);
+    });
+    if (conflicts.length) throw new Error(`Conflicto de identidad en ${label}: ${conflicts.map((r) => String((r as Row)[pk.key])).join(", ")}. Use correspondencias de reconciliación; los estados y la evidencia no se transfieren por ID.`);
+  }
   const before = await existingIds(tx, table, pk.column);
   const fileIds = new Set(rows.map((r) => String((r as Row)[pk.key])));
   let insertadas = 0;

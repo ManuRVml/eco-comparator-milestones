@@ -7,7 +7,7 @@ import { resolve } from "node:path";
 export async function startTestServer(port = Number(process.env.TEST_PORT ?? 3101)) {
   const dst = resolve("data/seguimiento.test.db");
   for (const ext of ["", "-journal", "-wal", "-shm"]) if (existsSync(dst + ext)) unlinkSync(dst + ext);
-  copyFileSync(resolve("data/seguimiento.db"), dst);
+  copyFileSync(resolve(process.env.TEST_SOURCE_DB ?? "data/seguimiento.db"), dst);
   const child = spawn(process.execPath, [resolve("node_modules/next/dist/bin/next"), "start", "-p", String(port)], {
     // LOCAL_DEMO=1: modo producción local con PIN de demo y base de archivo (la guardia lo exige; en Vercel se ignora).
     env: { ...process.env, DATABASE_URL: "file:./data/seguimiento.test.db", LOCAL_DEMO: "1" },

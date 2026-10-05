@@ -10,6 +10,7 @@ import type { UserRole } from "@/lib/auth-constants";
 import { hoyIso } from "@/lib/dates";
 import { loadRaw } from "@/lib/load";
 import { computeModel, type Model, vistaCliente } from "@/lib/model";
+import { loadWorkflow } from "@/lib/workflow/load";
 
 export interface Session {
   role: UserRole;
@@ -55,5 +56,5 @@ export async function getModel(session: Session): Promise<Model> {
   if (!session.canEdit) return vistaCliente(computeModel(raw, hoy, "oficial"));
   const tecnico = computeModel(raw, hoy, "tecnica");
   const oficial = computeModel(raw, hoy, "oficial");
-  return { ...tecnico, oficial: { total: oficial.total, kpis: oficial.kpis, areaResumen: oficial.areaResumen } };
+  return { ...tecnico, workflow: await loadWorkflow(db), oficial: { total: oficial.total, kpis: oficial.kpis, areaResumen: oficial.areaResumen } };
 }

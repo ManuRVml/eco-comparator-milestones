@@ -12,19 +12,16 @@ import {
   notas,
   riesgos,
   tareas,
+  flujoTarea,
 } from "@/db/schema";
 import type { UserRole } from "@/lib/auth-constants";
 import { hoyIso } from "@/lib/dates";
 import { CONFIG_DEFAULTS, ESTADOS_MILESTONE } from "@/lib/model";
-
-export class HttpError extends Error {
-  constructor(
-    public status: number,
-    message: string,
-  ) {
-    super(message);
-  }
-}
+import { ejecucionLegada } from "@/lib/workflow/domain";
+import { HttpError } from "@/lib/http-error";
+import { loadWorkflow } from "@/lib/workflow/load";
+import { insumosPendientes } from "@/lib/workflow/readiness";
+export { HttpError } from "@/lib/http-error";
 
 const ahora = sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))`;
 export const AUTOMATICO = "Automático";
@@ -71,6 +68,10 @@ export async function cambiarEstado(rol: UserRole, body: Record<string, unknown>
       .from(table)
       .where(eq(table.id, id));
     if (!actual) throw new HttpError(404, `${id} no existe`);
+    if (tipo === "tarea" && ["Hecha", "En curso"].includes(estado)) {
+      const workflow = await loadWorkflow(tx as unknown as typeof db);
+      if (workflow?.activo && insumosPendientes(workflow, id, ["Inicio", "Ejecución"])) throw new HttpError(409, "Hay insumos pendientes para ejecutar o terminar esta actividad");
+    }
 
     const anterior = tipo === "milestone" && actual.origen !== "editor" ? AUTOMATICO : actual.estado;
     const cambiaEvidencia = evidencia !== "" && evidencia !== (actual.evidencia ?? "");
@@ -93,6 +94,10 @@ export async function cambiarEstado(rol: UserRole, body: Record<string, unknown>
         .where(eq(table.id, id));
     }
     if (anterior !== estado) {
+      if (tipo === "tarea") {
+        const schema = await tx.all(sql`select name from sqlite_master where name='flujo_tarea'`);
+        if (schema.length) await tx.update(flujoTarea).set({ ejecucion: ejecucionLegada(estado), actualizadoEn: ahora }).where(eq(flujoTarea.tareaId, id));
+      }
       await tx.insert(bitacora).values({
         entidadTipo: tipo,
         entidadId: id,

@@ -83,7 +83,7 @@ Comparación: `docs/screens/palette-login-compare.png`.
 
 - **Oficial (Equipo Ecopetrol):** una tarea o un milestone solo cuenta como entregado si un editor o administrador lo **aprueba y publica**
   (`publicado_cliente`: fecha en que se completó y nota de entrega, p. ej. «Demostrado en weekly 15/10»). **Nada empieza publicado:**
-  el avance oficial arranca en 0/99. El resto se muestra según el plan: Pendiente antes de su inicio, En curso después.
+  el avance oficial arranca en 0/99. El resto permanece Pendiente: alcanzar una fecha planificada no demuestra inicio real.
   El Equipo Ecopetrol nunca ve estados técnicos, rutas de repositorio, commits ni evidencia de código.
 - **Técnica interna (editor/admin):** estado respaldado por código (matriz de evidencia + editor), rotulado
   «Avance técnico interno (local, no visible para el equipo Ecopetrol)» junto a los números oficiales. Es solo **evidencia técnica sugerida**:
@@ -111,6 +111,10 @@ pruebas anteriores al aislamiento (idempotente, imprime lo que cambia).
 - Cada cambio escribe en la **bitácora**: rol, fecha, campo y valor anterior → nuevo.
 - La vista Equipo Ecopetrol consulta `/api/version` cada 8 s y se refresca sola cuando hay cambios.
 - «Hoy» es la fecha de Bogotá; para demos se puede fijar con `APP_HOY=yyyy-mm-dd`.
+
+## Reconciliación y trabajo en paralelo
+
+La vista de equipo añade `/flujo` y `/reconciliacion`, con previsiones y bloqueos en el panel del timeline. Las fuentes se relacionan por contenido y conservan sus IDs de origen; las fechas base, la evidencia y las publicaciones se mantienen. Preparación, operación, respaldo y reversión: [docs/RECONCILIACION.md](docs/RECONCILIACION.md).
 
 ## Vistas
 

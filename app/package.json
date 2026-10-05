@@ -3,6 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "reconciliation:prepare": "tsx scripts/prepare-reconciliation.ts",
+    "reconciliation:backup": "node scripts/backup-reconciliation.mjs",
+    "reconciliation": "tsx scripts/reconcile.ts",
+    "reconciliation:activation": "tsx scripts/workflow-activation.ts",
+    "check:reconciliation": "node --import tsx --test scripts/tests/reconciliation.test.ts",
+    "check:workflow": "node scripts/e2e-workflow.mjs",
     "dev": "next dev -p 3100",
     "build": "next build",
     "start": "next start",

@@ -11,6 +11,7 @@ import { getBitacora, getModel, requireSession } from "@/lib/data";
 import { fmtCorta, fmtLarga, relativo } from "@/lib/dates";
 import { colorEstado, colorLinea } from "@/lib/format";
 import type { Model } from "@/lib/model";
+import { TaskWorkflow } from "@/components/workflow/task-panel";
 
 const ORIGEN: Record<string, string> = {
   plan: "Plan (sin verificar)",
@@ -75,6 +76,7 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
 
       <div className="detail-layout">
         <div className="detail-main">
+          {session.canEdit && <TaskWorkflow tarea={t} model={model} />}
           {model.capa === "oficial" ? (
             <Card kicker="ENTREGA" title="Entrega al equipo Ecopetrol">
               {t.evidencia ? (

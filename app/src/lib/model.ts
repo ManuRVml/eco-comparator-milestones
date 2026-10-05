@@ -27,6 +27,7 @@ import type {
   tareas,
 } from "../db/schema";
 import { addDays, daysBetween, isoWeekday } from "./dates";
+import type { Workflow } from "./workflow/types";
 
 export type Linea = typeof lineas.$inferSelect;
 export type Area = typeof areas.$inferSelect;
@@ -46,7 +47,7 @@ export type AvanceBase = typeof avanceAreaBase.$inferSelect;
 /**
  * Dos capas de avance:
  * - "oficial": lo que ve el cliente. Una tarea solo cuenta como Hecha si fue PUBLICADA; el resto muestra su
- *   estado según el plan (Pendiente antes de su inicio, En curso después). Sin evidencia técnica ni rutas de repo.
+ *   estado Pendiente hasta su entrega; una fecha planificada no demuestra inicio real. Sin evidencia técnica ni rutas de repo.
  * - "tecnica": estado interno respaldado por código (matriz de evidencia + editor). Solo editor/admin.
  */
 export type Capa = "oficial" | "tecnica";
@@ -155,6 +156,8 @@ export interface Kpis {
 }
 
 export interface Model {
+  /** Solo equipo; nunca se envía a la vista de consulta. */
+  workflow?: Workflow | null;
   hoy: string;
   capa: Capa;
   /** Solo en la capa técnica (editor/admin): los números oficiales para mostrarlos al lado. */
@@ -284,8 +287,8 @@ export function readConfig(raw: Partial<Record<string, string>>): Config {
 /** Estado que ve el cliente para una tarea: Hecha solo si está publicada; si no, lo que dice el plan. */
 export function estadoOficialTarea(t: Tarea, hoy: string): string {
   if (t.publicadoCliente) return "Hecha";
-  if (!t.fechaInicio || t.fechaInicio > hoy) return "Pendiente";
-  return "En curso";
+  void hoy;
+  return "Pendiente";
 }
 
 /** Reescribe los datos crudos a la capa oficial: sin estados ni evidencia técnica. */
@@ -300,12 +303,10 @@ export function aplicarCapaOficial(raw: Raw, hoy: string): Raw {
   }));
   const porHu = new Map<string, Tarea[]>();
   for (const t of tareasOf) if (t.historiaId) porHu.set(t.historiaId, [...(porHu.get(t.historiaId) ?? []), t]);
-  const sprintIni = new Map(raw.sprints.map((s) => [s.id, s.fechaInicio]));
   const historiasOf = raw.historias.map((h) => {
-    if (h.estadoOrigen === "editor") return { ...h, estadoOrigen: "plan" as const };
     const ts = porHu.get(h.id) ?? [];
-    const iniciada = ts.length ? ts.some((t) => t.estado !== "Pendiente") : (sprintIni.get(h.sprintId ?? "") ?? "9999") <= hoy;
-    return { ...h, estado: iniciada ? "En curso" : "No iniciada", estadoOrigen: "plan" as const, evidencia: null, fechaCierre: null, fechaEstado: null };
+    const entregada = ts.length > 0 && ts.every((t) => t.publicadoCliente);
+    return { ...h, estado: entregada ? "Aceptada" : "No iniciada", estadoOrigen: "plan" as const, evidencia: null, fechaCierre: null, fechaEstado: null };
   });
   return {
     ...raw,
@@ -501,6 +502,7 @@ export function vistaCliente(m: Model): Model {
   }));
   return {
     ...m,
+    workflow: undefined,
     milestones: milestonesCliente,
     milestoneById: new Map(milestonesCliente.map((x) => [x.id, x])),
     historias: huVisibles,

@@ -6,6 +6,7 @@ import { colorEstado, colorLinea } from "@/lib/format";
 import type { MilestoneView, Model, Tarea } from "@/lib/model";
 import { PublicarControl } from "@/components/editor/publicar-control";
 import { PanelClose } from "./panel-client";
+import { MilestoneWorkflow } from "../workflow/milestone-panel";
 
 function plazo(hoy: string, fecha: string | null, cumplido: boolean) {
   if (!fecha) return { texto: "Sin fecha", tono: "slate" };
@@ -63,6 +64,7 @@ export function MilestonePanel({ m, model, canEdit }: { m: MilestoneView; model:
 
       <div className="ms-panel-body">
         <div className="ms-panel-col">
+          {canEdit && <MilestoneWorkflow id={m.id} model={model} editar />}
           {m.publicado && (
             <p className="ms-entregado" data-testid={`entregado-${m.id}`}>
               <b>Entregado el {fmtCorta(m.fechaCierre)}</b> · {m.evidencia}
