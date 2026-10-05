@@ -4,8 +4,9 @@ import { Roadmap } from "@/components/roadmap";
 import { Card, PageHeading, ProgressBar, StatusBadge } from "@/components/ui";
 import { getModel, requireSession } from "@/lib/data";
 import { fmtCorta, fmtLarga } from "@/lib/dates";
-import { colorArea, colorEstado, colorLinea, fmtPct, TONE_COLOR } from "@/lib/format";
+import { colorEstado, colorLinea, fmtPct, TONE_COLOR } from "@/lib/format";
 import { ESTADOS_MILESTONE } from "@/lib/model";
+import { MetricNote } from "@/components/metric-note";
 
 export default async function LineasPage({ searchParams }: PageProps<"/lineas">) {
   const session = await requireSession();
@@ -22,11 +23,13 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
   return (
     <main className="page" data-testid="timeline">
       <PageHeading kicker="ROADMAP 21 SEP – 18 DIC 2026" title="Líneas de tiempo">
-        Tres líneas de valor, diez milestones en jueves de weekly.{" "}
+        Siete checkpoints de cierre, incluido el alistamiento de Sprint 0, y tres líneas de valor con diez milestones.{" "}
         {model.capa === "oficial"
           ? "Los nodos muestran el avance oficial entregado y su estado. Haz clic en un nodo para ver sus entregables."
           : "Vista de equipo: los nodos muestran el avance técnico interno (no visible para el equipo Ecopetrol). Haz clic en un nodo para ver sus entregables."}
       </PageHeading>
+
+      <MetricNote capa={model.capa} hoy={model.hoy} alcance={areaId ? `Área: ${model.areaById.get(areaId)?.nombre}; cada nodo usa sus propias tareas` : "Cada nodo usa sus propias tareas; el total usa el proyecto completo"} checkpoints />
 
       <section className="strip" aria-label="Avance global">
         <div className="strip-item">
@@ -41,7 +44,6 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
           <strong>
             {area.hechas} <small>/ {area.total} hechas · plan a hoy {area.planHoy}</small>
           </strong>
-          <ProgressBar value={area.pctTareas} plan={area.pctPlan} color={areaId ? colorArea(areaId) : "var(--brand-primary)"} label="Tareas hechas" />
         </div>
         <div className="strip-item">
           <span>{model.capa === "oficial" ? "Entregado ponderado por días hábiles" : "Real técnico ponderado por días hábiles"}</span>
@@ -92,7 +94,7 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
             <tbody>
               {model.milestones.map((m) => {
                 const a = areaId ? m.areas.find((x) => x.areaId === areaId) : null;
-                const p = areaId ? (a?.pctTareas ?? 0) : m.pctTareas;
+                const p = areaId ? (a?.pctReal ?? 0) : m.pctPonderado;
                 return (
                   <tr key={m.id} className={areaId && !a ? "is-muted" : ""}>
                     <td>

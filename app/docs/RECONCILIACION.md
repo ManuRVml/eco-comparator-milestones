@@ -33,6 +33,14 @@ La elección de base ocurre antes del arranque del proceso; no se modifica `.env
 
 ## Operación y piloto
 
+### Checkpoints y lectura de porcentajes
+
+El timeline incorpora una fila de checkpoints S0–S6, uno en la fecha base de cierre de cada sprint. S0 conserva el 21–25/09 y su semana de alistamiento. Cada nodo abre sus tareas; el filtro de área afecta tanto el nodo como su panel. Son adicionales a los diez milestones y no modifican sus fechas ni generan tareas nuevas.
+
+Los porcentajes de nodos, áreas, líneas y total usan días hábiles planificados de tareas completadas divididos por los días hábiles del alcance correspondiente. Las tareas compartidas se cuentan una vez dentro de cada alcance y el total se calcula directamente sobre las tareas del proyecto. El plan usa la misma ponderación para tareas cuya fecha fin base ya llegó; la brecha deja de comparar tareas con esfuerzo. Los conteos de tareas y los SP permanecen como medidas separadas.
+
+Las vistas explican fórmula, alcance, fecha de corte y capa mediante «Cómo leer estos porcentajes». El porcentaje técnico mide ejecución; los resultados aprobados y publicados evidencian entrega al equipo Ecopetrol. Una tarea en curso no recibe un porcentaje supuesto. Un checkpoint muestra el estado actual de las tareas de su sprint, no certifica retrospectivamente su cierre. Las fechas no bloquean el avance de otros equipos.
+
 En Trabajo por equipo, filtrar por área y milestone. Cada actividad conserva sprint y fecha base; se priorizan las que tienen insumos preparados. En su detalle, registrar responsable, criterio, entrega parcial y previsión para marcar Lista para empezar. Las validaciones exigen evidencia o justificación de No aplica.
 
 Un bloqueo de Integración permite preparar o ejecutar trabajo y evita certificar esa integración. Uno de Inicio impide preparar o iniciar la actividad afectada; las demás pueden avanzar. Las relaciones se versionan: Coordinación no impone secuencia, y los insumos obligatorios pendientes no pueden formar ciclos. Un proveedor terminado no da automáticamente por disponible su insumo: se necesita evidencia de la entrega acordada.
