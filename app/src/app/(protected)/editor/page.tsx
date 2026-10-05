@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MilestoneConfiguration } from "@/components/editor/milestone-configuration";
 import { ESTADOS_HISTORIA, ESTADOS_TAREA } from "@/db/schema";
 import { AreaFilter } from "@/components/area-filter";
 import { ConfigToggle } from "@/components/editor/config-toggle";
@@ -15,6 +16,7 @@ const VISTAS = [
   { id: "tareas", label: "Tareas" },
   { id: "hu", label: "Historias de usuario" },
   { id: "milestones", label: "Milestones" },
+  { id: "configuracion", label: "Configuración de milestones" },
   { id: "visibilidad", label: "Visibilidad y ajustes" },
 ] as const;
 
@@ -32,6 +34,7 @@ export default async function EditorPage({ searchParams }: PageProps<"/editor">)
   const model = await getModel(session);
   const sp = await searchParams;
   const vista = VISTAS.find((v) => v.id === sp.vista)?.id ?? "tareas";
+  if (vista === "configuracion" && !session.isAdmin) return <main className="page"><PageHeading kicker="ACCESO RESTRINGIDO" title="Solo el administrador configura milestones">Tu rol permite consultar resultados y actualizar el trabajo autorizado.</PageHeading></main>;
   const areaId = typeof sp.area === "string" && model.areaById.has(sp.area) ? sp.area : null;
   const estado = typeof sp.estado === "string" ? sp.estado : null;
   const ms = typeof sp.ms === "string" && model.milestoneById.has(sp.ms) ? sp.ms : null;
@@ -51,8 +54,8 @@ export default async function EditorPage({ searchParams }: PageProps<"/editor">)
   return (
     <main className="page" data-testid="editor">
       <PageHeading
-        kicker="PANEL Del EDITOR"
-        title="Actualiza el avance en tiempo casi real"
+        kicker={session.isAdmin ? "ADMINISTRACIÓN" : "PANEL DEL EDITOR"}
+        title={vista === "configuracion" ? "Configura el valor y la aceptación de cada milestone" : "Actualiza el avance en tiempo casi real"}
         aside={
           <div className="agenda-summary">
             <div>
@@ -77,12 +80,14 @@ export default async function EditorPage({ searchParams }: PageProps<"/editor">)
       </PageHeading>
 
       <div className="tabs" role="tablist">
-        {VISTAS.map((v) => (
+        {VISTAS.filter(v => session.isAdmin || v.id !== "configuracion").map((v) => (
           <Link key={v.id} href={`/editor?vista=${v.id}`} className={`tab ${vista === v.id ? "is-on" : ""}`} role="tab" aria-selected={vista === v.id}>
             {v.label}
           </Link>
         ))}
       </div>
+
+      {vista === "configuracion" && session.isAdmin && <MilestoneConfiguration model={model} selected={ms} />}
 
       {(vista === "tareas" || vista === "hu") && (
         <div className="toolbar is-stacked">
@@ -240,6 +245,7 @@ export default async function EditorPage({ searchParams }: PageProps<"/editor">)
       {vista === "visibilidad" && (
         <div className="grid-2">
           <Card kicker="REGLAS" title="Qué ve el equipo Ecopetrol">
+            {session.isAdmin ? <>
             <ConfigToggle
               clave="resumen_area_ecopetrol"
               activo={model.config.resumen_area_ecopetrol === "1"}
@@ -258,6 +264,7 @@ export default async function EditorPage({ searchParams }: PageProps<"/editor">)
               titulo="Contar «Lista para demo» como completa"
               descripcion="Si está apagado, el avance por SP solo cuenta HU aceptadas por Ecopetrol."
             />
+            </> : <p>Solo el administrador modifica las reglas de visualización y cálculo.</p>}
           </Card>
           <Card kicker="RIESGOS" title="Visibilidad de riesgos">
             <ul className="risk-list">

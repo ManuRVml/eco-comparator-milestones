@@ -11,7 +11,7 @@ import { loadRaw } from "../../src/lib/load";
 import { computeModel, vistaCliente } from "../../src/lib/model";
 import { prepararTimeline } from "../../src/lib/timeline-model";
 
-const definition = { ...EMPTY_DEFINITION, job: "Job de prueba", outcome: "Resultado de prueba", meta: "Dos usuarios de prueba ingresan", fueraAlcance: "Fuera de alcance de prueba", responsable: "Responsable de prueba", aprobador: "Aprobador de prueba" };
+const definition = { ...EMPTY_DEFINITION, job: "Job de prueba", outcome: "Resultado de prueba", meta: "Dos usuarios de prueba ingresan", alcanceIncluido:"Acceso por rol", fueraAlcance: "Fuera de alcance de prueba", responsable: "Responsable de prueba", aprobador: "Aprobador de prueba" };
 async function fixture() {
   const folder = mkdtempSync(resolve("data/reconciliation/contract-test-"));
   copyFileSync("data/reconciliation/preview.db", resolve(folder, "test.db"));
@@ -33,27 +33,30 @@ test("la ficha pública persiste, la aceptación queda trazada y un cambio de ou
   const c = await fixture();
   try {
     await migrate(c.db, { migrationsFolder: resolve("drizzle") });
-    await mutarContrato(c.db, "editor", { id: "M-01", accion: "ficha", ...definition, fechaPrevision: "2026-10-20", motivoPrevision: "Motivo público de prueba" });
-    await mutarContrato(c.db, "admin", { id: "M-01", accion: "criterio", criterioId: "M-01-C01", descripcion: "Condición verificable de prueba", obligatorio: true, estado: "Verificado", evidencia: "Acta de prueba", aprobador: definition.aprobador, fecha: "2026-10-05" });
+    await mutarContrato(c.db, "admin", { id: "M-01", accion: "ficha", ...definition, fechaPrevision: "2026-10-20", motivoPrevision: "Motivo público de prueba" });
+    await mutarContrato(c.db,"admin",{ id:"M-01",accion:"metrica",metricaId:"test-metric",nombre:"Usuarios con acceso",tipo:"Cuantitativa",unidad:"usuarios",comparador:"Igual",objetivo:2,metodo:"Dos accesos por rol",activa:true });
+    await mutarContrato(c.db, "admin", { id: "M-01", accion: "criterio", criterioId: "M-01-C01", descripcion: "Condición verificable de prueba", obligatorio: true, evidenciaRequerida:"Acta de acceso",metricaId:"test-metric",resultadoMedido:2, estado: "Verificado", evidencia: "Acta de prueba", aprobador: definition.aprobador, fecha: "2026-10-05" });
     let contracts = await loadMilestoneContracts(c.db, [{ id: "M-01", criterio: null }]);
     assert.equal(contractAccepted(contracts["M-01"], "2026-10-05"), true);
     assert.equal(contracts["M-01"].definicion.fechaPrevision, "2026-10-20");
-    await mutarContrato(c.db, "editor", { id: "M-01", accion: "ficha", ...definition, outcome: "Outcome revisado de prueba" });
+    await mutarContrato(c.db, "admin", { id: "M-01", accion: "ficha", ...definition, outcome: "Outcome revisado de prueba" });
     contracts = await loadMilestoneContracts(c.db, [{ id: "M-01", criterio: null }]);
     assert.equal(contractAccepted(contracts["M-01"], "2026-10-05"), false);
     assert.equal(contracts["M-01"].criterios[0].evidencia, "Acta de prueba");
-    assert.equal((await c.client.execute("select count(*) n from bitacora where campo like 'contrato:%'")).rows[0].n, 3);
+    assert.equal((await c.client.execute("select count(*) n from bitacora where campo like 'contrato:%'")).rows[0].n, 4);
   } finally { c.client.close(); }
 });
 test("consulta y editor no aprueban; se rechazan fecha futura, aprobador distinto y ficha incompleta", async () => {
   const c = await fixture();
   try {
     await migrate(c.db, { migrationsFolder: resolve("drizzle") });
-    const body = { id: "M-01", accion: "criterio", criterioId: "M-01-C01", descripcion: "Condición verificable de prueba", estado: "Verificado", evidencia: "Acta de prueba", aprobador: definition.aprobador, fecha: "2026-10-05" };
-    await assert.rejects(mutarContrato(c.db, "cliente", body), /Rol de consulta/);
+    const body = { obligatorio:true,evidenciaRequerida:"Acta de acceso",id: "M-01", accion: "criterio", criterioId: "M-01-C01", descripcion: "Condición verificable de prueba", estado: "Verificado", evidencia: "Acta de prueba", aprobador: definition.aprobador, fecha: "2026-10-05" };
+    await assert.rejects(mutarContrato(c.db, "cliente", body), /Solo el administrador/);
     await assert.rejects(mutarContrato(c.db, "editor", body), /Solo el administrador/);
     await assert.rejects(mutarContrato(c.db, "admin", body), /Completa/);
-    await mutarContrato(c.db, "editor", { id: "M-01", accion: "ficha", ...definition });
+    await mutarContrato(c.db, "admin", { id: "M-01", accion: "ficha", ...definition });
+    await mutarContrato(c.db,"admin",{ id:"M-01",accion:"metrica",metricaId:"test-metric",nombre:"Usuarios con acceso",tipo:"Cuantitativa",unidad:"usuarios",comparador:"Igual",objetivo:2,metodo:"Dos accesos por rol",activa:true });
+    Object.assign(body,{metricaId:"test-metric",resultadoMedido:2});
     await assert.rejects(mutarContrato(c.db, "admin", { ...body, fecha: "2099-01-01" }), /futura/);
     await assert.rejects(mutarContrato(c.db, "admin", { ...body, aprobador: "Otro aprobador" }), /coincidir/);
     await assert.rejects(mutarContrato(c.db, "admin", { ...body, evidencia: "" }), /evidencia/);

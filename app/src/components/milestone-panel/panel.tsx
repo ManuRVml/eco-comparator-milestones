@@ -19,7 +19,7 @@ function plazo(hoy: string, fecha: string | null, cumplido: boolean) {
 }
 
 /** Entregables de un milestone para el panel en línea de /lineas (datos ya filtrados por rol). */
-export function MilestonePanel({ m, model, canEdit, areaId = null }: { m: MilestoneView; model: Model; canEdit: boolean; areaId?: string | null }) {
+export function MilestonePanel({ m, model, canEdit, isAdmin = false, areaId = null }: { m: MilestoneView; model: Model; canEdit: boolean; isAdmin?: boolean; areaId?: string | null }) {
   const hus = m.huIds.map((id) => model.huById.get(id)).filter((h) => !!h);
   const tareas = m.tareaIds.map((id) => model.tareaById.get(id)).filter((t): t is Tarea => !!t && (!areaId || t.areaId === areaId));
   const area = areaId ? m.areas.find((a) => a.areaId === areaId) : null;
@@ -61,7 +61,7 @@ export function MilestonePanel({ m, model, canEdit, areaId = null }: { m: Milest
           </p>
         </div>
         <div className="ms-panel-actions">
-          {canEdit && <PublicarControl tipo="milestone" id={m.id} estado={m.estado} publicada={m.publicado} fecha={m.fechaCierre} nota={m.evidencia} />}
+          {isAdmin && <PublicarControl tipo="milestone" id={m.id} estado={m.estado} publicada={m.publicado} fecha={m.fechaCierre} nota={m.evidencia} />}
           <Link href={`/milestones/${m.id}`} className="btn btn-ghost btn-sm">
             Ver detalle completo →
           </Link>
@@ -81,7 +81,7 @@ export function MilestonePanel({ m, model, canEdit, areaId = null }: { m: Milest
             </p>
           )}
           <div className="ms-panel-value">
-            <span className="kicker">Qué recibe el equipo Ecopetrol</span>
+            <span className="kicker">Valor de referencia del plan</span>
             <p>{m.valorCliente ?? "—"}</p>
           </div>
           <div className="ms-panel-block">

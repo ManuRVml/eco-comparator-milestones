@@ -15,6 +15,7 @@ import {
   flujoTarea,
 } from "@/db/schema";
 import type { UserRole } from "@/lib/auth-constants";
+import { fecha as fechaValida } from "@/lib/workflow/validation";
 import { hoyIso } from "@/lib/dates";
 import { CONFIG_DEFAULTS, ESTADOS_MILESTONE } from "@/lib/model";
 import { ejecucionLegada } from "@/lib/workflow/domain";
@@ -205,8 +206,10 @@ export async function cambiarVisibilidad(rol: UserRole, body: Record<string, unk
 }
 
 export async function cambiarConfig(rol: UserRole, body: Record<string, unknown>) {
+  if (rol !== "admin") throw new HttpError(403, "Solo el administrador modifica la configuración");
   const clave = str(body.clave, "clave", 60);
   if (!(clave in CONFIG_DEFAULTS)) throw new HttpError(400, "Ajuste desconocido");
+  if (!["1", "0", true, false].includes(body.valor as string | boolean)) throw new HttpError(422, "El ajuste requiere un booleano o 0/1");
   const valor = body.valor === "1" || body.valor === true ? "1" : "0";
   return db.transaction(async (tx) => {
     const [row] = await tx.select({ valor: configuracion.valor }).from(configuracion).where(eq(configuracion.clave, clave));
@@ -237,12 +240,14 @@ export async function cambiarConfig(rol: UserRole, body: Record<string, unknown>
  */
 export async function cambiarPublicacion(rol: UserRole, body: Record<string, unknown>) {
   const tipo = body.tipo === "milestone" ? "milestone" : "tarea";
+  if (tipo === "milestone" && rol !== "admin") throw new HttpError(403, "Solo el administrador publica o retira milestones");
   const id = str(body.id, "id", 40);
   const publicar = body.publicar === true;
   const nota = typeof body.nota === "string" ? body.nota.trim().slice(0, 300) : "";
   const hoy = hoyIso();
   const fecha = typeof body.fecha === "string" && body.fecha ? body.fecha : hoy;
-  if (publicar && (!/^\d{4}-\d{2}-\d{2}$/.test(fecha) || fecha > hoy)) throw new HttpError(422, "La fecha de entrega debe ser válida y no futura.");
+  if (publicar) fechaValida({ fecha }, "fecha");
+  if (publicar && fecha > hoy) throw new HttpError(422, "La fecha de entrega debe ser válida y no futura.");
   if (publicar && nota.length < 5) throw new HttpError(422, "Escribe la nota de entrega para el equipo Ecopetrol (p. ej. «Demostrado en weekly 15/10»).");
 
   return db.transaction(async (tx) => {
