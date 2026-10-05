@@ -13,7 +13,7 @@ import { CompletionCheck } from "@/components/completion-check";
 const INICIO = "2026-09-21";
 const FIN = "2026-12-20";
 const SPAN = daysBetween(INICIO, FIN) + 1;
-const MIN_GAP = 13; // % mínimo entre nodos de una misma fila
+const MIN_GAP = 22; // % mínimo entre nodos de una misma fila
 
 const x = (iso: string) => ((daysBetween(INICIO, iso) + 0.5) / SPAN) * 100;
 const xStart = (iso: string) => (daysBetween(INICIO, iso) / SPAN) * 100;
