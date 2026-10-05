@@ -6,7 +6,7 @@ import { loadSprintPlans } from "../../src/lib/sprint-plan";
 import { computeModel } from "../../src/lib/model";
 import { sprintCheckpoint } from "../../src/lib/sprint-checkpoint";
 import { prepararTimeline } from "../../src/lib/timeline-model";
-import { tareaCompletada } from "../../src/lib/completion";
+import { milestoneCompletado, tareaCompletada } from "../../src/lib/completion";
 
 async function fixture() {
   const { client, db } = createDb("file:./data/reconciliation/preview.db");
@@ -75,4 +75,18 @@ test("el check aparece cuando todo el alcance está publicado y desaparece al qu
   assert.equal(filtered.completo, true);
   c.compromiso!.referenciasPendientes = 1;
   assert.equal(sprintCheckpoint(m, 0)?.completo, false);
+});
+
+test("un hito exige aceptación registrada además del trabajo completo y un criterio definido", async () => {
+  const m = await fixture(); m.capa = "oficial";
+  const hito = { ...m.milestones[0], publicado: true, fechaCierre: m.hoy, evidencia: "Resultado aceptado", criterio: "Acceso funcional verificado" };
+  for (const id of hito.tareaIds) Object.assign(m.tareaById.get(id)!, { estado: "Hecha", publicadoCliente: true, fechaPublicacion: m.hoy, notaPublicacion: "Aprobado" });
+  for (const id of hito.huIds) m.huById.get(id)!.estado = "Aceptada";
+  assert.equal(milestoneCompletado(hito, m), true);
+  assert.equal(milestoneCompletado({ ...hito, publicado: false }, m), false);
+  assert.equal(milestoneCompletado({ ...hito, criterio: "" }, m), false);
+  assert.equal(milestoneCompletado({ ...hito, evidencia: "" }, m), false);
+  assert.equal(milestoneCompletado({ ...hito, fechaCierre: "2026-10-06" }, m), false);
+  m.tareaById.get(hito.tareaIds[0])!.estado = "Pendiente";
+  assert.equal(milestoneCompletado(hito, m), false);
 });

@@ -29,6 +29,7 @@ export function SprintCheckpointPanel({ model, numero, areaId, canEdit }: { mode
       </header>
       <MetricNote capa={model.capa} hoy={model.hoy} alcance={`Sprint ${numero} completo; desglose por área dentro del cierre`} checkpoints />
       <div className="checkpoint-content">
+        <p>Este punto permite revisar el resultado, pendientes y ajustes del sprint. Su check confirma el resultado del sprint; cada hito M conserva su propia aceptación.</p>
         <p><b>Fecha base del checkpoint: {fmtCorta(sprint.fechaFin)}.</b> Objetivo al cierre: 100 % del alcance completo y entrega verificada.</p>
         <CheckpointProgress total={total} areas={checkpoint.areas} completo={checkpoint.completo} areaId={areaId} />
         {compromiso ? <div className="checkpoint-expectation" data-testid={`expected-${id}`}>

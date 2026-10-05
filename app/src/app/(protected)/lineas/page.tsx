@@ -7,6 +7,7 @@ import { fmtCorta, fmtLarga } from "@/lib/dates";
 import { colorEstado, colorLinea, fmtPct, TONE_COLOR } from "@/lib/format";
 import { ESTADOS_MILESTONE } from "@/lib/model";
 import { MetricNote } from "@/components/metric-note";
+import { DeliveryNote } from "@/components/delivery-note";
 
 export default async function LineasPage({ searchParams }: PageProps<"/lineas">) {
   const session = await requireSession();
@@ -23,11 +24,12 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
   return (
     <main className="page" data-testid="timeline">
       <PageHeading kicker="ROADMAP 21 SEP – 18 DIC 2026" title="Líneas de tiempo">
-        Siete checkpoints de cierre, incluido el alistamiento de Sprint 0, y tres líneas de valor con diez milestones.{" "}
+        Siete puntos de revisión al cierre de sprint, incluido Sprint 0, y diez hitos de entrega en tres líneas de valor.{" "}
         {model.capa === "oficial"
           ? "Los nodos muestran el avance oficial entregado y su estado. Haz clic en un nodo para ver sus entregables."
           : "Vista de equipo: los nodos muestran el avance técnico interno (no visible para el equipo Ecopetrol). Haz clic en un nodo para ver sus entregables."}
       </PageHeading>
+      <DeliveryNote />
 
       <MetricNote capa={model.capa} hoy={model.hoy} alcance={areaId ? `Área: ${model.areaById.get(areaId)?.nombre}; cada nodo usa sus propias tareas` : "Cada nodo usa sus propias tareas; el total usa el proyecto completo"} checkpoints />
 
@@ -79,11 +81,11 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
       </Card>
 
       <div className="ms-table-wrap">
-        <Card kicker={areaId ? `FILTRO: ${model.areaById.get(areaId)?.nombre?.toUpperCase()}` : "DETALLE"} title="Milestones por fecha">
+        <Card kicker={areaId ? `FILTRO: ${model.areaById.get(areaId)?.nombre?.toUpperCase()}` : "DETALLE"} title="Hitos de entrega por fecha">
           <table className="table ms-table">
             <thead>
               <tr>
-                <th>Milestone</th>
+                <th>Hito de entrega</th>
                 <th>Línea</th>
                 <th>Fecha</th>
                 <th>Estado</th>

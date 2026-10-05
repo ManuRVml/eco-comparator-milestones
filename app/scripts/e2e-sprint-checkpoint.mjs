@@ -17,6 +17,13 @@ try {
     const token = await new SignJWT({ role }).setProtectedHeader({ alg: "HS256", typ: "JWT" }).setIssuedAt().setExpirationTime("5m").sign(key);
     await context.addCookies([{ name: "seg_session", value: token, url: server.base }]);
     const page = await context.newPage();
+    await page.goto(server.base);
+    assert.equal(await page.getByTestId("sprint-reviews").locator("li").count(), 7); passed++;
+    assert.match(await page.getByTestId("delivery-note").innerText(), /Un hito puede abarcar varios sprints/); passed++;
+    assert.match(await page.locator(".kpi").last().innerText(), /Hitos de entrega confirmados/i); passed++;
+    await page.goto(`${server.base}/milestones/M-01`);
+    assert.match(await page.getByTestId("delivery-M-01").innerText(), /Criterio de aceptación/); passed++;
+    assert.equal(await page.getByTestId("check-delivery-M-01").count(), 0); passed++;
     await page.goto(`${server.base}/lineas`);
     assert.equal(await page.locator('.rm-checkpoint [data-testid^="node-S"]').count(), 7); passed++;
     assert.ok((await page.getByTestId("metric-note").first().innerText()).includes("ponderado por días hábiles")); passed++;
