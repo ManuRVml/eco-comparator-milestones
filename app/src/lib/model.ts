@@ -29,6 +29,7 @@ import type {
 import { addDays, daysBetween, isoWeekday } from "./dates";
 import type { Workflow } from "./workflow/types";
 import type { SprintPlan } from "./sprint-plan";
+import type { MilestoneContract } from "./milestone-contract/domain";
 
 export type Linea = typeof lineas.$inferSelect;
 export type Area = typeof areas.$inferSelect;
@@ -109,6 +110,7 @@ export interface AreaProgreso {
 }
 
 export interface MilestoneView extends MilestoneRow {
+  trabajo: AreaProgreso;
   cierreVerificado?: boolean;
   linea: Linea | null;
   huIds: string[];
@@ -158,6 +160,7 @@ export interface Kpis {
 }
 
 export interface Model {
+  contratosMilestone?: Record<string, MilestoneContract>;
   /** Objetivos planificados públicos y cierre del alcance completo, calculados antes del filtro de visibilidad. */
   planesSprint?: SprintPlan[];
   cierresSprint?: Record<string, boolean>;
@@ -385,6 +388,7 @@ export function computeModel(raw: Raw, hoy: string, capa: Capa = "tecnica"): Mod
         tareasPublicadas: ts.filter((t) => t.publicadoCliente).length,
         pctTareas: res.pctTareas,
         pctPonderado: res.pctReal,
+        trabajo: res,
         spTotal,
         spCompletos,
         pctSp: pct(spCompletos, spTotal),
@@ -509,6 +513,7 @@ export function vistaCliente(m: Model): Model {
   }));
   return {
     ...m,
+    contratosMilestone: Object.fromEntries(Object.entries(m.contratosMilestone ?? {}).filter(([id]) => idsMs.has(id))),
     workflow: undefined,
     planesSprint: m.planesSprint?.map((p) => ({ ...p, tareaIds: p.tareaIds.filter((id) => idsT.has(id)) })),
     milestones: milestonesCliente,
