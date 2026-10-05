@@ -158,7 +158,7 @@ function AreaDetalle({ areaId, model, canEdit, verResumen }: { areaId: string; m
               </div>
             )}
             <div>
-              <span>Milestones con tareas</span>
+              <span>Milestones habilitados por esta área</span>
               <strong>{ms.length}</strong>
             </div>
           </div>

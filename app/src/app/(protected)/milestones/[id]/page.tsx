@@ -37,7 +37,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
 
   return (
     <main className="page" data-testid="milestone">
-      <Breadcrumb items={[{ label: "Líneas de tiempo", href: "/lineas" }, { label: `${m.id}` }]} />
+      <Breadcrumb items={[{ label: "Timeline de milestones", href: "/lineas" }, { label: `${m.id}` }]} />
 
       <section className="ms-hero" style={{ "--linea": colorLinea(m.lineaId), "--c": color } as CSSProperties}>
         <div className="ms-hero-main">
@@ -58,7 +58,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
               </dd>
             </div>
             <div>
-              <dt>Sprints</dt>
+              <dt>Sprints relacionados</dt>
               <dd>{m.sprintsTexto ?? "—"}</dd>
             </div>
             <div>
@@ -77,7 +77,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
           <Ring value={m.pctPonderado} size={148} stroke={13} color={color}>
             <span className="gauge-pct is-dark">{Math.round(m.pctPonderado)}%</span>
             <span className="gauge-sub is-dark">
-              {m.tareasHechas}/{m.tareasTotal} tareas
+              Trabajo hacia el milestone
             </span>
           </Ring>
           <div className="ms-hero-stats">
@@ -196,7 +196,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
                   </details>
                 );
               })}
-              {m.areas.length === 0 && <Empty>Este milestone no tiene tareas asociadas.</Empty>}
+              {m.areas.length === 0 && <Empty>Este milestone (hito) no tiene tareas asociadas.</Empty>}
             </div>
           ) : (
             <HuTab model={model} huIds={m.huIds} canEdit={session.canEdit} />
@@ -205,8 +205,8 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
 
         <aside className="detail-side">
           {session.canEdit && (
-            <Card kicker="EDITOR" title="Control del milestone" className="editor-card">
-              <label className="field-label">Estado (automático o manual)</label>
+            <Card kicker="EDITOR" title="Control del milestone (hito)" className="editor-card">
+              <label className="field-label">Seguimiento del trabajo (automático o manual)</label>
               <EstadoControl tipo="milestone" id={m.id} estado={m.override ? m.estado : "Automático"} estados={["Automático", ...ESTADOS_MILESTONE]} />
               <p className="muted small">Sugerido hoy: {m.estadoSugerido}</p>
               <div className="field-row">

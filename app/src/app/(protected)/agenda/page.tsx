@@ -16,12 +16,12 @@ export default async function AgendaPage() {
     <main className="page" data-testid="agenda">
       <PageHeading
         kicker="QUÉ VERÁS Y CUÁNDO"
-        title="Agenda de demos"
+        title="Agenda de milestones y demostraciones"
         aside={
           <div className="agenda-summary">
             <div>
               <strong>{fechas.length}</strong>
-              <span>weeklies con demo</span>
+              <span>fechas planificadas</span>
             </div>
             <div>
               <strong>{totalHu}</strong>
@@ -34,7 +34,7 @@ export default async function AgendaPage() {
           </div>
         }
       >
-        Cada jueves de weekly mostramos funcionalidad funcionando. Esta es la lista cronológica de lo que podrás ver en cada fecha.
+        Fechas objetivo de milestones y demostraciones semanales. Una demo permite revisar el resultado; su aceptación confirma el milestone. Una fecha pasada no demuestra que la revisión o la entrega se haya realizado.
       </PageHeading>
 
       <ol className="agenda">
@@ -52,14 +52,14 @@ export default async function AgendaPage() {
                 <span className="agenda-dow">{fmtDiaSemana(f)}</span>
                 <span className="agenda-day">{Number(f.slice(8))}</span>
                 <span className="agenda-month">{mesCorto(f)}</span>
-                <span className="agenda-rel">{dias >= 0 ? relativo(model.hoy, f) : "realizada"}</span>
+                <span className="agenda-rel">{dias >= 0 ? relativo(model.hoy, f) : "fecha transcurrida"}</span>
               </div>
               <div className="agenda-card">
                 <header>
                   <div>
                     {esProxima && <span className="next-pill">Próxima demo</span>}
                     <h3>{fmtLarga(f)}</h3>
-                    <p>{hus.length ? `${hus.length} historias · ${sp} SP${epicas.length ? ` · ${epicas.join(" · ")}` : ""}` : "Cierre del MVP · aceptación en producción"}</p>
+                    <p>{hus.length ? `${hus.length} historias · ${sp} SP${epicas.length ? ` · ${epicas.join(" · ")}` : ""}` : "Fecha objetivo de milestone · resultado por revisar"}</p>
                   </div>
                 </header>
                 {ms.length > 0 && (
@@ -73,7 +73,7 @@ export default async function AgendaPage() {
                           <b>{m.id}</b>
                           <StatusBadge estado={m.estadoFinal} size="sm" />
                           <em>
-                            {Math.round(m.pctTareas)} % {model.capa === "oficial" ? "entregado" : "técnico"}
+                            Trabajo {Math.round(m.pctPonderado)} % · {m.cierreVerificado ? "Milestone cumplido" : "Milestone pendiente"}
                           </em>
                         </span>
                         <strong>{m.nombre}</strong>

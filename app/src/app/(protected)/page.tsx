@@ -47,7 +47,7 @@ export default async function DashboardPage() {
           <p>Solo cuenta lo entregado y publicado en los weeklies; las fechas planificadas no certifican entregas. El avance y el plan se ponderan por los días hábiles de las tareas.</p>
           <div className="hero-stats" data-testid="hero-stats">
             <div>
-              <span>Avance oficial ponderado</span>
+              <span>Trabajo publicado hacia milestones</span>
               <strong>{fmtPct(of.pctReal)}</strong>
             </div>
             <div>
@@ -94,7 +94,7 @@ export default async function DashboardPage() {
               </strong>
             </div>
             <div>
-              <span>Real ponderado (técnico)</span>
+              <span>Trabajo técnico hacia milestones</span>
               <strong>{fmtPct(tec.pctReal)}</strong>
             </div>
             <div>
@@ -194,7 +194,7 @@ export default async function DashboardPage() {
         </article>
 
         <article className="kpi">
-          <span className="kpi-label">Hitos de entrega confirmados</span>
+          <span className="kpi-label">Milestones cumplidos</span>
           <div className="kpi-value">
             {model.milestones.filter((m) => m.cierreVerificado).length}
             <small>de {model.milestones.length} visibles</small>
@@ -234,9 +234,9 @@ export default async function DashboardPage() {
             <LineasResumen model={model} />
           </Card>
         )}
-        <Card kicker="ROADMAP" title="Próximos hitos" actions={<Link className="card-link" href="/lineas">Líneas de tiempo →</Link>}>
+        <Card kicker="ROADMAP" title="Próximos milestones" actions={<Link className="card-link" href="/lineas">Líneas de tiempo →</Link>}>
           {proximos.length === 0 ? (
-            <Empty>No hay hitos próximos.</Empty>
+            <Empty>No hay milestones próximos.</Empty>
           ) : (
             <ul className="upcoming">
               {proximos.map((m) => (
@@ -249,6 +249,7 @@ export default async function DashboardPage() {
                         <em>{relativo(model.hoy, m.fechaObjetivo ?? model.hoy)}</em>
                       </span>
                       <strong>{m.nombre}</strong>
+                      <span className="muted small">Trabajo hacia el milestone: {fmtPct(m.pctPonderado)} · {m.cierreVerificado ? "Cumplido" : "Pendiente de confirmación"}</span>
                     </div>
                     <StatusBadge estado={m.estadoFinal} size="sm" />
                   </Link>
@@ -259,7 +260,7 @@ export default async function DashboardPage() {
         </Card>
       </div>
 
-      <section className="lines-grid" aria-label="Hitos de entrega por línea">
+      <section className="lines-grid" aria-label="Milestones por línea">
         {model.lineas.map((l) => {
           const ms = model.milestones.filter((m) => m.lineaId === l.id);
           return (
@@ -281,6 +282,7 @@ export default async function DashboardPage() {
                         <StatusBadge estado={m.estadoFinal} size="sm" />
                       </span>
                       <span className="line-ms-name">{m.nombre}</span>
+                      <span className="muted small">{m.cierreVerificado ? "Milestone cumplido" : "Milestone pendiente"} · Trabajo realizado: {fmtPct(m.pctPonderado)}</span>
                       <span className="line-ms-bar">
                         <ProgressBar value={m.pctPonderado} color={colorLinea(l.id)} height={6} label={`Avance ponderado ${m.id}`} />
                         <em>

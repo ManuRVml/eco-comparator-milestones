@@ -7,7 +7,7 @@ import { Card, ProgressBar } from "./ui";
 import { CompletionCheck } from "./completion-check";
 
 export function SprintReviews({ model }: { model: Model }) {
-  return <Card kicker="INSPECCIÓN Y ADAPTACIÓN" title="Puntos de revisión de sprint" actions={<Link className="card-link" href="/lineas">Ver línea de tiempo →</Link>}>
+  return <Card kicker="INSPECCIÓN Y ADAPTACIÓN" title="Revisión del avance hacia milestones por sprint" actions={<Link className="card-link" href="/lineas">Ver timeline de milestones →</Link>}>
     <p className="muted small">Revisar estos resultados orienta el siguiente paso. El cierre del periodo y la aceptación de un hito se registran por separado.</p>
     <ul className="sprint-reviews" data-testid="sprint-reviews">
       {model.sprints.map((s) => {

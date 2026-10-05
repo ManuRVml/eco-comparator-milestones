@@ -24,7 +24,7 @@ export function SprintCheckpointRow({ model, areaId, canEdit, position }: { mode
           const left = position(c.sprint.fechaFin), color = colorEstado(c.estado);
           const align = left > 93 ? "is-right" : left < 7 ? "is-left" : "";
           return (
-            <RoadmapNode key={c.id} id={c.id} href={`/lineas?${areaId ? `area=${areaId}&` : ""}m=${c.id}`} className={`rm-node ${align} ${c.tareas.length ? "" : "is-muted"}`} style={{ left: `${left}%`, "--fila": 0, "--c": color } as CSSProperties} title={`Sprint ${c.sprint.numero} · Checkpoint de cierre (clic para ver tareas)`}>
+            <RoadmapNode key={c.id} id={c.id} href={`/lineas?${areaId ? `area=${areaId}&` : ""}m=${c.id}`} className={`rm-node ${align} ${c.tareas.length ? "" : "is-muted"}`} style={{ left: `${left}%`, "--fila": 0, "--c": color } as CSSProperties} title={`Sprint ${c.sprint.numero} · Revisión del avance hacia milestones (clic para ver tareas)`}>
               <span className="rm-dot"><Ring value={c.total.pctReal} plan={c.completo ? undefined : c.total.pctPlan} size={44} stroke={5} color={color} track="var(--color-border-default)"><span className="rm-dot-inner">{c.id}</span></Ring><CompletionCheck complete={c.completo} label={`Sprint ${c.sprint.numero}: cierre completo verificado`} id={c.id} /></span>
               <span className="rm-label">
                 <span className="rm-date">{fmtDiaSemana(c.sprint.fechaFin)} {fmtCorta(c.sprint.fechaFin)}</span>

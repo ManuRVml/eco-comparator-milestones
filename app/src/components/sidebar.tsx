@@ -9,10 +9,10 @@ import { AreasIcon, CalendarIcon, CheckIcon, EditIcon, HomeIcon, LogoutIcon, Rep
 type Item = { href: string; label: string; icon: ComponentType<{ size?: number }>; match: (p: string) => boolean; equipo?: boolean; admin?: boolean };
 
 const ITEMS: Item[] = [
-  { href: "/", label: "Resumen", icon: HomeIcon, match: (p) => p === "/" },
-  { href: "/lineas", label: "Líneas de tiempo", icon: TimelineIcon, match: (p) => p.startsWith("/lineas") || p.startsWith("/milestones") },
-  { href: "/areas", label: "Áreas", icon: AreasIcon, match: (p) => p.startsWith("/areas") },
-  { href: "/agenda", label: "Qué verás y cuándo", icon: CalendarIcon, match: (p) => p.startsWith("/agenda") },
+  { href: "/", label: "Resumen de milestones", icon: HomeIcon, match: (p) => p === "/" },
+  { href: "/lineas", label: "Timeline de milestones", icon: TimelineIcon, match: (p) => p.startsWith("/lineas") || p.startsWith("/milestones") },
+  { href: "/areas", label: "Aporte por área", icon: AreasIcon, match: (p) => p.startsWith("/areas") },
+  { href: "/agenda", label: "Agenda de milestones", icon: CalendarIcon, match: (p) => p.startsWith("/agenda") },
   { href: "/editor", label: "Panel del editor", icon: EditIcon, match: (p) => p.startsWith("/editor"), equipo: true },
   { href: "/flujo", label: "Trabajo por equipo", icon: AreasIcon, match: (p) => p.startsWith("/flujo"), equipo: true },
   { href: "/reconciliacion", label: "Fuentes y compromisos", icon: ReportIcon, match: (p) => p.startsWith("/reconciliacion"), equipo: true },
@@ -21,11 +21,11 @@ const ITEMS: Item[] = [
 ];
 
 const TITULOS: [RegExp, string][] = [
-  [/^\/$/, "Resumen"],
-  [/^\/lineas/, "Líneas de tiempo"],
-  [/^\/milestones/, "Detalle del milestone"],
+  [/^\/$/, "Resumen de milestones"],
+  [/^\/lineas/, "Timeline de milestones"],
+  [/^\/milestones/, "Milestone: resultado y aceptación"],
   [/^\/areas/, "Avance por área"],
-  [/^\/agenda/, "Qué verás y cuándo"],
+  [/^\/agenda/, "Agenda de milestones"],
   [/^\/editor/, "Panel del editor"],
   [/^\/flujo/, "Trabajo por equipo"],
   [/^\/reconciliacion/, "Fuentes y compromisos"],
