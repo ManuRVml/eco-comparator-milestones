@@ -24,9 +24,9 @@ export function MilestoneDelivery({ m, model }: { m: MilestoneView; model: Model
       </li>)}
     </ol>
     {!contract?.criterios.length && <p>Por definir; el milestone no puede certificarse.</p>}
-    <details className="delivery-context"><summary>Job, outcome, responsables y alcance</summary>
+    <details className="delivery-context"><summary>Necesidad del usuario, resultado, responsables y alcance</summary>
       <dl className="definition-grid">
-        {[["Job del usuario (JTBD)", d?.job], ["Outcome medible", d?.outcome], ["Métrica y meta acordada", d?.meta], ["Responsable", d?.responsable], ["Aprobador del negocio", d?.aprobador], ["Incluido en la entrega", d?.alcanceIncluido], ["Fuera de alcance", d?.fueraAlcance]].map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value || "Por definir"}</dd></div>)}
+        {[["Necesidad del usuario (JTBD)", d?.job], ["Resultado esperado", d?.outcome], ["Objetivo de negocio", d?.meta], ["Responsable", d?.responsable], ["Aprobador del negocio", d?.aprobador], ["Incluido en la entrega", d?.alcanceIncluido], ["Fuera de alcance", d?.fueraAlcance]].map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value || "Por definir"}</dd></div>)}
         <div><dt>Alcance relacionado</dt><dd>{m.huIds.length} historias · {m.tareaIds.length} tareas · {m.epicas?.replaceAll(";", " · ") || "Épicas sin registrar"}</dd></div>
       </dl>
     </details>

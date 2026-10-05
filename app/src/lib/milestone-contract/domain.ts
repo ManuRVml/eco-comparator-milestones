@@ -4,7 +4,8 @@ export type MilestoneMetric = typeof metricasMilestone.$inferSelect;
 export interface MilestoneContract { definicion: MilestoneDefinition; criterios: MilestoneCriterion[]; metricas: MilestoneMetric[] }
 export const EMPTY_DEFINITION: MilestoneDefinition = { job: "", outcome: "", meta: "", alcanceIncluido: "", fueraAlcance: "", responsable: "", aprobador: "", fechaPrevision: "", motivoPrevision: "" };
 export function definitionPending(d: MilestoneDefinition): string[] {
-  return (["job", "outcome", "meta", "alcanceIncluido", "fueraAlcance", "responsable", "aprobador"] as const).filter(key => !d[key]?.trim());
+  const labels = { job: "Necesidad del usuario", outcome: "Resultado esperado", meta: "Objetivo de negocio", alcanceIncluido: "Alcance incluido", fueraAlcance: "Fuera de alcance", responsable: "Responsable", aprobador: "Aprobador del negocio" };
+  return (Object.keys(labels) as (keyof typeof labels)[]).filter(key => !d[key]?.trim()).map(key => labels[key]);
 }
 export function metricPending(m: MilestoneMetric): boolean {
   return !m.nombre.trim() || !m.metodo.trim() || (m.tipo === "Cuantitativa" ? !m.unidad.trim() || m.objetivo === null : !m.objetivoCualitativo.trim());

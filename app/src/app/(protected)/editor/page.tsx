@@ -75,8 +75,7 @@ export default async function EditorPage({ searchParams }: PageProps<"/editor">)
           </div>
         }
       >
-        El estado técnico y su evidencia son una sugerencia interna. El equipo Ecopetrol solo ve como entregado lo que un editor o un
-        administrador aprueba con «Aprobar y publicar» (fecha y nota de entrega). Todo queda en la bitácora con rol, fecha y valor anterior → nuevo.
+        {vista === "configuracion" ? "Define el resultado, las métricas y los criterios de cada milestone. Solo el administrador configura, registra la aceptación del negocio y publica el cumplimiento. El cliente consulta los compromisos y las evidencias; cada cambio queda en la bitácora." : "El estado técnico y su evidencia son una sugerencia interna. El equipo Ecopetrol solo ve las tareas aprobadas y publicadas. La aceptación y publicación de milestones corresponde al administrador. Todo queda en la bitácora con rol, fecha y valor anterior y nuevo."}
       </PageHeading>
 
       <div className="tabs" role="tablist">
