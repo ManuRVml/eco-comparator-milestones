@@ -24,6 +24,7 @@ export function tareaVerificada(t: Tarea, model: Model): boolean {
 export function milestoneCompletado(m: MilestoneView, model: Model): boolean {
   const tasks = m.tareaIds.map((id) => model.tareaById.get(id));
   const hus = m.huIds.map((id) => model.huById.get(id));
-  return tasks.length > 0 && tasks.every((t) => !!t && tareaVerificada(t, model)) &&
-    hus.every((h) => !!h && h.estado === "Aceptada") && (model.capa !== "oficial" || m.publicado);
+  return !!m.criterio?.trim() && m.publicado && !!m.fechaCierre && m.fechaCierre <= model.hoy && !!m.evidencia?.trim() &&
+    tasks.length > 0 && tasks.every((t) => !!t && tareaVerificada(t, model)) &&
+    hus.every((h) => !!h && h.estado === "Aceptada");
 }

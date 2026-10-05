@@ -13,6 +13,7 @@ import { fmtCorta, fmtDiaSemana, fmtLarga, relativo } from "@/lib/dates";
 import { colorArea, colorEstado, colorLinea, fmtPct } from "@/lib/format";
 import { ESTADOS_MILESTONE, type Model, type Tarea } from "@/lib/model";
 import { MetricNote } from "@/components/metric-note";
+import { MilestoneDelivery } from "@/components/milestone-delivery";
 
 function ordenar(ts: Tarea[]) {
   const hechas = ts.filter((t) => t.estado === "Hecha").sort((a, b) => (a.fechaCierre ?? "").localeCompare(b.fechaCierre ?? "") || a.id.localeCompare(b.id));
@@ -81,7 +82,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
           </Ring>
           <div className="ms-hero-stats">
             <div>
-              <span>Ponderado por días</span>
+              <span>Ejecución ponderada por días</span>
               <strong>{fmtPct(m.pctPonderado)}</strong>
             </div>
             <div>
@@ -108,6 +109,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
         </div>
       </section>
       <MetricNote capa={model.capa} hoy={model.hoy} alcance={`${m.id} completo; el desglose por área usa las tareas de cada disciplina`} />
+      <MilestoneDelivery m={m} />
 
       {m.criticasVencidas.length > 0 && (
         <div className="alert tone-amber" role="status">

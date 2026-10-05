@@ -8,6 +8,9 @@ import { colorEstado, colorLinea, fmtPct, TONE_COLOR, tono } from "@/lib/format"
 import { ESTADOS_MILESTONE, type Model } from "@/lib/model";
 import { progresoLinea } from "@/lib/line-progress";
 import { MetricNote } from "@/components/metric-note";
+import { DeliveryNote } from "@/components/delivery-note";
+import { SprintReviews } from "@/components/sprint-reviews";
+import { CompletionCheck } from "@/components/completion-check";
 
 const HU_ORDEN = ["Aceptada", "Lista para demo", "En curso", "No iniciada", "Bloqueada"];
 
@@ -36,7 +39,7 @@ export default async function DashboardPage() {
       <section className="hero">
         <div className="hero-copy">
           <span className="hero-kicker">
-            <span className="hero-kicker-dot" /> AVANCE OFICIAL Del MVP · CORTE {fmtLarga(model.hoy).toUpperCase()}
+            <span className="hero-kicker-dot" /> EJECUCIÓN OFICIAL DEL PROYECTO · CORTE {fmtLarga(model.hoy).toUpperCase()}
           </span>
           <h2 data-testid="hero-titulo">
             <span className="hero-num">{of.hechas}</span> de {of.total} tareas entregadas al equipo Ecopetrol
@@ -110,6 +113,7 @@ export default async function DashboardPage() {
       )}
 
       <MetricNote capa={model.capa} hoy={model.hoy} alcance="Proyecto completo; cabecera oficial y detalle según la capa indicada" />
+      <DeliveryNote />
 
       <section className="kpi-grid" aria-label="Indicadores clave">
         <article className="kpi">
@@ -190,18 +194,19 @@ export default async function DashboardPage() {
         </article>
 
         <article className="kpi">
-          <span className="kpi-label">Milestones</span>
+          <span className="kpi-label">Hitos de entrega confirmados</span>
           <div className="kpi-value">
-            {k.milestonesPorEstado.Cumplido}
-            <small>de {k.milestonesTotal} cumplidos</small>
+            {model.milestones.filter((m) => m.cierreVerificado).length}
+            <small>de {model.milestones.length} visibles</small>
           </div>
           <div className="ms-dots">
             {model.milestones.map((m) => (
-              <Link key={m.id} href={`/milestones/${m.id}`} className="ms-dot" style={{ background: colorEstado(m.estadoFinal) }} title={`${m.id} · ${m.estadoFinal}`}>
+              <Link key={m.id} href={`/milestones/${m.id}`} className="ms-dot" style={{ background: colorEstado(m.estadoFinal) }} title={`${m.id} · Seguimiento: ${m.estadoFinal} · ${m.cierreVerificado ? "Entrega confirmada" : "Entrega pendiente de confirmación"}`}>
                 {m.id.slice(2)}
               </Link>
             ))}
           </div>
+          <p className="kpi-note">El contador exige aceptación y publicación. Los colores indican el estado de seguimiento.</p>
           <ul className="kpi-legend is-inline">
             {ESTADOS_MILESTONE.filter((e) => k.milestonesPorEstado[e]).map((e) => (
               <li key={e}>
@@ -212,6 +217,8 @@ export default async function DashboardPage() {
           </ul>
         </article>
       </section>
+
+      <SprintReviews model={model} />
 
       <div className="grid-2">
         {verAreas ? (
@@ -252,7 +259,7 @@ export default async function DashboardPage() {
         </Card>
       </div>
 
-      <section className="lines-grid" aria-label="Milestones por línea">
+      <section className="lines-grid" aria-label="Hitos de entrega por línea">
         {model.lineas.map((l) => {
           const ms = model.milestones.filter((m) => m.lineaId === l.id);
           return (
@@ -269,7 +276,7 @@ export default async function DashboardPage() {
                   <li key={m.id}>
                     <Link href={`/milestones/${m.id}`}>
                       <span className="line-ms-top">
-                        <b>{m.id}</b>
+                        <b>{m.id} <CompletionCheck complete={!!m.cierreVerificado} label="Hito de entrega confirmado" id={`summary-${m.id}`} /></b>
                         <span>{fmtCorta(m.fechaObjetivo)}</span>
                         <StatusBadge estado={m.estadoFinal} size="sm" />
                       </span>
@@ -303,7 +310,7 @@ export default async function DashboardPage() {
                     <AreaDot areaId={t.areaId} />
                     <b>{t.id}</b>
                     <span>{model.areaById.get(t.areaId)?.nombre}</span>
-                    <em>{fmtCorta(t.fechaCierre ?? t.fechaFin)}</em>
+                    <em>{t.fechaCierre ? fmtCorta(t.fechaCierre) : "Cierre sin fecha registrada"}</em>
                   </span>
                   <strong>{t.nombre}</strong>
                   {t.evidencia && <span className="recent-evid">{t.evidencia}</span>}

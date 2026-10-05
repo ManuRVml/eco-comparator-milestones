@@ -737,3 +737,8 @@
 .workflow-column { min-width: 0; }
 .workflow-source { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; font-size: 12px; line-height: 1.6; max-height: 650px; overflow: auto; }
 .workflow-task { display: block; margin: .75rem 0; padding: .75rem; border: 1px solid var(--color-border-default); border-radius: 10px; }
+.sprint-reviews { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px; list-style: none; padding: 0; margin: 16px 0 0; }
+.sprint-reviews li { min-width: 0; }
+.sprint-reviews a { display: grid; gap: 10px; height: 100%; padding: 14px; border: 1px solid var(--color-border-default); border-radius: var(--radius-md); font-size: 12px; }
+.sprint-reviews a:hover { border-color: var(--color-brand-primary); }
+.ms-panel > .checkpoint-expectation { margin: 12px 20px; }

@@ -15,7 +15,7 @@ export function SprintCheckpointRow({ model, areaId, canEdit, position }: { mode
     <div className="rm-row rm-lane rm-checkpoint" style={{ "--filas": 1, "--linea": "var(--color-brand-primary)" } as CSSProperties}>
       <div className="rm-lane-label">
         <span className="rm-lane-id">CP</span>
-        <strong>Cierres de sprint</strong>
+        <strong>Revisión de sprints</strong>
         <span className="rm-lane-meta">S0: una semana · S1–S6: dos semanas</span>
       </div>
       <div className="rm-track">

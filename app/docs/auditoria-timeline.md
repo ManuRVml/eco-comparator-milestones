@@ -47,3 +47,11 @@ Las referencias críticas son un subconjunto del trabajo del sprint. No sustituy
 Ocho casos numéricos y de correlación en dos archivos; 28 comprobaciones de interfaz en un archivo, con perfiles administrador y cliente y tamaños escritorio/móvil. ESLint sobre archivos modificados y compilación Next.js con TypeScript correctos. Las pruebas utilizan una copia de la base; esta corrección no escribe ni migra datos de producción.
 
 Los datos registrados son la evidencia disponible: la fecha transcurrida no demuestra entrega y esta vista no inventa estados históricos. El redondeo visual puede causar diferencias de una décima al sumar aportes mostrados. Las correspondencias pendientes deben resolverse con evidencia antes de certificar esos cierres.
+
+## Aplicación de la metodología en dashboards
+
+El resumen distingue hitos de entrega confirmados de sus estados de seguimiento. El contador usa la verificación del alcance completo, un criterio definido y el registro de aprobación/publicación con fecha y evidencia. Los colores conservan los estados existentes; no sustituyen ese contador. No se cambian los estados guardados.
+
+Los siete puntos de revisión aparecen también en el resumen, con resultado esperado y comparación de ejecución prevista/real. Los paneles y detalles de hitos explican el resultado para el cliente, el criterio y el cumplimiento confirmado. Terminar un periodo no certifica un hito, y un hito puede abarcar varios sprints. Se eliminó otra sustitución de fecha real de cierre por fecha planificada en entregas recientes.
+
+Validación de esta ampliación: seis casos de correlación en un archivo y 38 comprobaciones de interfaz en otro; lint de archivos modificados y compilación con TypeScript correctos. Se reutiliza la evidencia de las tres pruebas de ponderación, cuyo código no cambió. No hay migraciones ni escrituras sobre datos de producción.

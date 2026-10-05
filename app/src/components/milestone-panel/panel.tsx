@@ -8,13 +8,14 @@ import { PublicarControl } from "@/components/editor/publicar-control";
 import { PanelClose } from "./panel-client";
 import { MilestoneWorkflow } from "../workflow/milestone-panel";
 import { MetricNote } from "../metric-note";
+import { MilestoneDelivery } from "../milestone-delivery";
 
 function plazo(hoy: string, fecha: string | null, cumplido: boolean) {
   if (!fecha) return { texto: "Sin fecha", tono: "slate" };
   const n = daysBetween(hoy, fecha);
   if (n === 0) return { texto: "Es hoy", tono: "cyan" };
   if (n > 0) return { texto: n === 1 ? "Falta 1 día" : `Faltan ${n} días`, tono: "cyan" };
-  return cumplido ? { texto: `Cumplido hace ${-n} días`, tono: "green" } : { texto: `Vencido hace ${-n} días`, tono: "red" };
+  return cumplido ? { texto: "Entrega confirmada", tono: "green" } : { texto: `Objetivo vencido hace ${-n} días`, tono: "red" };
 }
 
 /** Entregables de un milestone para el panel en línea de /lineas (datos ya filtrados por rol). */
@@ -24,7 +25,7 @@ export function MilestonePanel({ m, model, canEdit, areaId = null }: { m: Milest
   const area = areaId ? m.areas.find((a) => a.areaId === areaId) : null;
   const porcentaje = areaId ? (area?.pctReal ?? 0) : m.pctPonderado;
   const hechas = tareas.filter((t) => t.estado === "Hecha").length;
-  const p = plazo(model.hoy, m.fechaObjetivo, m.estadoFinal === "Cumplido");
+  const p = plazo(model.hoy, m.fechaObjetivo, !!m.cierreVerificado);
   const color = colorEstado(m.estadoFinal);
   const riesgos = m.riesgoIds.map((id) => model.riesgoById.get(id)).filter((r) => !!r);
   const deps = [...m.dependeDe.map((id) => ({ id, rel: "Depende de" })), ...m.dependientes.map((id) => ({ id, rel: "Habilita" }))];
@@ -68,6 +69,7 @@ export function MilestonePanel({ m, model, canEdit, areaId = null }: { m: Milest
       </header>
 
       <MetricNote capa={model.capa} hoy={model.hoy} alcance={`${m.id}${areaId ? ` · ${model.areaById.get(areaId)?.nombre}` : " · tareas de este milestone"}`} />
+      <MilestoneDelivery m={m} />
 
       <div className="ms-panel-body">
         <div className="ms-panel-col">

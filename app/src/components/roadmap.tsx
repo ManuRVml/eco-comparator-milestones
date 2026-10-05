@@ -137,7 +137,7 @@ export function Roadmap({ model, areaId, inicial, canEdit }: { model: Model; are
                   <span className="rm-lane-id">{l.id}</span>
                   <strong>{l.nombre}</strong>
                   <span className="rm-lane-meta">
-                    {ms.length} milestones · {fmtPct(progreso.pctReal)} {model.capa === "oficial" ? "entregado" : "técnico"} ponderado
+                    {ms.length} hitos de entrega · {fmtPct(progreso.pctReal)} {model.capa === "oficial" ? "entregado" : "técnico"} ponderado
                   </span>
                 </div>
                 <div className="rm-track">
