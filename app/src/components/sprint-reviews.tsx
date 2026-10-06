@@ -14,7 +14,7 @@ export function SprintReviews({ model }: { model: Model }) {
         const c = sprintCheckpoint(model, s.numero)!;
         return <li key={s.id}><Link href={`/lineas?m=${c.id}`}>
           <span className="line-ms-top"><b>{c.id} · {fmtCorta(s.fechaFin)}</b><CompletionCheck complete={c.completo} label="Resultado del sprint verificado" id={`review-${c.id}`} /></span>
-          <strong>{c.compromiso?.resultado || `Revisión del Sprint ${s.numero}`}</strong>
+          <strong>{c.id} · {c.titulo}</strong>
           <span>Trabajo realizado: {fmtPct(c.total.pctReal)}{!c.completo && <> · previsto al corte: {fmtPct(c.total.pctPlan)}</>}</span>
           <ProgressBar value={c.total.pctReal} plan={c.completo ? undefined : c.total.pctPlan} label={`Ejecución ponderada ${c.id}`} />
           <span className="muted small">{c.completo ? "Resultado verificado" : "Resultado pendiente de verificación"}</span>

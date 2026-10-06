@@ -15,8 +15,8 @@ export function SprintCheckpointRow({ model, areaId, canEdit, position }: { mode
     <div className="rm-row rm-lane rm-checkpoint" style={{ "--filas": 2, "--linea": "var(--color-brand-primary)" } as CSSProperties}>
       <div className="rm-lane-label">
         <span className="rm-lane-id">CP</span>
-        <strong>Revisión de sprints</strong>
-        <span className="rm-lane-meta">S0: una semana · S1–S6: dos semanas</span>
+        <strong>Milestones por sprint</strong>
+        <span className="rm-lane-meta">S1–S6: resultado esperado · S0: alistamiento</span>
       </div>
       <div className="rm-track">
         <span className="rm-line" />
@@ -27,8 +27,9 @@ export function SprintCheckpointRow({ model, areaId, canEdit, position }: { mode
             <RoadmapNode key={c.id} id={c.id} href={`/lineas?${areaId ? `area=${areaId}&` : ""}m=${c.id}`} className={`rm-node ${align} ${c.tareas.length ? "" : "is-muted"}`} style={{ left: `${left}%`, "--fila": index % 2, "--c": color } as CSSProperties} title={`Sprint ${c.sprint.numero} · Revisión del avance hacia milestones (clic para ver tareas)`}>
               <span className="rm-dot"><Ring value={c.total.pctReal} plan={c.completo ? undefined : c.total.pctPlan} size={44} stroke={5} color={color} track="var(--color-border-default)"><span className="rm-dot-inner">{c.id}</span></Ring><CompletionCheck complete={c.completo} label={`Sprint ${c.sprint.numero}: cierre completo verificado`} id={c.id} /></span>
               <span className="rm-label">
+                <span className="rm-kind">{c.sprint.numero === 0 ? "Alistamiento" : "Milestone del sprint"}</span>
                 <span className="rm-date">{fmtDiaSemana(c.sprint.fechaFin)} {fmtCorta(c.sprint.fechaFin)}</span>
-                <span className="rm-name">{c.compromiso?.resultado ?? (c.sprint.numero === 0 ? "Alistamiento inicial" : `Cierre Sprint ${c.sprint.numero}`)}</span>
+                <span className="rm-name">{c.id} · {c.titulo}</span>
                 <span className="rm-stat"><i style={{ background: color }} />Total {fmtPct(c.total.pctReal)}</span>
                 {!c.completo && <span className="rm-comparison">Previsto {fmtPct(c.total.pctPlan)} · {c.estado}</span>}
                 {areaId && <span className="rm-comparison">Área {fmtPct(c.porcentaje)}</span>}

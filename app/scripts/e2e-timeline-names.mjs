@@ -43,6 +43,19 @@ try {
         assert.ok(!(a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top), `${geometry.nodes[i].id} se superpone a ${geometry.nodes[j].id}`);
       }
       await page.getByTestId("roadmap").screenshot({ path: `${out}/${role}-${width}.png`, animations:"disabled" });
+      const node = page.getByTestId("node-S1");
+      await node.scrollIntoViewIfNeeded();
+      const before = await page.evaluate(() => window.scrollY);
+      await node.click();
+      const dialog = page.getByRole("dialog");
+      await dialog.waitFor({ state: "visible" });
+      assert.equal(await page.evaluate(() => window.scrollY), before, "Abrir no desplaza la página");
+      assert.match(await dialog.textContent(), /S1 · Autenticación y navegación disponibles/);
+      assert.equal(await dialog.evaluate(el => getComputedStyle(el).position), "fixed");
+      await page.keyboard.press("Escape");
+      await dialog.waitFor({ state: "hidden" });
+      assert.equal(await node.evaluate(el => document.activeElement === el), true, "Retorna el foco al nodo");
+      assert.equal(await page.evaluate(() => window.scrollY), before, "Cerrar conserva la posición");
       receipt.push({ role, width, ...geometry });
       console.log(JSON.stringify({ role, width, names:geometry.nodes.length, clipped:0, overlaps:0 }));
       await context.close();

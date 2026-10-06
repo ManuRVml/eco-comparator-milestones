@@ -24,8 +24,8 @@ export function SprintCheckpointPanel({ model, numero, areaId, canEdit }: { mode
           <span className="mini-ring-label is-lg">{Math.round(total.pctReal)}%</span>
         </Ring>
         <div className="ms-panel-title">
-          <div className="ms-panel-tags"><span className="ms-id">Sprint {numero}</span><StatusBadge estado={estado} size="sm" /><CompletionCheck complete={checkpoint.completo} label="Cierre completo verificado" id={`panel-${id}`} /></div>
-          <h3 id={`panel-heading-${id}`}>{numero === 0 ? "Revisión de alistamiento · Sprint 0" : `Revisión de avance · Sprint ${numero}`}</h3>
+          <div className="ms-panel-tags"><span className="ms-id">{numero === 0 ? "Alistamiento S0" : `Milestone S${numero}`}</span><StatusBadge estado={estado} size="sm" /><CompletionCheck complete={checkpoint.completo} label="Cierre completo verificado" id={`panel-${id}`} /></div>
+          <h3 id={`panel-heading-${id}`}>{id} · {checkpoint.titulo}</h3>
           <p className="ms-panel-meta">{fmtCorta(sprint.fechaInicio)} – {fmtCorta(sprint.fechaFin)} · {daysBetween(sprint.fechaInicio, sprint.fechaFin) < 7 ? "Una semana" : "Dos semanas"} · Total: {total.hechas}/{total.total} tareas {model.capa === "oficial" ? "entregadas" : "hechas (técnico interno)"}</p>
         </div>
         <div className="ms-panel-actions"><PanelClose /></div>

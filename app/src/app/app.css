@@ -586,10 +586,12 @@
 .rm-node.is-selected .rm-dot { position: relative; display: grid; width: 44px; height: 44px; place-items: center; border-radius: 50%; background: var(--color-surface-card); transition: transform 180ms var(--motion-easing-standard); }
 .rm-node.is-selected .rm-label { background: var(--color-brand-primary-subtle); box-shadow: 0 0 0 1px var(--color-brand-primary-border); }
 .rm-node.is-selected .rm-name { color: var(--color-brand-primary-dark); }
-.rm-panel-wrap { position: relative; z-index: 5; display: grid; grid-column: 1 / -1; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows 360ms cubic-bezier(.2,.7,.2,1), opacity 260ms ease; }
-.rm-panel-wrap.is-open { grid-template-rows: 1fr; opacity: 1; }
-.rm-panel-inner { min-height: 0; overflow: hidden; }
-.rm-backdrop { display: none; }
+.rm-kind { display: block; font-size: 11px; font-weight: 700; color: var(--color-brand-primary-dark); margin-bottom: 3px; }
+.rm-panel-wrap { position: fixed; inset: 0 0 0 auto; width: min(760px, 92vw); z-index: 70; display: block; opacity: 0; visibility: hidden; transform: translateX(32px); transition: transform 260ms cubic-bezier(.32,.72,0,1), opacity 220ms ease, visibility 0s linear 260ms; background: var(--color-surface-card); box-shadow: -16px 0 48px rgb(0 0 0 / .16); }
+.rm-panel-wrap.is-open { opacity: 1; visibility: visible; transform: translateX(0); transition-delay: 0s; }
+.rm-panel-inner { height: 100%; max-height: 100dvh; overflow-y: auto; overscroll-behavior: contain; }
+.rm-backdrop { position: fixed; inset: 0; z-index: 65; display: block; background: color-mix(in srgb, var(--color-text-heading) 30%, transparent); opacity: 0; pointer-events: none; transition: opacity 220ms ease; }
+.rm-backdrop.is-open { opacity: 1; pointer-events: auto; }
 .ms-panel { position: relative; margin: 2px 20px 24px 22px; padding: 20px 22px 22px; border: 1px solid color-mix(in srgb, var(--linea) 28%, var(--color-border-default)); border-top: 3px solid var(--linea); border-radius: 18px; background: var(--color-surface-card); box-shadow: 0 18px 44px color-mix(in srgb, var(--color-brand-primary-dark) 13%, transparent); }
 .ms-panel::before { position: absolute; top: -10px; left: 50px; width: 16px; height: 16px; transform: rotate(45deg); border-top: 3px solid var(--linea); border-left: 1px solid color-mix(in srgb, var(--linea) 28%, var(--color-border-default)); background: var(--color-surface-card); content: ""; display: none; }
 .ms-panel-grip { display: none; }
@@ -635,11 +637,7 @@
   .ms-panel-body .ms-panel-col:last-child { grid-column: 1 / -1; }
 }
 @media (max-width: 760px) {
-  .rm-backdrop { position: fixed; inset: 0; z-index: 65; display: block; background: color-mix(in srgb, var(--color-text-heading) 42%, transparent); opacity: 0; pointer-events: none; transition: opacity 260ms ease; }
-  .rm-backdrop.is-open { opacity: 1; pointer-events: auto; }
-  .rm-panel-wrap { position: fixed; right: 0; bottom: 0; left: 0; z-index: 70; display: block; opacity: 1; visibility: hidden; transform: translateY(104%); transition: transform 340ms cubic-bezier(.2,.7,.2,1), visibility 0s linear 340ms; }
-  .rm-panel-wrap.is-open { visibility: visible; transform: none; transition: transform 340ms cubic-bezier(.2,.7,.2,1), visibility 0s; }
-  .rm-panel-inner { max-height: 86vh; overflow-y: auto; overscroll-behavior: contain; border-radius: 20px 20px 0 0; }
+  .rm-panel-wrap { width: 100%; }
   .ms-panel { margin: 0; padding: 10px 16px 28px; border-radius: 20px 20px 0 0; box-shadow: 0 -12px 40px color-mix(in srgb, var(--color-text-heading) 22%, transparent); }
   .ms-panel-grip { display: block; width: 42px; height: 4px; margin: 0 auto 12px; border-radius: 4px; background: var(--color-border-default); }
   .ms-panel-head { grid-template-columns: auto minmax(0, 1fr); gap: 14px; }
@@ -842,3 +840,9 @@
   .contribution-table td:first-child { display: block; }
   .contribution-table td[data-label]::before { content: attr(data-label); color: var(--color-text-muted); font-size: 12px; }
 }
+
+.rm-panel-wrap[role="dialog"] { max-height: 100dvh; outline: 0; }
+.rm-panel-wrap .ms-panel { margin: 0; min-height: 100%; border-radius: 0; box-shadow: none; padding: 24px; }
+.rm-panel-wrap .ms-panel-body { grid-template-columns: 1fr; }
+.rm-panel-wrap .ms-panel-grip { display: none; }
+@media (max-width: 760px) { .rm-panel-wrap .ms-panel { padding: 16px; } }

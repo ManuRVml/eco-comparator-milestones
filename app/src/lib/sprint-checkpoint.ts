@@ -1,6 +1,15 @@
 import { progresoAreas, resumir, type EstadoMilestone, type Model } from "./model";
 import { tareaVerificada } from "./completion";
 
+const resultadosSprint: Record<number, string> = {
+  1: "Autenticación y navegación disponibles",
+  2: "Comparativo definido y fuentes ingestadas",
+  3: "Datos homologados y resultados calculados",
+  4: "Monitor de Valor y simulación disponibles",
+  5: "Presentaciones generadas e Yarbis integrado",
+  6: "Salida a producción del MVP",
+};
+
 /** El alistamiento conserva su sprint y tareas; no crea un milestone ni certifica su entrega por fecha. */
 export function sprintCheckpoint(model: Model, numero: number, areaId: string | null = null) {
   const sprint = model.sprints.find((s) => s.numero === numero);
@@ -22,5 +31,5 @@ export function sprintCheckpoint(model: Model, numero: number, areaId: string | 
   const estado: EstadoMilestone = completo ? "Cumplido"
     : sprint.fechaFin < model.hoy ? "Atrasado"
     : todas.some((t) => t.estado === "Hecha" || t.estado === "En curso") ? "En curso" : "Pendiente";
-  return { id: `S${numero}`, sprint, tareas, hechas, estado, completo, referenciasPendientes, porcentaje: progreso.pctReal, progreso, total, areas, compromiso };
+  return { titulo: resultadosSprint[numero] ?? compromiso?.resultado ?? "Alistamiento inicial", id: `S${numero}`, sprint, tareas, hechas, estado, completo, referenciasPendientes, porcentaje: progreso.pctReal, progreso, total, areas, compromiso };
 }

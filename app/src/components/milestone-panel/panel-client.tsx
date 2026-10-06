@@ -1,10 +1,10 @@
 "use client";
 
+import { createPortal } from "react-dom";
 import { createContext, type CSSProperties, type ReactNode, useCallback, useContext, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
 interface PanelCtx {
   sel: string | null;
-  isMobile: boolean;
   ultimoPorLinea: Record<string, string>;
   toggle: (id: string, trigger?: HTMLElement) => void;
   close: () => void;
@@ -25,23 +25,11 @@ function syncUrl(id: string | null) {
   window.history.pushState(window.history.state, "", `${u.pathname}${u.search}${u.hash}`);
 }
 
-function revelar(lineaId: string | undefined) {
-  if (!lineaId) return;
-  window.setTimeout(() => {
-    const el = document.getElementById(`rm-slot-${lineaId}`);
-    if (el && window.matchMedia("(min-width: 761px)").matches) el.scrollIntoView({ behavior: "smooth", block: "nearest" });
-  }, 60);
-}
-
 /** Estado del panel de entregables de la línea de tiempo: selección, Esc, deep link ?m=. */
 export function PanelProvider({ initial, lineaDe, children }: { initial: string | null; lineaDe: Record<string, string>; children: ReactNode }) {
+  const mounted = useMounted();
   const [sel, setSel] = useState<string | null>(initial);
   const [trigger, setTrigger] = useState<HTMLElement | null>(null);
-  const isMobile = useSyncExternalStore(
-    (notify) => { const media = window.matchMedia("(max-width: 760px)"); media.addEventListener("change", notify); return () => media.removeEventListener("change", notify); },
-    () => window.matchMedia("(max-width: 760px)").matches,
-    () => false,
-  );
   const [ultimoPorLinea, setUltimo] = useState<Record<string, string>>(() => (initial && lineaDe[initial] ? { [lineaDe[initial]]: initial } : {}));
 
   const close = useCallback(() => {
@@ -60,14 +48,14 @@ export function PanelProvider({ initial, lineaDe, children }: { initial: string 
   }, [lineaDe]);
 
   useEffect(() => {
-    if (!sel || !isMobile) return;
+    if (!sel || !mounted) return;
     const dialog = document.querySelector<HTMLElement>(`[data-testid="slot-${lineaDe[sel]}"]`);
     if (!dialog) return;
     const changed: { node: HTMLElement; inert: boolean }[] = [];
     let current: HTMLElement | null = dialog;
     while (current?.parentElement && current !== document.body) {
       for (const sibling of Array.from(current.parentElement.children)) {
-        if (sibling !== current && sibling instanceof HTMLElement) {
+        if (sibling !== current && sibling instanceof HTMLElement && !sibling.classList.contains("rm-backdrop")) {
           changed.push({ node: sibling, inert: sibling.inert });
           sibling.inert = true;
         }
@@ -76,13 +64,13 @@ export function PanelProvider({ initial, lineaDe, children }: { initial: string 
     }
     const priorOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    dialog.querySelector<HTMLElement>(".panel-x")?.focus();
+    dialog.querySelector<HTMLElement>(".panel-x")?.focus({ preventScroll: true });
     return () => {
       for (const item of changed) item.node.inert = item.inert;
       document.body.style.overflow = priorOverflow;
-      window.requestAnimationFrame(() => trigger?.focus());
+      window.requestAnimationFrame(() => trigger?.focus({ preventScroll: true }));
     };
-  }, [isMobile, lineaDe, sel, trigger]);
+  }, [lineaDe, sel, trigger, mounted]);
 
   const toggle = useCallback(
     (id: string, element?: HTMLElement) => {
@@ -90,17 +78,10 @@ export function PanelProvider({ initial, lineaDe, children }: { initial: string 
       setSel(next);
       if (next && element) setTrigger(element);
       syncUrl(next);
-      if (next) revelar(lineaDe[next]);
       if (lineaDe[id]) setUltimo((u) => ({ ...u, [lineaDe[id]]: id }));
     },
     [sel, lineaDe],
   );
-
-  useEffect(() => {
-    if (initial) revelar(lineaDe[initial]);
-    // solo al montar (deep link)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffect(() => {
     if (!sel) return;
@@ -111,11 +92,11 @@ export function PanelProvider({ initial, lineaDe, children }: { initial: string 
     return () => window.removeEventListener("keydown", onKey);
   }, [sel, close]);
 
-  const value = useMemo(() => ({ sel, isMobile, ultimoPorLinea, toggle, close }), [sel, isMobile, ultimoPorLinea, toggle, close]);
+  const value = useMemo(() => ({ sel, ultimoPorLinea, toggle, close }), [sel, ultimoPorLinea, toggle, close]);
   return (
     <Ctx.Provider value={value}>
       {children}
-      <div className={`rm-backdrop ${sel ? "is-open" : ""}`} onClick={close} aria-hidden="true" />
+      <PanelBackdrop />
     </Ctx.Provider>
   );
 }
@@ -142,20 +123,32 @@ export function RoadmapNode({ id, href, className, style, title, children }: { i
   );
 }
 
-/** Ranura bajo la fila de una línea: se expande con el panel del milestone seleccionado. */
+const subscribeMounted = () => () => {};
+function useMounted() {
+  return useSyncExternalStore(subscribeMounted, () => true, () => false);
+}
+function PanelBackdrop() {
+  const { sel, close } = usePanel();
+  const mounted = useMounted();
+  return mounted ? createPortal(<div className={`rm-backdrop ${sel ? "is-open" : ""}`} onClick={close} aria-hidden="true" />, document.body) : null;
+}
+
+/** Panel lateral fuera del timeline: conserva la posición de la página. */
 export function LaneSlot({ lineaId, panels }: { lineaId: string; panels: Record<string, ReactNode> }) {
-  const { sel, isMobile, ultimoPorLinea } = usePanel();
+  const { sel, ultimoPorLinea } = usePanel();
+  const mounted = useMounted();
   const abierto = !!sel && sel in panels;
   const mostrado = abierto ? sel : ultimoPorLinea[lineaId];
-  return (
+  if (!mounted) return null;
+  return createPortal(
     <div
       id={`rm-slot-${lineaId}`}
       className={`rm-panel-wrap ${abierto ? "is-open" : ""}`}
-      role={abierto && isMobile ? "dialog" : undefined}
-      aria-modal={abierto && isMobile ? true : undefined}
+      role={abierto ? "dialog" : undefined}
+      aria-modal={abierto ? true : undefined}
       aria-labelledby={abierto ? `panel-heading-${mostrado}` : undefined}
-      tabIndex={abierto && isMobile ? -1 : undefined}
-      onKeyDown={abierto && isMobile ? (event) => {
+      tabIndex={abierto ? -1 : undefined}
+      onKeyDown={abierto ? (event) => {
         if (event.key !== "Tab") return;
         const controls = Array.from(event.currentTarget.querySelectorAll<HTMLElement>('a[href],button:not(:disabled),input:not(:disabled),select:not(:disabled),textarea:not(:disabled),[tabindex]:not([tabindex="-1"])')).filter((el) => el.getClientRects().length > 0);
         if (!controls.length) { event.preventDefault(); event.currentTarget.focus(); return; }
@@ -168,7 +161,7 @@ export function LaneSlot({ lineaId, panels }: { lineaId: string; panels: Record<
       data-testid={`slot-${lineaId}`}
     >
       <div className="rm-panel-inner">{mostrado ? panels[mostrado] : null}</div>
-    </div>
+    </div>, document.body
   );
 }
 
