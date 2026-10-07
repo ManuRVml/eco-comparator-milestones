@@ -40,6 +40,10 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
   const capacidades = model.capacidadesPorMilestone.get(m.id) ?? [];
   // El cliente ve primero las capacidades (sin HU/SP); el detalle técnico queda tras "Ver detalle completo".
   const resumen = !session.canEdit && capacidades.length > 0 && sp.vista !== "detalle";
+  // Siguiente milestone de la misma línea por fechaObjetivo
+  const nextMilestone = model.milestones
+    .filter((mm) => mm.lineaId === m.lineaId && mm.fechaObjetivo && m.fechaObjetivo && mm.fechaObjetivo > m.fechaObjetivo)
+    .sort((a, b) => (a.fechaObjetivo ?? "").localeCompare(b.fechaObjetivo ?? ""))[0];
 
   return (
     <main className="page" data-testid="milestone">
@@ -78,6 +82,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
                 </dd>
               </div>
             )}
+            {session.canEdit && (
             <div>
               <dt>Épicas</dt>
               <dd>
@@ -87,13 +92,14 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
                       return (
                         <Fragment key={code}>
                           {i > 0 && " · "}
-                          {session.canEdit ? <Link href={`/milestones/${m.id}?tab=hu${q}#${epicAnchor(m.huIds, model, code)}`} className="link-underline">{code}</Link> : code}
+                          <Link href={`/milestones/${m.id}?tab=hu${q}#${epicAnchor(m.huIds, model, code)}`} className="link-underline">{code}</Link>
                         </Fragment>
                       );
                     })
                   : "—"}
               </dd>
             </div>
+            )}
           </dl>
         </div>
         <div className="ms-hero-gauge">
@@ -104,10 +110,12 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
             </span>
           </Ring>
           <div className="ms-hero-stats">
+            {session.canEdit && (
             <div>
               <span>Ejecución ponderada por días</span>
               <strong>{fmtPct(m.pctPonderado)}</strong>
             </div>
+            )}
             {!resumen && (
               <div>
                 <span>SP {model.config.progreso_incluye_lista_demo === "1" ? "aceptados o en demo" : "aceptados"}</span>
@@ -141,7 +149,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
       {session.isAdmin && <Link className="btn btn-sm" href={`/editor?vista=configuracion&ms=${m.id}`}>Configurar valor, métricas y aceptación</Link>}
       <CheckpointProgress total={m.trabajo} areas={m.areas} completo={!!m.cierreVerificado} areaId={areaFoco} alcance="milestone" />
 
-      {m.criticasVencidas.length > 0 && (
+      {session.canEdit && m.criticasVencidas.length > 0 && (
         <div className="alert tone-amber" role="status">
           <strong>Atención:</strong> {m.criticasVencidas.length === 1 ? "una tarea en ruta crítica venció" : `${m.criticasVencidas.length} tareas en ruta crítica vencieron`} sin cerrarse:{" "}
           {m.criticasVencidas.map((t, i) => (
@@ -152,6 +160,16 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
             </span>
           ))}
           .
+        </div>
+      )}
+
+      {!session.canEdit && (
+        <div className="next-milestone" data-testid="next-milestone">
+          {nextMilestone ? (
+            <p>Qué sigue: {nextMilestone.nombre} el {fmtLarga(nextMilestone.fechaObjetivo)}</p>
+          ) : (
+            <p>Qué sigue: es el último hito de esta línea.</p>
+          )}
         </div>
       )}
 
