@@ -57,7 +57,7 @@ export function MilestoneValor({ m, model }: { m: MilestoneView; model: Model })
     <MilestoneRiesgos m={m} model={model} />
     <h4>Qué sigue</h4>
     <p>{siguiente ? `${siguiente.id} · ${siguiente.nombre} · ${ddmm(siguiente.fechaObjetivo)}` : "Es el último hito de esta línea."}</p>
-    <Link href={`/milestones/${m.id}`} className="btn btn-sm">Ver detalles</Link>
+    {m.id !== "S0" && <Link href={`/milestones/${m.id}`} className="btn btn-sm">Ver detalles</Link>}
   </section>;
 }
 

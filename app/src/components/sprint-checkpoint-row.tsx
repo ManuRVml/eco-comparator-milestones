@@ -18,7 +18,7 @@ export function inicioComoMilestone(model: Model, c: NonNullable<ReturnType<type
     ...base, id: "S0", nombre: "Proyecto listo para arrancar", lineaId: "CP", linea: null, fechaObjetivo: c.sprint.fechaFin,
     valorCliente: "Infraestructura y accesos preparados; nada visible aún para ti.", criterio: null, descripcion: null,
     estado: c.estado, estadoFinal: c.estado, cierreVerificado: c.completo, publicado: false, override: false, evidencia: null, fechaCierre: null,
-    huIds: [], tareaIds: [], dependeDe: [], dependientes: [], riesgoIds: [], pctPonderado: c.total.pctReal, areas: [], criticasVencidas: [],
+    huIds: [], tareaIds: [], dependeDe: [], dependientes: [], riesgoIds: ["R-05"], pctPonderado: c.total.pctReal, areas: [], criticasVencidas: [],
   };
 }
 
