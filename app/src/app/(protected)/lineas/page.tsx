@@ -42,7 +42,7 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
               </p>
             ),
           },
-          { id: "leer", label: "Cómo leer milestones, revisiones y aceptación", icon: "book", content: <DeliveryNote defaultOpen /> },
+          { id: "leer", label: "Cómo leer milestones, revisiones y aceptación", icon: "book", content: <DeliveryNote defaultOpen equipo={session.canEdit} /> },
           {
             id: "trabajo",
             label: "Trabajo hacia el milestone",
