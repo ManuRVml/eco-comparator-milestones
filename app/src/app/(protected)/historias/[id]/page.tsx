@@ -40,16 +40,17 @@ export default async function HistoriaPage({
   const sprint = h.sprintId
     ? model.sprints.find((x) => x.id === h.sprintId)
     : undefined;
-  const detalle: [string, string | number | null | undefined][] = [
+  const detalleBase: [string, string | number | null | undefined][] = [
     ["Descripción", h.justificacion],
     ["Criterios de aceptación", null],
     ["Dependencias", h.dependencias],
     ["Épica", h.epica],
     ["Funcionalidad", h.feature],
     ["Prioridad", h.prioridad],
-    ["SP", h.sp],
-    ["Sprint", sprint?.id ?? h.sprintId],
   ];
+  const detalle = session.canEdit
+    ? [...detalleBase, ["SP", h.sp], ["Sprint", sprint?.id ?? h.sprintId]]
+    : [...detalleBase, ["Sprint", sprint?.id ?? h.sprintId]];
   const log = session.canEdit
     ? (
         await getBitacora(session, {
@@ -76,7 +77,7 @@ export default async function HistoriaPage({
           <div className="ms-hero-tags">
             <span className="ms-id">{h.id}</span>
             <StatusBadge estado={h.estado} />
-            <span className="sp-pill">{h.sp ?? 0} SP</span>
+            {session.canEdit && <span className="sp-pill">{h.sp ?? 0} SP</span>}
             {h.prioridad && (
               <span className="chip">Prioridad {h.prioridad}</span>
             )}
