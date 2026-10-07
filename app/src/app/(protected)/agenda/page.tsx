@@ -24,10 +24,12 @@ export default async function AgendaPage() {
               <strong>{fechas.length}</strong>
               <span>fechas planificadas</span>
             </div>
-            <div>
-              <strong>{totalHu}</strong>
-              <span>HU a demostrar</span>
-            </div>
+            {!session.canEdit && (
+              <div>
+                <strong>{totalHu}</strong>
+                <span>HU a demostrar</span>
+              </div>
+            )}
             <div>
               <strong>{model.milestones.length}</strong>
               <span>milestones</span>
@@ -61,6 +63,7 @@ export default async function AgendaPage() {
                     {esProxima && <span className="next-pill">Próxima demo</span>}
                     <h3>{fmtLarga(f)}</h3>
                     {session.canEdit && <p>{hus.length ? `${hus.length} historias · ${sp} SP${epicas.length ? ` · ${epicas.join(" · ")}` : ""}` : "Fecha objetivo de milestone · resultado por revisar"}</p>}
+                    {!session.canEdit && <p>Fecha objetivo de milestone · resultado por revisar</p>}
                   </div>
                 </header>
                 {ms.length > 0 && (
@@ -73,9 +76,8 @@ export default async function AgendaPage() {
                           </span>
                           <b>{m.id}</b>
                           <StatusBadge estado={m.estadoFinal} size="sm" />
-                          <em>
-                            Trabajo {Math.round(m.pctPonderado)} % · {m.cierreVerificado ? "Milestone cumplido" : "Milestone pendiente"}
-                          </em>
+                          {!session.canEdit && <em>Milestone {m.cierreVerificado ? "cumplido" : "pendiente"}</em>}
+                          {session.canEdit && <em>Trabajo {Math.round(m.pctPonderado)} % · {m.cierreVerificado ? "Milestone cumplido" : "Milestone pendiente"}</em>}
                         </span>
                         <strong>{m.nombre}</strong>
                         {m.valorCliente && <span className="agenda-value">{m.valorCliente}</span>}
@@ -83,7 +85,7 @@ export default async function AgendaPage() {
                     ))}
                   </div>
                 )}
-                {hus.length > 0 ? (
+                {session.canEdit && hus.length > 0 ? (
                   <ul className="agenda-hu">
                     {hus.map((h) => {
                       const ts = (model.tareasPorHu.get(h.id) ?? []).map((t) => model.tareaById.get(t)).filter((t) => !!t);
