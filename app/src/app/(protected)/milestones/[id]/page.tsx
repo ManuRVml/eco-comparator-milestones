@@ -48,6 +48,12 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
   return (
     <main className="page" data-testid="milestone">
       <Breadcrumb items={[{ label: "Timeline de milestones", href: "/lineas" }, { label: `${m.id}` }]} />
+      {!resumen && (
+        <div className="alert tone-slate" role="note" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+          <span><b>Detalle técnico</b> · información para el equipo</span>
+          <Link className="btn btn-ghost btn-sm" href={`/milestones/${m.id}`}>Volver al hito</Link>
+        </div>
+      )}
 
       <section className="ms-hero milestone-focused" style={{ "--linea": colorLinea(m.lineaId), "--c": color } as CSSProperties}>
         <div className="ms-hero-main">
