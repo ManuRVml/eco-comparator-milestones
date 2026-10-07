@@ -123,7 +123,7 @@ export function Ring({
 export function MiniRing({ value, estado, size = 44 }: { value: number; estado: string; size?: number }) {
   return (
     <Ring value={value} size={size} stroke={5} color={colorEstado(estado)}>
-      <span className="mini-ring-label">{Math.round(value)}%</span>
+      <span className="mini-ring-label">{fmtPct(value, 1)}</span>
     </Ring>
   );
 }

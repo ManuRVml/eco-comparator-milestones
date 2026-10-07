@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { CSSProperties } from "react";
 import { AreaDot, Ring, StatusBadge } from "@/components/ui";
 import { daysBetween, fmtCorta, fmtDiaSemana } from "@/lib/dates";
-import { colorEstado, colorLinea, textoLinea } from "@/lib/format";
+import { colorEstado, colorLinea, fmtPct, textoLinea } from "@/lib/format";
 import type { MilestoneView, Model, Tarea } from "@/lib/model";
 import { PublicarControl } from "@/components/editor/publicar-control";
 import { PanelClose } from "./panel-client";
@@ -35,7 +35,7 @@ export function MilestonePanel({ m, model, canEdit, isAdmin = false, areaId = nu
       <span className="ms-panel-grip" aria-hidden="true" />
       <header className="ms-panel-head">
         <Ring value={porcentaje} size={84} stroke={8} color={color}>
-          {canEdit && <span className="mini-ring-label is-lg">{Math.round(porcentaje)}%</span>}
+          {canEdit && <span className="mini-ring-label is-lg">{fmtPct(porcentaje, 1)}</span>}
         </Ring>
         <div className="ms-panel-title">
           <div className="ms-panel-tags">
@@ -47,7 +47,7 @@ export function MilestonePanel({ m, model, canEdit, isAdmin = false, areaId = nu
             <span className={`chip tone-${p.tono}`}>{p.texto}</span>
           </div>
           <h3 id={`panel-heading-${m.id}`}>{m.nombre}</h3>
-          {canEdit && <p className="muted small">{areaId ? "Trabajo del área hacia el milestone" : "Trabajo hacia el milestone"}: {Math.round(porcentaje)} %. Cumplimiento: {m.cierreVerificado ? "confirmado" : "pendiente"}.</p>}
+          {canEdit && <p className="muted small">{areaId ? "Trabajo del área hacia el milestone" : "Trabajo hacia el milestone"}: {fmtPct(porcentaje, 1)}. Cumplimiento: {m.cierreVerificado ? "confirmado" : "pendiente"}.</p>}
           <p className="ms-panel-meta">
             <b>
               {fmtDiaSemana(m.fechaObjetivo ?? model.hoy, true)} {fmtCorta(m.fechaObjetivo)}
