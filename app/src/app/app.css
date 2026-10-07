@@ -846,3 +846,14 @@
 .rm-panel-wrap .ms-panel-body { grid-template-columns: 1fr; }
 .rm-panel-wrap .ms-panel-grip { display: none; }
 @media (max-width: 760px) { .rm-panel-wrap .ms-panel { padding: 16px; } }
+
+/* Barra de iconos informativa (Timeline) */
+.info-toolbar { position: relative; margin: 12px 0; }
+.info-toolbar-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.info-toolbar-btn { display: inline-grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--color-border-default); border-radius: 12px; background: var(--color-surface-card); color: var(--color-brand-primary-dark); cursor: pointer; }
+.info-toolbar-btn:hover, .info-toolbar-btn.is-active { border-color: var(--color-brand-primary-border); background: var(--color-brand-primary-faint); }
+.info-toolbar-btn:focus-visible { outline: 2px solid var(--color-brand-primary); outline-offset: 2px; }
+.info-toolbar-panel { margin-top: 8px; max-height: 70vh; overflow: auto; border: 1px solid var(--color-border-default); border-radius: 12px; background: var(--color-surface-card); box-shadow: 0 8px 24px rgb(0 0 0 / .08); }
+.info-toolbar-panel .metric-note { margin: 0; border: 0; border-radius: 0; background: transparent; }
+.info-toolbar-panel .strip { padding: 12px; }
+.info-toolbar-panel > p { margin: 0; padding: 12px 16px; color: var(--color-text-secondary); font-size: 14px; line-height: 1.6; }

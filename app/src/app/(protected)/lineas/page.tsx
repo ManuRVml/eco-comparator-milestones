@@ -8,6 +8,7 @@ import { colorEstado, colorLinea, fmtPct, TONE_COLOR, textoLinea } from "@/lib/f
 import { ESTADOS_MILESTONE } from "@/lib/model";
 import { MetricNote } from "@/components/metric-note";
 import { DeliveryNote } from "@/components/delivery-note";
+import { InfoToolbar } from "@/components/info-toolbar";
 
 export default async function LineasPage({ searchParams }: PageProps<"/lineas">) {
   const session = await requireSession();
@@ -23,41 +24,62 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
 
   return (
     <main className="page" data-testid="timeline">
-      <PageHeading kicker="ROADMAP 21 SEP – 18 DIC 2026" title="Timeline de milestones">
-        Siete puntos de revisión al cierre de sprint, incluido Sprint 0, y diez milestones (hitos) en tres líneas de valor.{" "}
-        {model.capa === "oficial"
-          ? "Los nodos muestran el avance oficial entregado y su estado. Haz clic en un nodo para ver sus entregables."
-          : "Vista de equipo: los nodos muestran el avance técnico interno (no visible para el equipo Ecopetrol). Haz clic en un nodo para ver sus entregables."}
-      </PageHeading>
-      <DeliveryNote />
+      <PageHeading kicker="ROADMAP 21 SEP – 18 DIC 2026" title="Timeline de milestones" />
 
-      <MetricNote capa={model.capa} hoy={model.hoy} alcance={areaId ? `Área: ${model.areaById.get(areaId)?.nombre}; cada nodo usa sus propias tareas` : "Cada nodo usa sus propias tareas; el total usa el proyecto completo"} checkpoints />
-
-      <details className="timeline-kpis">
-      <summary><span>Proyecto · {model.capa === "oficial" ? "avance publicado" : "avance técnico interno"}: {fmtPct(model.total.pctReal)} vs. {fmtPct(model.total.pctPlan)} previsto</span><span>Desglose de tareas, SP y área</span></summary>
-      <section className="strip" aria-label="Avance global">
-        <div className="strip-item">
-          <span>SP completados vs. planificados a la fecha</span>
-          <strong>
-            {k.spCompletos} <small>/ {spPlanHoy} SP a hoy · {k.spTotal} SP en total</small>
-          </strong>
-          <ProgressBar value={k.spTotal ? (k.spCompletos / k.spTotal) * 100 : 0} plan={k.spTotal ? (spPlanHoy / k.spTotal) * 100 : 0} color={TONE_COLOR.green} label="SP completados" />
-        </div>
-        <div className="strip-item">
-          <span>{areaId ? `Tareas de ${model.areaById.get(areaId)?.nombre}` : (model.capa === "oficial" ? "Tareas entregadas" : "Tareas hechas (técnico interno)")}</span>
-          <strong>
-            {area.hechas} <small>/ {area.total} hechas · plan a hoy {area.planHoy}</small>
-          </strong>
-        </div>
-        <div className="strip-item">
-          <span>{model.capa === "oficial" ? "Entregado ponderado por días hábiles" : "Real técnico ponderado por días hábiles"}</span>
-          <strong>
-            {fmtPct(area.pctReal)} <small>vs. {fmtPct(area.pctPlan)} planificado</small>
-          </strong>
-          <ProgressBar value={area.pctReal} plan={area.pctPlan} color={TONE_COLOR.cyan} label="Real ponderado" />
-        </div>
-      </section>
-      </details>
+      <InfoToolbar
+        label="Información del timeline"
+        items={[
+          {
+            id: "seguimiento",
+            label: "Seguimiento BenchHub · MVP Ecopetrol",
+            icon: "info",
+            content: (
+              <p>
+                Siete puntos de revisión al cierre de sprint, incluido Sprint 0, y diez milestones (hitos) en tres líneas de valor.{" "}
+                {model.capa === "oficial"
+                  ? "Los nodos muestran el avance oficial entregado y su estado. Haz clic en un nodo para ver sus entregables."
+                  : "Vista de equipo: los nodos muestran el avance técnico interno (no visible para el equipo Ecopetrol). Haz clic en un nodo para ver sus entregables."}
+              </p>
+            ),
+          },
+          { id: "leer", label: "Cómo leer milestones, revisiones y aceptación", icon: "book", content: <DeliveryNote defaultOpen /> },
+          {
+            id: "trabajo",
+            label: "Trabajo hacia el milestone",
+            icon: "gauge",
+            content: <MetricNote capa={model.capa} hoy={model.hoy} alcance={areaId ? `Área: ${model.areaById.get(areaId)?.nombre}; cada nodo usa sus propias tareas` : "Cada nodo usa sus propias tareas; el total usa el proyecto completo"} checkpoints />,
+          },
+          {
+            id: "proyecto",
+            label: `Proyecto · ${model.capa === "oficial" ? "avance publicado" : "avance técnico interno"}: ${fmtPct(model.total.pctReal)} vs. ${fmtPct(model.total.pctPlan)} previsto`,
+            icon: "chart",
+            content: (
+            <section className="strip" aria-label="Avance global">
+              <div className="strip-item">
+                <span>SP completados vs. planificados a la fecha</span>
+                <strong>
+                  {k.spCompletos} <small>/ {spPlanHoy} SP a hoy · {k.spTotal} SP en total</small>
+                </strong>
+                <ProgressBar value={k.spTotal ? (k.spCompletos / k.spTotal) * 100 : 0} plan={k.spTotal ? (spPlanHoy / k.spTotal) * 100 : 0} color={TONE_COLOR.green} label="SP completados" />
+              </div>
+              <div className="strip-item">
+                <span>{areaId ? `Tareas de ${model.areaById.get(areaId)?.nombre}` : (model.capa === "oficial" ? "Tareas entregadas" : "Tareas hechas (técnico interno)")}</span>
+                <strong>
+                  {area.hechas} <small>/ {area.total} hechas · plan a hoy {area.planHoy}</small>
+                </strong>
+              </div>
+              <div className="strip-item">
+                <span>{model.capa === "oficial" ? "Entregado ponderado por días hábiles" : "Real técnico ponderado por días hábiles"}</span>
+                <strong>
+                  {fmtPct(area.pctReal)} <small>vs. {fmtPct(area.pctPlan)} planificado</small>
+                </strong>
+                <ProgressBar value={area.pctReal} plan={area.pctPlan} color={TONE_COLOR.cyan} label="Real ponderado" />
+              </div>
+            </section>
+            ),
+          },
+        ]}
+      />
 
       <div className="toolbar">
         <AreaFilter areas={model.areas} actual={areaId} base="/lineas" />
