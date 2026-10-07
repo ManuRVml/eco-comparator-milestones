@@ -19,6 +19,7 @@
     "import": "tsx scripts/import.ts",
     "seed:evidence": "tsx scripts/seed-evidence.ts",
     "seed:decisiones": "tsx scripts/seed-decisiones.ts",
+    "seed:capacidades": "tsx scripts/seed-capacidades.ts",
     "verify:import": "tsx scripts/verify-import.ts",
     "import:milestones": "tsx scripts/import-milestones.ts",
     "import:progress": "tsx scripts/import-progress.ts",

@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm";
-import { check, index, integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
-import { milestones } from "./schema";
+import { check, index, integer, primaryKey, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { historias, milestones } from "./schema";
 
 // El JSON original se conserva como archivo histórico; las columnas son la fuente vigente.
 export interface LegacyMilestoneDefinition {
@@ -45,3 +45,15 @@ export const decisionesPendientes = sqliteTable("decisiones_pendientes", {
   borrador: integer("borrador", { mode: "boolean" }).notNull().default(true),
   creadoEn: text("creado_en").notNull().default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))`),
 }, t => [index("decisiones_pendientes_idx").on(t.milestoneId), check("decision_resuelta",sql`${t.resuelta} in (0,1)`), check("decision_borrador",sql`${t.borrador} in (0,1)`)]);
+/** Capacidades: lo que el usuario podrá hacer al cerrar un milestone, agrupando HU en lenguaje de cliente. */
+export const capacidades = sqliteTable("capacidades", {
+  id: text("id").primaryKey(), milestoneId: text("milestone_id").notNull().references(() => milestones.id),
+  titulo: text("titulo").notNull(), descripcion: text("descripcion").notNull().default(""),
+  orden: integer("orden").notNull().default(0),
+  /** Borrador: propuesta del equipo, aún no confirmada para mostrarse al cliente. */
+  borrador: integer("borrador", { mode: "boolean" }).notNull().default(true),
+}, t => [index("capacidades_milestone_idx").on(t.milestoneId), check("capacidad_borrador",sql`${t.borrador} in (0,1)`)]);
+export const capacidadHistoria = sqliteTable("capacidad_historia", {
+  capacidadId: text("capacidad_id").notNull().references(() => capacidades.id),
+  historiaId: text("historia_id").notNull().references(() => historias.id),
+}, t => [primaryKey({ columns: [t.capacidadId, t.historiaId] }), index("capacidad_historia_hu_idx").on(t.historiaId)]);

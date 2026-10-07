@@ -1,0 +1,43 @@
+id,milestone_id,titulo,descripcion,orden,historias
+C-01,M-01,Entras con tu cuenta corporativa,Ingresas a BenchHub con tu usuario de siempre y sin crear otra clave.,1,HU-001
+C-02,M-01,Eliges tu rol y tu vista,Escoges con qué perfil entras y puedes cambiar de uno a otro cuando lo necesites.,2,HU-002;HU-003
+C-03,M-01,Ves solo lo que tu rol permite,Cada persona accede únicamente a lo que le corresponde según su rol.,3,HU-004
+C-04,M-01,Ves un resumen de tu situación,Al entrar encuentras un resumen ejecutivo y los indicadores de mercado del día.,4,HU-005;HU-006
+C-05,M-01,Encuentras tus análisis y pendientes,Tu Inicio te muestra los análisis habilitados para ti y lo que está por atender.,5,HU-008;HU-010
+C-06,M-01,Consultas tus análisis y su detalle,Listas tus análisis y abres cualquiera para ver sus parámetros.,6,HU-018;HU-019
+C-07,M-02,Eliges el tipo de análisis,Empiezas tu comparativo escogiendo qué tipo de análisis quieres hacer.,1,HU-021
+C-08,M-02,"Defines objetivo, periodo y alcance","Dices qué pregunta quieres responder, de qué periodo y con qué alcance.",2,HU-022;HU-023
+C-09,M-02,Seleccionas y filtras competidores,Escoges las compañías con las que te vas a comparar y las filtras por línea de negocio.,3,HU-024;HU-025
+C-10,M-02,Recibes sugerencias de competidores,Te sugerimos compañías relevantes según lo que estás analizando.,4,HU-026;HU-085
+C-11,M-02,Escoges los indicadores a comparar,Seleccionas los indicadores de tus pares y los estratégicos de Ecopetrol.,5,HU-027;HU-028
+C-12,M-03,Confirmas las fuentes de datos,Revisas de dónde saldrán los datos de tu análisis y las confirmas.,1,HU-029
+C-13,M-03,Revisas tu configuración antes de lanzar,Ves un resumen final y te avisamos si falta algo antes de ejecutar.,2,HU-030
+C-14,M-03,Lanzas tu análisis,Con un clic generas el análisis con la configuración que definiste.,3,HU-031
+C-15,M-03,Sigues el estado de tu análisis,Ves en qué punto va tu análisis y si terminó o necesita reintento.,4,HU-020
+C-16,M-04,Sabes qué datos faltan por compañía,Conoces qué porcentaje de datos está disponible y cuál falta.,1,HU-032
+C-17,M-04,Ves la cobertura de cada compañía,Revisas compañía por compañía qué tan completa está su información.,2,HU-033
+C-18,M-05,Navegas los resultados por categoría,Recorres los resultados por categoría y exploras sus indicadores.,1,HU-035;HU-043
+C-19,M-05,Comparas cada indicador con tus pares,Ves a Ecopetrol frente a sus pares en tablas y gráficos.,2,HU-036;HU-037
+C-20,M-05,Ves indicadores clave por dimensión,Consultas los indicadores principales agrupados por dimensión.,3,HU-041
+C-21,M-05,Ves quién lidera cada categoría,Identificas qué compañías van primero en cada categoría.,4,HU-042
+C-22,M-05,Llevas el resumen a Excel,Descargas el resumen de tu comparativo para trabajarlo por tu cuenta.,5,HU-039
+C-23,M-06,Configuras fechas y fuentes del monitor,Defines el periodo y las fuentes que alimentan tu seguimiento de valor.,1,HU-047
+C-24,M-06,Eliges los indicadores a seguir,Seleccionas qué indicadores quieres vigilar en el Monitor de Valor.,2,HU-048
+C-25,M-06,Ves tu tabla de indicadores de valor,Consultas en una tabla cada indicador con su estado.,3,HU-050
+C-26,M-06,Editas metas y valores reales,Ajustas la meta y el valor real de cada indicador directamente en la tabla.,4,HU-051
+C-27,M-06,Ves el cumplimiento global,Sabes de un vistazo qué porcentaje de tus metas se está cumpliendo.,5,HU-052
+C-28,M-06,Ves el peso de cada dimensión,Entiendes cuánto pesa cada dimensión en el resultado.,6,HU-053
+C-29,M-06,Comparas tus pares por indicador,Ves cómo se ordenan tus pares en cada indicador.,7,HU-054
+C-30,M-07,Simulas palancas y ves la fórmula,Mueves las variables que dependen de ti y ves cómo se calcula cada indicador.,1,HU-059;HU-060
+C-31,M-07,Comparas la base con lo simulado,Ves lado a lado el resultado actual y el simulado.,2,HU-061
+C-32,M-07,Ajustas escenarios y ves el efecto,Pruebas escenarios y comparas el antes y el después del retorno.,3,HU-062;HU-063
+C-33,M-07,Ajustas y restableces los pesos,Cambias el peso de cada indicador y vuelves al original cuando quieras.,4,HU-064;HU-065
+C-34,M-08,Creas tu presentación desde el tablero,Partes de lo que ya ves en pantalla para armar una presentación.,1,HU-046;HU-074
+C-35,M-08,Eliges el tipo y las diapositivas,Escoges el formato de tu presentación y qué diapositivas incluir.,2,HU-075;HU-076
+C-36,M-08,Previsualizas y editas tu presentación,Revisas cómo se verá y ajustas el orden y los textos.,3,HU-077;HU-073
+C-37,M-08,Descargas y compartes tu presentación,La bajas como archivo o la compartes con quien corresponda.,4,HU-078;HU-079
+C-38,M-08,Encuentras tus presentaciones,Ves la lista de las presentaciones que has creado.,5,HU-072
+C-39,M-09,Recibes y lees tus notificaciones,Ves tus avisos y cuántos tienes sin leer.,1,HU-080;HU-082
+C-40,M-09,Consultas al asistente Yarbis,Le preguntas a Yarbis desde cualquier pantalla.,2,HU-083
+C-41,M-09,Te avisamos de cambios relevantes,Yarbis detecta cambios importantes y te los señala.,3,HU-084
+C-42,M-10,Ves de dónde sale cada cifra,Cada respuesta generada por el asistente muestra su fuente.,1,HU-087

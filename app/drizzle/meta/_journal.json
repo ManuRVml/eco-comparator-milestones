@@ -50,6 +50,13 @@
       "when": 1791375945747,
       "tag": "0006_decisiones_pendientes",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1791379011265,
+      "tag": "0007_capacidades",
+      "breakpoints": true
     }
   ]
 }
