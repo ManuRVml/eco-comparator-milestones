@@ -1,8 +1,17 @@
 import Link from "next/link";
 import type { Model } from "@/lib/model";
-import { fmtCorta } from "@/lib/dates";
+import { fmtCorta, fmtLarga } from "@/lib/dates";
 
-export function MilestoneOverview({ model }: { model: Model }) {
+export function MilestoneOverview({ model, cliente = false }: { model: Model; cliente?: boolean }) {
+  if (cliente) {
+    // A tiempo = cumplido, o su fecha objetivo aún no pasó.
+    const aTiempo = model.milestones.filter((m) => m.cierreVerificado || (m.fechaObjetivo ?? model.hoy) >= model.hoy).length;
+    const prox = model.milestones.find((m) => !m.cierreVerificado && (m.fechaObjetivo ?? "") >= model.hoy);
+    return <section className="milestone-overview" data-testid="milestone-overview" aria-label="Resumen de milestones">
+      <p data-testid="hitos-resumen"><strong>{aTiempo} de {model.milestones.length} hitos a tiempo.</strong>{prox && <> Próximo: {prox.nombre} el {fmtLarga(prox.fechaObjetivo ?? model.hoy)}</>}</p>
+      <Link href="/lineas" className="btn btn-primary btn-sm">Ver timeline →</Link>
+    </section>;
+  }
   const cumplidos = model.milestones.filter((m) => m.cierreVerificado).length;
   const next = model.milestones.find((m) => !m.cierreVerificado);
   const d = next && model.contratosMilestone?.[next.id]?.definicion;
