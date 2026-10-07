@@ -165,7 +165,11 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
 
       {!session.canEdit && (
         <div className="next-milestone" data-testid="next-milestone">
-          <p>Qué sigue: {nextMilestone?.nombre} el {fmtLarga(nextMilestone?.fechaObjetivo ?? model.hoy)}</p>
+          {nextMilestone ? (
+            <p>Qué sigue: {nextMilestone.nombre} el {fmtLarga(nextMilestone.fechaObjetivo)}</p>
+          ) : (
+            <p>Qué sigue: es el último hito de esta línea.</p>
+          )}
         </div>
       )}
 
