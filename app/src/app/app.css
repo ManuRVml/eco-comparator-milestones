@@ -879,3 +879,9 @@
 
 /* Anclas de la lista de historias (enlaces del encabezado del milestone) */
 #historias, [id^="epica-"] { scroll-margin-top: 80px; }
+
+.hu-descripcion { scroll-margin-top: var(--size-layout-header); }
+#descripcion { scroll-margin-top: 80px; }
+.hu-detalle { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px 28px; margin: 0; padding: 4px 10px 8px; }
+.hu-detalle dt { color: var(--color-text-muted); font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.hu-detalle dd { margin: 3px 0 0; color: var(--color-text-heading); font-size: 13.5px; line-height: 1.5; }
