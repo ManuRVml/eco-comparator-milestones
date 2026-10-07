@@ -22,15 +22,22 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
   const area = areaId ? model.areaResumen.find((a) => a.areaId === areaId)! : model.total;
   const k = model.kpis;
   const spPlanHoy = model.historias
-    .filter((h) => (model.weeklyPorHu.get(h.id) ?? "9999") <= model.hoy)
+    .filter((h) => h.prioridad !== "R2" && (model.weeklyPorHu.get(h.id) ?? "9999") <= model.hoy)
     .reduce((s, h) => s + (h.sp ?? 0), 0);
+
+  const inicioRoadmap = model.sprints.map((x) => x.fechaInicio).sort()[0];
+  const finRoadmap = model.sprints.map((x) => x.fechaFin).sort().at(-1);
+  const kicker = inicioRoadmap && finRoadmap ? `ROADMAP ${fmtCorta(inicioRoadmap).toUpperCase()} – ${fmtCorta(finRoadmap).toUpperCase()} ${finRoadmap.slice(0, 4)}` : "ROADMAP";
+  // Previsión real registrada en la ficha del milestone; sin ella no se muestra la columna al cliente.
+  const prevision = (id: string) => model.contratosMilestone?.[id]?.definicion?.fechaPrevision || null;
+  const hayPrevision = model.milestones.some((m) => prevision(m.id));
 
   const cero = !session.canEdit ? sprintCheckpoint(model, 0) : null;
   const filaCero = cero ? inicioComoMilestone(model, cero) : null;
 
   return (
     <main className="page" data-testid="timeline">
-      <PageHeading kicker="ROADMAP 21 SEP – 18 DIC 2026" title="Timeline de milestones" />
+      <PageHeading kicker={kicker} title="Timeline de milestones" />
       {!session.canEdit && <MilestoneOverview model={model} cliente />}
 
       <InfoToolbar
@@ -42,7 +49,7 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
             icon: "info",
             content: (
               <p>
-                Siete puntos de revisión al cierre de sprint, incluido Sprint 0, y diez milestones (hitos) en tres líneas de valor.{" "}
+                {model.sprints.length} puntos de revisión al cierre de sprint, incluido Sprint 0, y {model.milestones.length} milestones (hitos) en {model.lineas.length} líneas de valor.{" "}
                 {model.capa === "oficial"
                   ? "Los nodos muestran el avance oficial entregado y su estado. Haz clic en un nodo para ver sus entregables."
                   : "Vista de equipo: los nodos muestran el avance técnico interno (no visible para el equipo Ecopetrol). Haz clic en un nodo para ver sus entregables."}
@@ -58,12 +65,12 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
           },
           {
             id: "proyecto",
-            label: `Proyecto · ${model.capa === "oficial" ? "avance publicado" : "avance técnico interno"}: ${fmtPct(model.total.pctReal)} vs. ${fmtPct(model.total.pctPlan)} previsto`,
+            label: `${areaId ? "Proyecto completo (sin filtro de área)" : "Proyecto"} · ${model.capa === "oficial" ? "avance publicado" : "avance técnico interno"}: ${fmtPct(model.total.pctReal)} vs. ${fmtPct(model.total.pctPlan)} previsto`,
             icon: "chart",
             content: (
             <section className="strip" aria-label="Avance global">
               <div className="strip-item">
-                <span>SP completados vs. planificados a la fecha</span>
+                <span>SP completados vs. planificados a la fecha · proyecto completo{areaId ? " (sin filtro de área)" : ""}</span>
                 <strong>
                   {k.spCompletos} <small>/ {spPlanHoy} SP a hoy · {k.spTotal} SP en total</small>
                 </strong>
@@ -125,11 +132,12 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
                 <th>Seguimiento</th><th>Cumplimiento</th>
                 {session.canEdit ? (
                   <>
-                    <th className="w-bar">{areaId ? "Trabajo del área" : model.capa === "oficial" ? "Trabajo publicado" : "Trabajo técnico"}</th>
-                    <th className="num">SP</th>
+                    <th className="w-bar">{areaId ? "Trabajo del área" : model.capa === "oficial" ? "Trabajo publicado" : "Trabajo técnico"} (tareas · % ponderado)</th>
+                    <th className="num">Previsto a hoy</th>
+                    <th className="num">SP aceptados</th>
                   </>
                 ) : (
-                  <th>Prevista</th>
+                  hayPrevision && <th>Previsión</th>
                 )}
               </tr>
             </thead>
@@ -141,7 +149,7 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
                   <td className="nowrap" title={fmtLarga(cero.sprint.fechaFin)}>{fmtCorta(cero.sprint.fechaFin)}</td>
                   <td><StatusBadge estado={cero.estado} size="sm" /></td>
                   <td><span className={`chip tone-${cero.completo ? "green" : "slate"}`}>{cero.completo ? "Cumplido" : "Pendiente"}</span></td>
-                  <td className="nowrap">{fmtCorta(cero.sprint.fechaFin)}</td>
+                  {hayPrevision && <td className="nowrap">—</td>}
                 </tr>
               )}
               {model.milestones.map((m) => {
@@ -176,17 +184,20 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
                         <span className="bar-cell">
                           <ProgressBar value={p} color={colorLinea(m.lineaId)} height={6} label={`Avance ${m.id}`} />
                           <em>
-                            {areaId ? `${a?.hechas}/${a?.total}` : `${m.tareasHechas}/${m.tareasTotal}`} · {Math.round(p)}%
+                            {areaId ? `${a?.hechas}/${a?.total}` : `${m.tareasHechas}/${m.tareasTotal}`} tareas · {fmtPct(p)} ponderado
                           </em>
                         </span>
                       )}
+                    </td>
+                    <td className="num" title="Días hábiles de tareas con fecha fin vencida ÷ días hábiles del alcance">
+                      {areaId && !a ? "—" : fmtPct(areaId ? (a?.pctPlan ?? 0) : m.trabajo.pctPlan)}
                     </td>
                     <td className="num">
                       {m.spCompletos}/{m.spTotal}
                     </td>
                       </>
                     ) : (
-                      <td className="nowrap">{fmtCorta(m.fechaObjetivo)}</td>
+                      hayPrevision && <td className="nowrap">{prevision(m.id) ? fmtCorta(prevision(m.id)) : "—"}</td>
                     )}
                   </tr>
                 );
