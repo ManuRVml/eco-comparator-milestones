@@ -9,6 +9,8 @@ import { ESTADOS_MILESTONE } from "@/lib/model";
 import { MetricNote } from "@/components/metric-note";
 import { DeliveryNote } from "@/components/delivery-note";
 import { InfoToolbar } from "@/components/info-toolbar";
+import { inicioComoMilestone } from "@/components/sprint-checkpoint-row";
+import { sprintCheckpoint } from "@/lib/sprint-checkpoint";
 import { MilestoneOverview } from "@/components/milestone-overview";
 
 export default async function LineasPage({ searchParams }: PageProps<"/lineas">) {
@@ -22,6 +24,9 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
   const spPlanHoy = model.historias
     .filter((h) => (model.weeklyPorHu.get(h.id) ?? "9999") <= model.hoy)
     .reduce((s, h) => s + (h.sp ?? 0), 0);
+
+  const cero = !session.canEdit ? sprintCheckpoint(model, 0) : null;
+  const filaCero = cero ? inicioComoMilestone(model, cero) : null;
 
   return (
     <main className="page" data-testid="timeline">
@@ -129,6 +134,16 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
               </tr>
             </thead>
             <tbody>
+              {cero && filaCero && (
+                <tr>
+                  <td><span className="ms-cell"><b>S0</b><span>{filaCero.nombre}</span></span></td>
+                  <td><span className="line-pill" style={{ background: "var(--color-brand-primary)", color: "var(--color-text-inverse)" }}>Inicio</span></td>
+                  <td className="nowrap" title={fmtLarga(cero.sprint.fechaFin)}>{fmtCorta(cero.sprint.fechaFin)}</td>
+                  <td><StatusBadge estado={cero.estado} size="sm" /></td>
+                  <td><span className={`chip tone-${cero.completo ? "green" : "slate"}`}>{cero.completo ? "Cumplido" : "Pendiente"}</span></td>
+                  <td className="nowrap">{fmtCorta(cero.sprint.fechaFin)}</td>
+                </tr>
+              )}
               {model.milestones.map((m) => {
                 const a = areaId ? m.areas.find((x) => x.areaId === areaId) : null;
                 const p = areaId ? (a?.pctReal ?? 0) : m.pctPonderado;

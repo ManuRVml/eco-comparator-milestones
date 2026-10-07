@@ -40,7 +40,7 @@ export function MilestonePanel({ m, model, canEdit, isAdmin = false, areaId = nu
         <div className="ms-panel-title">
           <div className="ms-panel-tags">
             <span className="line-pill" style={{ background: colorLinea(m.lineaId), color: textoLinea(m.lineaId) }}>
-              {m.lineaId}
+              {m.id === "S0" ? "Inicio" : m.lineaId}
             </span>
             <span className="ms-id">{m.id}</span>
             <StatusBadge estado={m.estadoFinal} size="sm" />

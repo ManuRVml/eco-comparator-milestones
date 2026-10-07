@@ -42,7 +42,8 @@ const ETIQUETA_CAPACIDAD = { pendiente: "Pendiente", "en curso": "En curso", ent
 export function MilestoneValor({ m, model }: { m: MilestoneView; model: Model }) {
   const d = model.contratosMilestone?.[m.id]?.definicion;
   const capacidades = model.capacidadesPorMilestone.get(m.id) ?? [];
-  const siguiente = model.milestones.find((x) => x.lineaId === m.lineaId && x.id !== m.id && (x.fechaObjetivo ?? "") > (m.fechaObjetivo ?? ""));
+  const siguiente = [...model.milestones].sort((a, b) => (a.fechaObjetivo ?? "").localeCompare(b.fechaObjetivo ?? ""))
+    .find((x) => (m.id === "S0" || x.lineaId === m.lineaId) && x.id !== m.id && (x.fechaObjetivo ?? "") > (m.fechaObjetivo ?? ""));
   const evidencia = m.publicado && m.evidencia ? m.evidencia : null;
   return <section className="milestone-delivery" data-testid={`valor-${m.id}`} aria-label="Valor del milestone">
     <h4>Qué obtienes</h4>
@@ -56,7 +57,7 @@ export function MilestoneValor({ m, model }: { m: MilestoneView; model: Model })
     <MilestoneRiesgos m={m} model={model} />
     <h4>Qué sigue</h4>
     <p>{siguiente ? `${siguiente.id} · ${siguiente.nombre} · ${ddmm(siguiente.fechaObjetivo)}` : "Es el último hito de esta línea."}</p>
-    <Link href={`/milestones/${m.id}`} className="btn btn-sm">Ver detalles</Link>
+    {m.id !== "S0" && <Link href={`/milestones/${m.id}`} className="btn btn-sm">Ver detalles</Link>}
   </section>;
 }
 

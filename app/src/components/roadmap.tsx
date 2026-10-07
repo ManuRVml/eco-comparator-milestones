@@ -126,7 +126,7 @@ export function Roadmap({ model, areaId, inicial, canEdit, isAdmin = false }: { 
             )}
           </div>
 
-          {canEdit && <SprintCheckpointRow model={model} areaId={areaId} canEdit={canEdit} position={x} />}
+          <SprintCheckpointRow model={model} areaId={areaId} canEdit={canEdit} position={x} />
           {model.lineas.map((l) => {
             const ms = model.milestones.filter((m) => m.lineaId === l.id);
             const { nodos, filas } = ubicar(ms, areaId);
