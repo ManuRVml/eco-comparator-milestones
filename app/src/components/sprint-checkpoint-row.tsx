@@ -10,15 +10,17 @@ import { CompletionCheck } from "@/components/completion-check";
 import { MilestonePanel } from "@/components/milestone-panel/panel";
 import type { MilestoneView } from "@/lib/model";
 
-/** Adaptador: el alistamiento (S0) se presenta con el mismo panel de valor que los milestones, sin crear uno nuevo en el modelo. */
-export function inicioComoMilestone(model: Model, c: NonNullable<ReturnType<typeof sprintCheckpoint>>): MilestoneView | null {
-  const base = model.milestones[0];
-  if (!base) return null;
+/** Adaptador: el alistamiento (S0) se presenta con el mismo panel de valor que los milestones, sin crear uno nuevo en el modelo. Todo número sale del checkpoint de S0, no de otro milestone. */
+export function inicioComoMilestone(_model: Model, c: NonNullable<ReturnType<typeof sprintCheckpoint>>): MilestoneView {
+  const t = c.total;
   return {
-    ...base, id: "S0", nombre: "Ambientes y arquitectura base desplegados", lineaId: "CP", linea: null, fechaObjetivo: c.sprint.fechaFin,
-    valorCliente: "Infraestructura y accesos preparados; nada visible aún para ti.", criterio: null, descripcion: null,
-    estado: c.estado, estadoFinal: c.estado, cierreVerificado: c.completo, publicado: false, override: false, evidencia: null, fechaCierre: null,
-    huIds: [], tareaIds: [], dependeDe: [], dependientes: [], riesgoIds: ["R-05"], pctPonderado: c.total.pctReal, areas: [], criticasVencidas: [],
+    id: "S0", nombre: "Ambientes y arquitectura base desplegados", descripcion: null, lineaId: "CP", sprintId: c.sprint.id, fechaObjetivo: c.sprint.fechaFin, criterio: null, orden: 0,
+    valorCliente: "Infraestructura y accesos preparados; nada visible aún para ti.", sprintsTexto: null, epicas: null, avanceCodigoPct: null, avanceCodigoEvidencia: null,
+    estado: c.estado, estadoOrigen: "plan", visibleCliente: true, fechaEstado: null, evidencia: null, fechaCierre: null, creadoEn: "", actualizadoEn: "",
+    trabajo: t, cierreVerificado: c.completo, linea: null, huIds: [], tareaIds: c.tareas.map((x) => x.id), dependeDe: [], dependientes: [], riesgoIds: ["R-05"],
+    tareasTotal: t.total, tareasHechas: t.hechas, tareasEnCurso: t.enCurso, tareasPublicadas: c.tareas.filter((x) => x.publicadoCliente).length,
+    pctTareas: t.pctTareas, pctPonderado: t.pctReal, spTotal: 0, spCompletos: 0, pctSp: 0, huCompletas: 0,
+    estadoSugerido: c.estado, publicado: false, estadoFinal: c.estado, override: false, criticasVencidas: [], areas: c.areas,
   };
 }
 
