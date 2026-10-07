@@ -10,13 +10,21 @@ import { progresoLinea } from "@/lib/line-progress";
 import { milestoneCompletado } from "@/lib/completion";
 import { CompletionCheck } from "@/components/completion-check";
 
-const INICIO = "2026-09-21";
-const FIN = "2026-12-20";
-const SPAN = daysBetween(INICIO, FIN) + 1;
 const MIN_GAP = 22; // % mínimo entre nodos de una misma fila
 
-const x = (iso: string) => ((daysBetween(INICIO, iso) + 0.5) / SPAN) * 100;
-const xStart = (iso: string) => (daysBetween(INICIO, iso) / SPAN) * 100;
+/** Eje temporal derivado de los datos: desde el inicio del primer sprint hasta el domingo de la semana del último cierre o hito. */
+function escala(model: Model) {
+  const fechas = [...model.sprints.flatMap((s) => [s.fechaInicio, s.fechaFin]), ...model.milestones.map((m) => m.fechaObjetivo ?? "")].filter(Boolean).sort();
+  const INICIO = fechas[0] ?? model.hoy;
+  let FIN = fechas.at(-1) ?? model.hoy;
+  while (isoWeekday(FIN) !== 7) FIN = addDays(FIN, 1);
+  const SPAN = daysBetween(INICIO, FIN) + 1;
+  return {
+    INICIO, FIN, SPAN,
+    x: (iso: string) => ((daysBetween(INICIO, iso) + 0.5) / SPAN) * 100,
+    xStart: (iso: string) => (daysBetween(INICIO, iso) / SPAN) * 100,
+  };
+}
 
 interface Nodo {
   m: MilestoneView;
@@ -26,7 +34,7 @@ interface Nodo {
   sinTareas: boolean;
 }
 
-function ubicar(ms: MilestoneView[], areaId: string | null): { nodos: Nodo[]; filas: number } {
+function ubicar(ms: MilestoneView[], areaId: string | null, INICIO: string, x: (iso: string) => number): { nodos: Nodo[]; filas: number } {
   const ultimos: number[] = [];
   const nodos: Nodo[] = [];
   for (const m of [...ms].sort((a, b) => (a.fechaObjetivo ?? "").localeCompare(b.fechaObjetivo ?? ""))) {
@@ -49,6 +57,7 @@ function ubicar(ms: MilestoneView[], areaId: string | null): { nodos: Nodo[]; fi
 }
 
 export function Roadmap({ model, areaId, inicial, canEdit, isAdmin = false }: { model: Model; areaId: string | null; inicial: string | null; canEdit: boolean; isAdmin?: boolean }) {
+  const { INICIO, FIN, SPAN, x, xStart } = escala(model);
   const lineaDe = Object.fromEntries(model.milestones.map((m) => [m.id, m.lineaId ?? ""]));
   for (const sprint of model.sprints) lineaDe[`S${sprint.numero}`] = "CP";
   const jueves: string[] = [];
@@ -129,7 +138,7 @@ export function Roadmap({ model, areaId, inicial, canEdit, isAdmin = false }: { 
           <SprintCheckpointRow model={model} areaId={areaId} canEdit={canEdit} position={x} />
           {model.lineas.map((l) => {
             const ms = model.milestones.filter((m) => m.lineaId === l.id);
-            const { nodos, filas } = ubicar(ms, areaId);
+            const { nodos, filas } = ubicar(ms, areaId, INICIO, x);
             const progreso = progresoLinea(model, l.id, areaId);
             const proximo = ms.filter((m) => !m.cierreVerificado && m.fechaObjetivo && m.fechaObjetivo >= model.hoy).sort((a, b) => a.fechaObjetivo!.localeCompare(b.fechaObjetivo!))[0];
             return (
@@ -146,7 +155,7 @@ export function Roadmap({ model, areaId, inicial, canEdit, isAdmin = false }: { 
                     ) : (
                       "todos cumplidos"
                     )}
-                    {canEdit && ` · avance ${fmtPct(progreso.pctReal)} vs ${fmtPct(progreso.pctPlan)} previsto`}
+                    {canEdit && ` · avance ${fmtPct(progreso.pctReal)} vs ${fmtPct(progreso.pctPlan)} previsto · ponderado por días de sus tareas`}
                   </span>
                 </div>
                 <div className="rm-track">
@@ -183,7 +192,7 @@ export function Roadmap({ model, areaId, inicial, canEdit, isAdmin = false }: { 
                           <span className="rm-name">{n.m.nombre}</span>
                           <span className="rm-stat">
                             {canEdit && <i style={{ background: color }} />}
-                            {n.sinTareas ? `Sin tareas de ${areaNombre}` : areaId ? `${areaNombre} · ${fmtPct(area?.pctReal ?? 0)}` : canEdit ? `Trabajo ${fmtPct(n.m.pctPonderado)}` : null}
+                            {n.sinTareas ? `Sin tareas de ${areaNombre}` : areaId ? `${areaNombre} · ${fmtPct(area?.pctReal ?? 0)}${canEdit ? ` vs ${fmtPct(area?.pctPlan ?? 0)} previsto` : ""}` : canEdit ? `Trabajo ${fmtPct(n.m.trabajo.pctReal)} vs ${fmtPct(n.m.trabajo.pctPlan)} previsto` : null}
                           </span>
                           {areaId && <span className="rm-comparison">Total milestone {fmtPct(n.m.pctPonderado)} · aporte del área {aporteArea.toFixed(1).replace(".", ",")} pts</span>}
                           <span className="rm-comparison">{n.m.cierreVerificado ? "Milestone cumplido" : "Milestone pendiente"}</span>
