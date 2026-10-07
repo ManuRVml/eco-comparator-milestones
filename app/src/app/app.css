@@ -848,3 +848,6 @@
 .rm-panel-wrap .ms-panel-body { grid-template-columns: 1fr; }
 .rm-panel-wrap .ms-panel-grip { display: none; }
 @media (max-width: 760px) { .rm-panel-wrap .ms-panel { padding: 16px; } }
+
+/* Anclas de la lista de historias (enlaces del encabezado del milestone) */
+#historias, [id^="epica-"] { scroll-margin-top: 80px; }
