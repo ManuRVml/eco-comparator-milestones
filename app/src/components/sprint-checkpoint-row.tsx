@@ -2,7 +2,7 @@ import type { CSSProperties } from "react";
 import type { Model } from "@/lib/model";
 import { sprintCheckpoint } from "@/lib/sprint-checkpoint";
 import { fmtCorta, fmtDiaSemana } from "@/lib/dates";
-import { colorEstado, fmtPct } from "@/lib/format";
+import { colorEstado, fmtPct, tono } from "@/lib/format";
 import { Ring } from "@/components/ui";
 import { LaneSlot, RoadmapNode } from "@/components/milestone-panel/panel-client";
 import { SprintCheckpointPanel } from "@/components/sprint-checkpoint-panel";
@@ -11,11 +11,16 @@ import { CompletionCheck } from "@/components/completion-check";
 export function SprintCheckpointRow({ model, areaId, canEdit, position }: { model: Model; areaId: string | null; canEdit: boolean; position: (date: string) => number }) {
   const todos = model.sprints.map((s) => sprintCheckpoint(model, s.numero, areaId)).filter((c) => c !== null);
   const inicio = todos.find((c) => c.sprint.numero === 0);
-  const checkpoints = todos.filter((c) => c.sprint.numero !== 0);
-  const nota = inicio && (
+  // El editor abre S0 como un punto más del carril; el cliente solo ve la nota de partida.
+  const checkpoints = canEdit ? todos : [];
+  const nota = inicio && !canEdit && (
     <div className="rm-start-note">
-      Punto de partida · ambientes y arquitectura listos ({fmtCorta(inicio.sprint.fechaFin)})
-      <CompletionCheck complete={inicio.completo} label="Ambientes y arquitectura base desplegados" id="S0" />
+      <div>
+        <strong>Proyecto listo para arrancar</strong> · ambientes y arquitectura base · {fmtCorta(inicio.sprint.fechaFin)}{" "}
+        {inicio.completo ? <CompletionCheck complete label="Ambientes y arquitectura base desplegados" id="S0" /> : <span className={`chip tone-${tono(inicio.estado)}`}>{inicio.estado.toLowerCase()}</span>}
+        {inicio.completo && " Cumplido"}
+        <div>Qué obtienes: infraestructura y accesos preparados; nada visible aún para ti.</div>
+      </div>
     </div>
   );
   if (!checkpoints.length) return nota || null;
@@ -26,7 +31,7 @@ export function SprintCheckpointRow({ model, areaId, canEdit, position }: { mode
       <div className="rm-lane-label">
         <span className="rm-lane-id">CP</span>
         <strong>Milestones por sprint</strong>
-        <span className="rm-lane-meta">S1–S6: resultado esperado</span>
+        <span className="rm-lane-meta">S0–S6: resultado esperado</span>
       </div>
       <div className="rm-track">
         <span className="rm-line" />
@@ -37,7 +42,7 @@ export function SprintCheckpointRow({ model, areaId, canEdit, position }: { mode
             <RoadmapNode key={c.id} id={c.id} href={`/lineas?${areaId ? `area=${areaId}&` : ""}m=${c.id}`} className={`rm-node ${align} ${c.tareas.length ? "" : "is-muted"}`} style={{ left: `${left}%`, "--fila": index % 2, "--c": color } as CSSProperties} title={`Sprint ${c.sprint.numero} · Revisión del avance hacia milestones (clic para ver tareas)`}>
               <span className="rm-dot"><Ring value={c.total.pctReal} plan={c.completo ? undefined : c.total.pctPlan} size={44} stroke={5} color={color} track="var(--color-border-default)"><span className="rm-dot-inner">{c.id}</span></Ring><CompletionCheck complete={c.completo} label={`Sprint ${c.sprint.numero}: cierre completo verificado`} id={c.id} /></span>
               <span className="rm-label">
-                <span className="rm-kind">Milestone del sprint</span>
+                <span className="rm-kind">{c.sprint.numero === 0 ? "Punto de partida" : "Milestone del sprint"}</span>
                 <span className="rm-date">{fmtDiaSemana(c.sprint.fechaFin)} {fmtCorta(c.sprint.fechaFin)}</span>
                 <span className="rm-name">{c.id} · {c.titulo}</span>
                 <span className="rm-stat"><i style={{ background: color }} />Total {fmtPct(c.total.pctReal)}</span>
