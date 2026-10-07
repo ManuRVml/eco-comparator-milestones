@@ -1,5 +1,26 @@
 import { describe, it, expect } from "vitest";
-import { semaforoMilestone } from "./format";
+import { diasHabilesEntre, semaforoMilestone } from "./format";
+
+describe("diasHabilesEntre", () => {
+  it("returns 0 for same day", () => {
+    expect(diasHabilesEntre("2026-10-07", "2026-10-07")).toBe(0);
+  });
+
+  it("returns 5 for Mon 2026-10-12 to Mon 2026-10-19 (Tue-Fri + Mon)", () => {
+    // Start exclusive: Tue, Wed, Thu, Fri (4) + next Mon (1) = 5 business days
+    expect(diasHabilesEntre("2026-10-12", "2026-10-19")).toBe(5);
+  });
+
+  it("returns 6 for Mon 2026-10-12 to Tue 2026-10-20", () => {
+    // Start exclusive: Tue-Fri (4) + Mon (1) + Tue (1) = 6 business days
+    expect(diasHabilesEntre("2026-10-12", "2026-10-20")).toBe(6);
+  });
+
+  it("returns 1 for Fri 2026-10-09 to Mon 2026-10-12", () => {
+    // Start exclusive: only Mon (1 business day, skipping weekend)
+    expect(diasHabilesEntre("2026-10-09", "2026-10-12")).toBe(1);
+  });
+});
 
 describe("semaforoMilestone", () => {
   const hoy = "2026-10-07";
@@ -47,12 +68,12 @@ describe("semaforoMilestone", () => {
   });
 
   it('returns "ambar" when prevision is exactly 5 business days after objective', () => {
-    // Mon 2026-10-12 to Fri 2026-10-16 = 5 business days (ambar)
+    // Mon 2026-10-12 to Mon 2026-10-19 = 5 business days (ambar)
     expect(
       semaforoMilestone(
         {
           fechaObjetivo: "2026-10-12",
-          fechaPrevision: "2026-10-16",
+          fechaPrevision: "2026-10-19",
           cumplido: false,
           iniciado: true,
         },

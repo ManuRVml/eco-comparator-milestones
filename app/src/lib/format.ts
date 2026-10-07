@@ -120,7 +120,7 @@ export function lineaCorta(id: string | null | undefined) {
  * Cuenta los días hábiles (lunes a viernes) entre dos fechas.
  * Cuenta desde `desde` (exclusive) hasta `hasta` (inclusive), en UTC.
  */
-function diasHabilesEntre(desde: string, hasta: string): number {
+export function diasHabilesEntre(desde: string, hasta: string): number {
   const desdeDate = new Date(desde + "T00:00:00Z");
   const hastaDate = new Date(hasta + "T00:00:00Z");
   if (desdeDate >= hastaDate) return 0;
@@ -128,11 +128,11 @@ function diasHabilesEntre(desde: string, hasta: string): number {
   const diasHabiles = { 1: true, 2: true, 3: true, 4: true, 5: true }; // Mon-Fri
   let count = 0;
   const current = new Date(desdeDate);
-  current.setDate(current.getDate() + 1); // desde exclusive
+  current.setUTCDate(current.getUTCDate() + 1); // desde exclusive
 
   while (current <= hastaDate) {
     if (diasHabiles[current.getUTCDay()]) count++;
-    current.setDate(current.getDate() + 1);
+    current.setUTCDate(current.getUTCDate() + 1);
   }
   return count;
 }
