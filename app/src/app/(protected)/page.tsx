@@ -37,7 +37,7 @@ export default async function DashboardPage() {
 
   return (
     <main className="page" data-testid="dashboard">
-      <MilestoneOverview model={model} />
+      <MilestoneOverview model={model} cliente={!session.canEdit} />
       <details className="work-summary"><summary>Trabajo hacia los milestones · {fmtPct(of.pctReal)} publicado{tec && ` · ${fmtPct(tec.pctReal)} técnico`}</summary>
       <section className="hero">
         <div className="hero-copy">
@@ -119,6 +119,7 @@ export default async function DashboardPage() {
       <MetricNote capa={model.capa} hoy={model.hoy} alcance="Proyecto completo; cabecera oficial y detalle según la capa indicada" />
       <DeliveryNote />
 
+      {session.canEdit && (
       <section className="kpi-grid" aria-label="Indicadores clave">
         <article className="kpi">
           <span className="kpi-label">Historias de usuario</span>
@@ -221,6 +222,7 @@ export default async function DashboardPage() {
           </ul>
         </article>
       </section>
+      )}
 
       <SprintReviews model={model} />
 
