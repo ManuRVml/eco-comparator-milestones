@@ -48,6 +48,12 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
   return (
     <main className="page" data-testid="milestone">
       <Breadcrumb items={[{ label: "Timeline de milestones", href: "/lineas" }, { label: `${m.id}` }]} />
+      {!resumen && (
+        <div className="alert tone-slate" role="note" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+          <span><b>Detalle técnico</b> · información para el equipo</span>
+          <Link className="btn btn-ghost btn-sm" href={`/milestones/${m.id}`}>Volver al hito</Link>
+        </div>
+      )}
 
       <section className="ms-hero milestone-focused" style={{ "--linea": colorLinea(m.lineaId), "--c": color } as CSSProperties}>
         <div className="ms-hero-main">
@@ -144,10 +150,10 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
         </div>
       </section>
       <MilestoneDelivery m={m} model={model} canEdit={session.canEdit} />
-      <MetricNote capa={model.capa} hoy={model.hoy} alcance={`${m.id} completo; el desglose por área usa las tareas de cada disciplina`} cliente={!session.canEdit} />
+      {session.canEdit && <MetricNote capa={model.capa} hoy={model.hoy} alcance={`${m.id} completo; el desglose por área usa las tareas de cada disciplina`} cliente={!session.canEdit} />}
       {(resumen || session.canEdit) && <CapabilityCards capacidades={capacidades} detalleHref={`/milestones/${m.id}?vista=detalle`} canEdit={session.canEdit} />}
       {session.isAdmin && <Link className="btn btn-sm" href={`/editor?vista=configuracion&ms=${m.id}`}>Configurar valor, métricas y aceptación</Link>}
-      <CheckpointProgress total={m.trabajo} areas={m.areas} completo={!!m.cierreVerificado} areaId={areaFoco} alcance="milestone" />
+      {session.canEdit && <CheckpointProgress total={m.trabajo} areas={m.areas} completo={!!m.cierreVerificado} areaId={areaFoco} alcance="milestone" />}
 
       {session.canEdit && m.criticasVencidas.length > 0 && (
         <div className="alert tone-amber" role="status">
@@ -179,14 +185,14 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
         </div>
       )}
 
-      <div className="grid-2 value-grid">
+      {session.canEdit && <div className="grid-2 value-grid">
         <Card kicker="VALOR DE REFERENCIA DEL PLAN" className="quote-card">
           <blockquote>{m.valorCliente ?? "—"}</blockquote>
         </Card>
         <Card kicker="CRITERIO ORIGINAL DEL PLAN" className="criterio-card">
           <p>{m.criterio ?? "—"}</p>
         </Card>
-      </div>
+      </div>}
 
       {!resumen && (
       <div className="detail-layout">

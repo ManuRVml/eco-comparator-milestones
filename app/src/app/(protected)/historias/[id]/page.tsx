@@ -72,6 +72,10 @@ export default async function HistoriaPage({
           { label: h.id },
         ]}
       />
+      <div className="alert tone-slate" role="note" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+        <span><b>Detalle técnico</b> · información para el equipo</span>
+        {ms[0] && <Link className="btn btn-ghost btn-sm" href={`/milestones/${ms[0].id}`}>Volver al hito</Link>}
+      </div>
       <section className="entity-hero">
         <div>
           <div className="ms-hero-tags">
