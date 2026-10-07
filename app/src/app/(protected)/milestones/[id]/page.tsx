@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import * as React from "react";
 import type { CSSProperties } from "react";
 import { ESTADOS_HISTORIA } from "@/db/schema";
 import { EstadoControl } from "@/components/editor/estado-control";
@@ -66,12 +67,23 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
             <div>
               <dt>Historias</dt>
               <dd>
-                {m.huIds.length} HU · {m.spTotal} SP
+                <a href="#historias" style={{ textDecoration: "underline", color: "inherit", cursor: "pointer", padding: "2px 0", outline: "none", textDecorationLine: "underline", textDecorationStyle: "dotted" }}>{m.huIds.length} HU · {m.spTotal} SP</a>
               </dd>
             </div>
             <div>
               <dt>Épicas</dt>
-              <dd>{m.epicas?.replaceAll(";", " · ") ?? "—"}</dd>
+                <dd>{m.epicas
+                  ? m.epicas.split(";").map((epica, i) => {
+                      const code = epica.trim();
+                      return (
+                        <React.Fragment key={code}>
+                          {i > 0 && " · "}
+                          <a href={`#epica-${code}`} style={{ textDecoration: "underline", color: "inherit", cursor: "pointer", padding: "2px 0", outline: "none" }}>{code}</a>
+                        </React.Fragment>
+                      );
+                    })
+                  : "—"}
+                </dd>
             </div>
           </dl>
         </div>
@@ -305,7 +317,7 @@ function HuTab({ model, huIds, canEdit }: { model: Model; huIds: string[]; canEd
   const hus = huIds.map((h) => model.huById.get(h)).filter((h) => !!h);
   if (hus.length === 0) return <Empty>No hay historias visibles en este milestone.</Empty>;
   return (
-    <ul className="hu-list">
+    <ul className="hu-list" id="historias" style={{ scrollMarginTop: "80px" }}>
       {hus.map((h) => {
         const ts = (model.tareasPorHu.get(h.id) ?? []).map((t) => model.tareaById.get(t)).filter((t): t is Tarea => !!t);
         const hechas = ts.filter((t) => t.estado === "Hecha").length;
