@@ -31,7 +31,7 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
       </PageHeading>
       <DeliveryNote />
 
-      <MetricNote capa={model.capa} hoy={model.hoy} alcance={areaId ? `Área: ${model.areaById.get(areaId)?.nombre}; cada nodo usa sus propias tareas` : "Cada nodo usa sus propias tareas; el total usa el proyecto completo"} checkpoints />
+      <MetricNote capa={model.capa} hoy={model.hoy} alcance={areaId ? `Área: ${model.areaById.get(areaId)?.nombre}; cada nodo usa sus propias tareas` : "Cada nodo usa sus propias tareas; el total usa el proyecto completo"} checkpoints cliente={!session.canEdit} />
 
       <details className="timeline-kpis">
       <summary><span>Proyecto · {model.capa === "oficial" ? "avance publicado" : "avance técnico interno"}: {fmtPct(model.total.pctReal)} vs. {fmtPct(model.total.pctPlan)} previsto</span><span>Desglose de tareas, SP y área</span></summary>

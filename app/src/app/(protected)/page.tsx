@@ -116,7 +116,7 @@ export default async function DashboardPage() {
       )}
       </details>
 
-      <MetricNote capa={model.capa} hoy={model.hoy} alcance="Proyecto completo; cabecera oficial y detalle según la capa indicada" />
+      <MetricNote capa={model.capa} hoy={model.hoy} alcance="Proyecto completo; cabecera oficial y detalle según la capa indicada" cliente={!session.canEdit} />
       <DeliveryNote />
 
       <section className="kpi-grid" aria-label="Indicadores clave">

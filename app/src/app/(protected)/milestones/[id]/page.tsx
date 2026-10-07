@@ -111,7 +111,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
         </div>
       </section>
       <MilestoneDelivery m={m} model={model} />
-      <MetricNote capa={model.capa} hoy={model.hoy} alcance={`${m.id} completo; el desglose por área usa las tareas de cada disciplina`} />
+      <MetricNote capa={model.capa} hoy={model.hoy} alcance={`${m.id} completo; el desglose por área usa las tareas de cada disciplina`} cliente={!session.canEdit} />
       {session.isAdmin && <Link className="btn btn-sm" href={`/editor?vista=configuracion&ms=${m.id}`}>Configurar valor, métricas y aceptación</Link>}
       <CheckpointProgress total={m.trabajo} areas={m.areas} completo={!!m.cierreVerificado} areaId={areaFoco} alcance="milestone" />
 

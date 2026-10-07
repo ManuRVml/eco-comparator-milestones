@@ -23,7 +23,7 @@ export default async function AreasPage({ searchParams }: PageProps<"/areas">) {
         Siete áreas de ejecución. El avance real se pondera por días hábiles y se compara con lo planificado a la fecha en el cronograma.
       </PageHeading>
 
-      <MetricNote capa={model.capa} hoy={model.hoy} alcance={areaId ? `Área: ${model.areaById.get(areaId)?.nombre}` : "Cada área usa sus tareas; el total usa el proyecto completo"} />
+      <MetricNote capa={model.capa} hoy={model.hoy} alcance={areaId ? `Área: ${model.areaById.get(areaId)?.nombre}` : "Cada área usa sus tareas; el total usa el proyecto completo"} cliente={!session.canEdit} />
 
       <AreaFilter areas={model.areas} actual={areaId} base="/areas" />
 
