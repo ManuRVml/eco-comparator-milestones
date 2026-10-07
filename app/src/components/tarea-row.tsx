@@ -25,7 +25,7 @@ export function TareaRow({ t, model, canEdit, showArea = false }: { t: Tarea; mo
         <div className="tarea-meta">
           <StatusBadge estado={t.estado} size="sm" />
           {hu && (
-            <Link href={`/historias/${hu.id}`} className="meta-link" title={hu.nombre}>
+            <Link href={`/historias/${hu.id}#descripcion`} className="meta-link" title={hu.nombre}>
               {hu.id}
             </Link>
           )}

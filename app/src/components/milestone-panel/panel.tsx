@@ -133,7 +133,7 @@ export function MilestonePanel({ m, model, canEdit, isAdmin = false, areaId = nu
           <ul className="panel-hu">
             {hus.map((h) => (
               <li key={h.id}>
-                <Link href={`/historias/${h.id}`}>
+                <Link href={`/historias/${h.id}#descripcion`}>
                   <b>{h.id}</b>
                   <span className="panel-hu-name">{h.nombre}</span>
                   <em>{h.sp ?? 0} SP</em>

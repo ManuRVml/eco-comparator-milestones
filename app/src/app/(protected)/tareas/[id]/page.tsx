@@ -106,7 +106,7 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
             <ul className="dep-list">
               {hu && (
                 <li>
-                  <Link href={`/historias/${hu.id}`}>
+                  <Link href={`/historias/${hu.id}#descripcion`}>
                     <span className="dep-dot" style={{ background: colorEstado(hu.estado) }} />
                     <b>{hu.id}</b>
                     <span className="dep-name">{hu.nombre}</span>
