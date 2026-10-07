@@ -1,6 +1,6 @@
 id,milestone_id,texto,responsable_cliente,fecha_limite,fuente
 D-01,M-03,"Entregar a BenchHub las credenciales de API de S&P Capital IQ y Bloomberg; si no llegan, la ingesta se hace con archivos Excel cargados a mano y la entrega puede moverse.",,2026-10-16,CTX R-01
-D-02,M-01,"Habilitar los accesos al workspace de Databricks y a Microsoft Entra ID (inicio de sesión corporativo) para el equipo.",,2026-09-25,CTX S-01
+D-02,M-01,"Autorizar los accesos de tu equipo al ambiente de BenchHub y el inicio de sesión con la cuenta corporativa.",,2026-09-25,CTX S-01
 D-03,M-02,"Confirmar que las fórmulas de los indicadores de negocio quedan congeladas durante el MVP; un cambio obliga a recalcular y puede mover fechas.",,2026-10-16,CTX S-02
-D-04,M-02,"Aprobar la cuota de procesamiento en Databricks y el presupuesto de inferencia en Azure AI Foundry para las sugerencias de Yarbis y el motor de simulación.",,2026-10-16,CTX S-03
+D-04,M-02,"Aprobar la capacidad de procesamiento y el presupuesto de inteligencia artificial que necesitan las sugerencias de Yarbis y el simulador.",,2026-10-16,CTX S-03
 D-05,M-03,"Confirmar los formatos y la frecuencia de los archivos que entregarán las fuentes de Ecopetrol e ISA.",,2026-10-16,CTX S-05
