@@ -6,8 +6,7 @@ import { AreaDot, Card, Empty, MiniRing, ProgressBar, Ring, StatusBadge } from "
 import { getModel, requireSession } from "@/lib/data";
 import { daysBetween, fmtCorta, fmtDiaSemana, fmtLarga, relativo } from "@/lib/dates";
 import { colorEstado, colorLinea, fmtPct, TONE_COLOR, TONE_TEXT_COLOR, tono } from "@/lib/format";
-import { ESTADOS_MILESTONE, type Model } from "@/lib/model";
-import { progresoLinea } from "@/lib/line-progress";
+import { ESTADOS_MILESTONE } from "@/lib/model";
 import { MetricNote } from "@/components/metric-note";
 import { DeliveryNote } from "@/components/delivery-note";
 import { SprintReviews } from "@/components/sprint-reviews";
@@ -21,7 +20,6 @@ export default async function DashboardPage() {
   const model = await getModel(session);
   if (!session.canEdit) redirect("/lineas");
   const k = model.kpis;
-  const verAreas = session.canEdit || model.config.resumen_area_ecopetrol === "1";
   const diasWeekly = daysBetween(model.hoy, model.proximoWeekly);
   const demo = model.proximaDemo ? model.agendaWeekly.find((w) => w.fecha === model.proximaDemo) : null;
   const msDemo = model.proximaDemo ? model.milestones.filter((m) => m.fechaObjetivo === model.proximaDemo) : [];
@@ -229,19 +227,13 @@ export default async function DashboardPage() {
       <SprintReviews model={model} />
 
       <div className="grid-2">
-        {verAreas ? (
-          <Card
-            kicker={esCliente ? "DÍAS HÁBILES" : "DÍAS HÁBILES · TÉCNICO INTERNO"}
-            title={esCliente ? "Planificado vs. entregado por área" : "Planificado vs. real técnico por área"}
-            actions={<Link className="card-link" href="/areas">Ver áreas →</Link>}
-          >
-            <AreaBullets areas={model.areaResumen} etiquetaReal={esCliente ? "Entregado (días hábiles)" : "Real técnico (días hábiles hechos)"} />
-          </Card>
-        ) : (
-          <Card kicker="LÍNEAS" title="Avance por línea de trabajo">
-            <LineasResumen model={model} />
-          </Card>
-        )}
+        <Card
+          kicker={esCliente ? "DÍAS HÁBILES" : "DÍAS HÁBILES · TÉCNICO INTERNO"}
+          title={esCliente ? "Planificado vs. entregado por área" : "Planificado vs. real técnico por área"}
+          actions={<Link className="card-link" href="/areas">Ver áreas →</Link>}
+        >
+          <AreaBullets areas={model.areaResumen} etiquetaReal={esCliente ? "Entregado (días hábiles)" : "Real técnico (días hábiles hechos)"} />
+        </Card>
         <Card kicker="ROADMAP" title="Próximos milestones" actions={<Link className="card-link" href="/lineas">Líneas de tiempo →</Link>}>
           {proximos.length === 0 ? (
             <Empty>No hay milestones próximos.</Empty>
@@ -331,24 +323,5 @@ export default async function DashboardPage() {
       </Card>
       )}
     </main>
-  );
-}
-
-function LineasResumen({ model }: { model: Model }) {
-  return (
-    <ul className="line-summary">
-      {model.lineas.map((l) => {
-        const p = progresoLinea(model, l.id).pctReal;
-        return (
-          <li key={l.id}>
-            <span>
-              <b style={{ color: colorLinea(l.id) }}>{l.id}</b> {l.nombre}
-            </span>
-            <ProgressBar value={p} color={colorLinea(l.id)} label={l.nombre} />
-            <em>{fmtPct(p, 0)}</em>
-          </li>
-        );
-      })}
-    </ul>
   );
 }

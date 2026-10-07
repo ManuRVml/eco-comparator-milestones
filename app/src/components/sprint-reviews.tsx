@@ -15,7 +15,7 @@ export function SprintReviews({ model }: { model: Model }) {
         return <li key={s.id}><Link href={`/lineas?m=${c.id}`}>
           <span className="line-ms-top"><b>{c.id} · {fmtCorta(s.fechaFin)}</b><CompletionCheck complete={c.completo} label="Resultado del sprint verificado" id={`review-${c.id}`} /></span>
           <strong>{c.id} · {c.titulo}</strong>
-          <span>Trabajo realizado: {fmtPct(c.total.pctReal)}{!c.completo && <> · previsto al corte: {fmtPct(c.total.pctPlan)}</>}</span>
+          <span>Trabajo realizado (técnico interno): {fmtPct(c.total.pctReal)}{!c.completo && <> · previsto al corte: {fmtPct(c.total.pctPlan)}</>}</span>
           <ProgressBar value={c.total.pctReal} plan={c.completo ? undefined : c.total.pctPlan} label={`Ejecución ponderada ${c.id}`} />
           <span className="muted small">{c.completo ? "Resultado verificado" : "Resultado pendiente de verificación"}</span>
         </Link></li>;
