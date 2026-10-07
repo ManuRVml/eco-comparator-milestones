@@ -67,7 +67,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
             <div>
               <dt>Historias</dt>
               <dd>
-                <a href="#historias" style={{ textDecoration: "underline", color: "inherit", cursor: "pointer", padding: "2px 0", outline: "none", textDecorationLine: "underline", textDecorationStyle: "dotted" }}>{m.huIds.length} HU · {m.spTotal} SP</a>
+                <a href="#historias" className="link-underline">{m.huIds.length} HU · {m.spTotal} SP</a>
               </dd>
             </div>
             <div>
@@ -78,7 +78,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
                       return (
                         <React.Fragment key={code}>
                           {i > 0 && " · "}
-                          <a href={`#epica-${code}`} style={{ textDecoration: "underline", color: "inherit", cursor: "pointer", padding: "2px 0", outline: "none" }}>{code}</a>
+                          <a href={`#epica-${code}`} className="link-underline">{code}</a>
                         </React.Fragment>
                       );
                     })
@@ -316,9 +316,73 @@ function DepList({ titulo, ids, model, vacio }: { titulo: string; ids: string[];
 function HuTab({ model, huIds, canEdit }: { model: Model; huIds: string[]; canEdit: boolean }) {
   const hus = huIds.map((h) => model.huById.get(h)).filter((h) => !!h);
   if (hus.length === 0) return <Empty>No hay historias visibles en este milestone.</Empty>;
+  const epicHus = hus.filter((h) => h.epica);
+  const epicCodes = Array.from(new Set(epicHus.map((h) => h.epica!.trim())));
   return (
     <ul className="hu-list" id="historias" style={{ scrollMarginTop: "80px" }}>
-      {hus.map((h) => {
+      {epicCodes.map((epica) => {
+        const epicHuIds = epicHus.filter((h) => h.epica?.trim() === epica).map((h) => h.id);
+        return (
+          <React.Fragment key={epica}>
+            <li id={`epica-${epica}`} style={{ scrollMarginTop: "80px" }}>
+              <h4 className="epica-heading">{epica}</h4>
+            </li>
+            {hus.map((h) => {
+              if (!epicHuIds.includes(h.id)) return null;
+              const ts = (model.tareasPorHu.get(h.id) ?? []).map((t) => model.tareaById.get(t)).filter((t): t is Tarea => !!t);
+              const hechas = ts.filter((t) => t.estado === "Hecha").length;
+              const weekly = model.weeklyPorHu.get(h.id);
+              return (
+                <li key={h.id}>
+                  <details className="hu-item">
+                    <summary>
+                      <span className="hu-id">
+                        <Link href={`/historias/${h.id}`}>{h.id}</Link>
+                      </span>
+                      <span className="hu-name">{h.nombre}</span>
+                      <span className="hu-meta">
+                        <StatusBadge estado={h.estado} size="sm" />
+                        <span className="sp-pill">{h.sp ?? 0} SP</span>
+                        {weekly && <span className="muted small">Demo {fmtCorta(weekly)}</span>}
+                        <span className="muted small">
+                          {hechas}/{ts.length} tareas
+                        </span>
+                      </span>
+                    </summary>
+                    <div className="hu-body">
+                      {canEdit && (
+                        <div className="hu-edit">
+                          <span className="field-label">Estado de la HU</span>
+                          <EstadoControl tipo="historia" id={h.id} estado={h.estado} estados={ESTADOS_HISTORIA} evidencia={h.evidencia} compact />
+                          <VisibilidadToggle tipo="historia" id={h.id} visible={h.visibleCliente} />
+                        </div>
+                      )}
+                      {model.areas
+                        .filter((a) => ts.some((t) => t.areaId === a.id))
+                        .map((a) => (
+                          <div key={a.id} className="hu-area">
+                            <h5>
+                              <AreaDot areaId={a.id} /> {a.nombre}
+                            </h5>
+                            <ul className="tarea-list">
+                              {ts
+                                .filter((t) => t.areaId === a.id)
+                                .map((t) => (
+                                  <TareaRow key={t.id} t={t} model={model} canEdit={canEdit} />
+                                ))}
+                            </ul>
+                          </div>
+                        ))}
+                      {ts.length === 0 && <Empty>Esta HU no tiene tareas técnicas propias.</Empty>}
+                    </div>
+                  </details>
+                </li>
+              );
+            })}
+          </React.Fragment>
+        );
+      })}
+      {hus.filter((h) => !h.epica).map((h) => {
         const ts = (model.tareasPorHu.get(h.id) ?? []).map((t) => model.tareaById.get(t)).filter((t): t is Tarea => !!t);
         const hechas = ts.filter((t) => t.estado === "Hecha").length;
         const weekly = model.weeklyPorHu.get(h.id);
