@@ -12,14 +12,13 @@ function getItems(canEdit: boolean): Item[] {
   return [
     { href: "/", label: "Resumen de milestones", icon: HomeIcon, match: (p) => p === "/" },
     { href: "/lineas", label: "Timeline de milestones", icon: TimelineIcon, match: (p) => p.startsWith("/lineas") || p.startsWith("/milestones") },
-    { href: "/areas", label: "Avance por área", icon: AreasIcon, match: (p) => p.startsWith("/areas") },
+    { href: "/areas", label: "Avance por área", icon: AreasIcon, match: (p) => p.startsWith("/areas"), equipo: true },
     { href: "/agenda", label: canEdit ? "Agenda de milestones" : "Entregas por fecha", icon: CalendarIcon, match: (p) => p.startsWith("/agenda") },
     { href: "/editor", label: "Panel del editor", icon: EditIcon, match: (p) => p.startsWith("/editor"), equipo: true },
     { href: "/flujo", label: "Trabajo por equipo", icon: AreasIcon, match: (p) => p.startsWith("/flujo"), equipo: true },
     { href: "/reconciliacion", label: "Fuentes y compromisos", icon: ReportIcon, match: (p) => p.startsWith("/reconciliacion"), equipo: true },
     { href: "/verificacion", label: "Verificación", icon: CheckIcon, match: (p) => p.startsWith("/verificacion"), equipo: true },
     { href: "/bitacora", label: "Bitácora", icon: ReportIcon, match: (p) => p.startsWith("/bitacora"), equipo: true },
-    { href: "/configuracion", label: "Configuración", icon: AreasIcon, match: (p) => p.startsWith("/configuracion"), admin: true },
   ];
 }
 
