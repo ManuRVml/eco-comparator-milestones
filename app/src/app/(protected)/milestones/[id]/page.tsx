@@ -15,6 +15,7 @@ import { ESTADOS_MILESTONE, type Model, type Tarea } from "@/lib/model";
 import { MetricNote } from "@/components/metric-note";
 import { MilestoneDelivery } from "@/components/milestone-delivery";
 import { CheckpointProgress } from "@/components/checkpoint-progress";
+import { CapabilityCards } from "@/components/capability-cards";
 
 function ordenar(ts: Tarea[]) {
   const hechas = ts.filter((t) => t.estado === "Hecha").sort((a, b) => (a.fechaCierre ?? "").localeCompare(b.fechaCierre ?? "") || a.id.localeCompare(b.id));
@@ -35,6 +36,9 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
   const hus = m.huIds.map((h) => model.huById.get(h)).filter((h) => !!h);
   const color = colorEstado(m.estadoFinal);
   const q = areaFoco ? `&area=${areaFoco}` : "";
+  const capacidades = model.capacidadesPorMilestone.get(m.id) ?? [];
+  // El cliente ve primero las capacidades (sin HU/SP); el detalle técnico queda tras "Ver detalle completo".
+  const resumen = !session.canEdit && capacidades.length > 0 && sp.vista !== "detalle";
 
   return (
     <main className="page" data-testid="milestone">
@@ -63,12 +67,14 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
               <dt>Sprints relacionados</dt>
               <dd>{m.sprintsTexto ?? "—"}</dd>
             </div>
-            <div>
-              <dt>Historias</dt>
-              <dd>
-                {m.huIds.length} HU · {m.spTotal} SP
-              </dd>
-            </div>
+            {!resumen && (
+              <div>
+                <dt>Historias</dt>
+                <dd>
+                  {m.huIds.length} HU · {m.spTotal} SP
+                </dd>
+              </div>
+            )}
             <div>
               <dt>Épicas</dt>
               <dd>{m.epicas?.replaceAll(";", " · ") ?? "—"}</dd>
@@ -87,12 +93,14 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
               <span>Ejecución ponderada por días</span>
               <strong>{fmtPct(m.pctPonderado)}</strong>
             </div>
-            <div>
-              <span>SP {model.config.progreso_incluye_lista_demo === "1" ? "aceptados o en demo" : "aceptados"}</span>
-              <strong>
-                {m.spCompletos}/{m.spTotal}
-              </strong>
-            </div>
+            {!resumen && (
+              <div>
+                <span>SP {model.config.progreso_incluye_lista_demo === "1" ? "aceptados o en demo" : "aceptados"}</span>
+                <strong>
+                  {m.spCompletos}/{m.spTotal}
+                </strong>
+              </div>
+            )}
             {session.canEdit && (
               <div>
                 <span>Publicadas a Ecopetrol</span>
@@ -101,15 +109,18 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
                 </strong>
               </div>
             )}
-            <div>
-              <span>HU completas</span>
-              <strong>
-                {m.huCompletas}/{m.huIds.length}
-              </strong>
-            </div>
+            {!resumen && (
+              <div>
+                <span>HU completas</span>
+                <strong>
+                  {m.huCompletas}/{m.huIds.length}
+                </strong>
+              </div>
+            )}
           </div>
         </div>
       </section>
+      {(resumen || session.canEdit) && <CapabilityCards capacidades={capacidades} detalleHref={`/milestones/${m.id}?vista=detalle`} canEdit={session.canEdit} />}
       <MilestoneDelivery m={m} model={model} />
       <MetricNote capa={model.capa} hoy={model.hoy} alcance={`${m.id} completo; el desglose por área usa las tareas de cada disciplina`} />
       {session.isAdmin && <Link className="btn btn-sm" href={`/editor?vista=configuracion&ms=${m.id}`}>Configurar valor, métricas y aceptación</Link>}
@@ -144,6 +155,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
         </Card>
       </div>
 
+      {!resumen && (
       <div className="detail-layout">
         <div className="detail-main">
           <nav className="tabs" aria-label={`Información de ${m.id}`}>
@@ -269,6 +281,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
           <Notas model={model} entidadTipo="milestone" entidadId={m.id} canEdit={session.canEdit} />
         </div>
       </div>
+      )}
     </main>
   );
 }

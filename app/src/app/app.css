@@ -846,3 +846,8 @@
 .rm-panel-wrap .ms-panel-body { grid-template-columns: 1fr; }
 .rm-panel-wrap .ms-panel-grip { display: none; }
 @media (max-width: 760px) { .rm-panel-wrap .ms-panel { padding: 16px; } }
+.capability-grid { list-style: none; margin: 0 0 14px; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.capability-card { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; padding: 12px 14px; border: 1px solid var(--color-border-default); border-radius: 10px; background: var(--color-surface-card); }
+.capability-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; width: 100%; }
+.capability-head h4 { margin: 0; font-size: 14px; }
+.capability-desc { margin: 0; font-size: 13px; color: var(--color-text-secondary); display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
