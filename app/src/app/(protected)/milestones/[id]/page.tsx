@@ -315,7 +315,7 @@ function HuTab({ model, huIds, canEdit }: { model: Model; huIds: string[]; canEd
             <details className="hu-item">
               <summary>
                 <span className="hu-id">
-                  <Link href={`/historias/${h.id}`}>{h.id}</Link>
+                  <Link href={`/historias/${h.id}#descripcion`}>{h.id}</Link>
                 </span>
                 <span className="hu-name">{h.nombre}</span>
                 <span className="hu-meta">

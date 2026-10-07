@@ -36,7 +36,7 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
         items={[
           { label: "Líneas de tiempo", href: "/lineas" },
           ...(ms[0] ? [{ label: ms[0].id, href: `/milestones/${ms[0].id}` }] : []),
-          ...(hu ? [{ label: hu.id, href: `/historias/${hu.id}` }] : []),
+          ...(hu ? [          { label: hu.id, href: `/historias/${hu.id}#descripcion` }] : []),
           { label: t.id },
         ]}
       />
