@@ -92,10 +92,62 @@ export function plural(n: number, uno: string, varios: string) {
  * nombre del rol de consulta sin reescribir el registro de auditoría.
  */
 export function etiquetaCampo(campo: string): string {
-  return campo.replace(new RegExp("(para|al) el cli" + "ente", "i"), "$1 el equipo Ecopetrol").replace(new RegExp("cli" + "ente", "gi"), "equipo Ecopetrol");
+  return campo
+    .replace(
+      new RegExp("(para|al) el cli" + "ente", "i"),
+      "$1 el equipo Ecopetrol",
+    )
+    .replace(new RegExp("cli" + "ente", "gi"), "equipo Ecopetrol");
 }
 
 /** Nombre corto de línea para chips. */
 export function lineaCorta(id: string | null | undefined) {
   return id ?? "—";
+}
+
+/**
+ * Semáforo de milestone: verde/ámbar/rojo/gris/cumplido según estado y fechas.
+ * Umbral de retraso: >5 días hábiles = rojo, 1-5 días hábiles = ámbar.
+ * Reglas (en orden de evaluación):
+ * 1. cumplido=true → 'cumplido'
+ * 2. !iniciado && fechaObjetivo > hoy → 'gris' (sin iniciar, futuro)
+ * 3. fechaObjetivo < hoy && !cumplido → 'rojo' (atrasado)
+ * 4. prevision > objetivo + >5 días hábiles → 'rojo' (prevision muy lejana)
+ * 5. prevision > objetivo + 1-5 días hábiles → 'ambar' (previsión ajustada)
+ * 6. else → 'verde' (dentro de plazo)
+ */
+export function semaforoMilestone(
+  m: {
+    fechaObjetivo: string;
+    fechaPrevision?: string | null;
+    cumplido: boolean;
+    iniciado: boolean;
+  },
+  hoy: string,
+): "verde" | "ambar" | "rojo" | "gris" | "cumplido" {
+  // 1. Cumplido
+  if (m.cumplido) return "cumplido";
+
+  // 2. Sin iniciar y objetivo en el futuro
+  if (!m.iniciado && new Date(m.fechaObjetivo) > new Date(hoy)) return "gris";
+
+  // 3. Objetivo pasado y no cumplido
+  if (new Date(m.fechaObjetivo) < new Date(hoy)) return "rojo";
+
+  // 4-5. Verificar previsión si existe
+  if (m.fechaPrevision) {
+    const objetivo = new Date(m.fechaObjetivo);
+    const prevision = new Date(m.fechaPrevision);
+    const diffDays =
+      (prevision.getTime() - objetivo.getTime()) / (1000 * 60 * 60 * 24);
+
+    // Días hábiles aproximados (excluyendo fines de semana)
+    const diffBusinessDays = Math.floor((diffDays * 5) / 7);
+
+    if (diffBusinessDays > 5) return "rojo";
+    if (diffBusinessDays >= 1) return "ambar";
+  }
+
+  // 6. Dentro de plazo
+  return "verde";
 }
