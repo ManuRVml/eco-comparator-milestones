@@ -31,6 +31,7 @@ try {
     assert.equal(await page.locator(".agenda-rel").filter({ hasText: /^realizada$/ }).count(), 0); passed++;
     await page.goto(`${server.base}/lineas`);
     assert.equal(await page.locator('.rm-checkpoint [data-testid^="node-S"]').count(), 7); passed++;
+    await page.getByRole('button', { name: /Trabajo hacia el milestone/ }).click();
     assert.ok((await page.getByTestId("metric-note").first().innerText()).includes("ponderado por días hábiles")); passed++;
     const node = page.getByTestId("node-S0"), panel = page.getByTestId("ms-panel-S0");
     assert.match(await node.innerText(), /25 sep/i); passed++;

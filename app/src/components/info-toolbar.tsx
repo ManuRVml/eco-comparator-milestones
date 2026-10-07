@@ -13,29 +13,27 @@ export function InfoToolbar({ items, label }: { items: InfoToolbarItem[]; label:
   const root = useRef<HTMLDivElement>(null);
   const uid = useId();
 
+  const active = items.find((i) => i.id === open);
+  const trayRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(null);
-    };
-    const onDown = (e: MouseEvent) => {
-      if (root.current && !root.current.contains(e.target as Node)) setOpen(null);
+      if (e.key === "Escape") {
+        const btn = trayRef.current?.querySelector(`[aria-expanded="true"]`) as HTMLButtonElement | null;
+        btn?.focus();
+        setOpen(null);
+      }
     };
     document.addEventListener("keydown", onKey);
-    document.addEventListener("mousedown", onDown);
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.removeEventListener("mousedown", onDown);
-    };
+    return () => document.removeEventListener("keydown", onKey);
   }, [open]);
-
-  const active = items.find((i) => i.id === open);
   return (
     <div className="info-toolbar" ref={root} data-testid="info-toolbar">
-      <div className="info-toolbar-row" role="toolbar" aria-label={label}>
+      <div className="info-toolbar-row" role="toolbar" aria-label={label} ref={trayRef}>
         {items.map((it) => {
           const Icon = ICONS[it.icon];
           const on = open === it.id;
+          const btnId = `${uid}-${it.id}`;
           return (
             <button
               key={it.id}
@@ -44,7 +42,8 @@ export function InfoToolbar({ items, label }: { items: InfoToolbarItem[]; label:
               aria-label={it.label}
               title={it.label}
               aria-expanded={on}
-              aria-controls={`${uid}-${it.id}`}
+              aria-controls={on ? btnId : undefined}
+              id={on ? btnId : undefined}
               onClick={() => setOpen(on ? null : it.id)}
             >
               <Icon size={20} />
