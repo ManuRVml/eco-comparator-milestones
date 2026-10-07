@@ -66,7 +66,7 @@ export function MilestoneDelivery({ m, model, canEdit }: { m: MilestoneView; mod
   return <section className="milestone-delivery" data-testid={`delivery-${m.id}`} aria-label="Cumplimiento del milestone">
     <div className="delivery-heading"><h3>{m.cierreVerificado ? "Milestone cumplido" : "Milestone pendiente"}</h3><CompletionCheck complete={!!m.cierreVerificado} label="Criterios aceptados y cumplimiento publicado" id={`delivery-${m.id}`} /><span className={`chip tone-${m.cierreVerificado ? "green" : "slate"}`}>{m.id}</span></div>
     <p className="delivery-result"><b>Resultado esperado:</b> {d?.outcome || m.valorCliente || m.nombre}</p>
-    <dl className="delivery-dates"><div><dt>Fecha comprometida</dt><dd>{fmtCorta(m.fechaObjetivo)}</dd></div><div><dt>Previsión actual</dt><dd>{d?.fechaPrevision ? fmtCorta(d.fechaPrevision) : "Sin previsión registrada"}</dd></div><div><dt>Aceptación publicada</dt><dd>{m.cierreVerificado ? fmtCorta(m.fechaCierre) : "Pendiente"}</dd></div></dl>
+    <dl className="delivery-dates"><div><dt>Fecha comprometida</dt><dd>{fmtCorta(m.fechaObjetivo)}</dd></div><div><dt>Previsión actual</dt><dd>{fmtCorta(d?.fechaPrevision || m.fechaObjetivo)}</dd></div><div><dt>Aceptación publicada</dt><dd>{m.cierreVerificado ? fmtCorta(m.fechaCierre) : "Pendiente"}</dd></div></dl>
     {d?.fechaPrevision && <p><b>Motivo de la previsión:</b> {d.motivoPrevision}</p>}
     {pending.length > 0 && <p className="definition-pending" role="status">Definición de valor pendiente: {pending.length} campo(s) por completar. El cumplimiento no se certifica hasta completar la ficha y aceptar los criterios obligatorios.</p>}
     <Necesidades m={m} model={model} />
