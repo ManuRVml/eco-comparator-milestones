@@ -69,7 +69,7 @@ export function MilestonePanel({ m, model, canEdit, isAdmin = false, areaId = nu
         </div>
       </header>
 
-      <MilestoneDelivery m={m} model={model} />
+      <MilestoneDelivery m={m} model={model} canEdit={canEdit} />
       <MetricNote capa={model.capa} hoy={model.hoy} alcance={`${m.id}${areaId ? ` · ${model.areaById.get(areaId)?.nombre}` : " · tareas de este milestone"}`} />
 
       <div className="ms-panel-body">
