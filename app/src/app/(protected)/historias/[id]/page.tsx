@@ -80,6 +80,56 @@ export default async function HistoriaPage({ params }: PageProps<"/historias/[id
         </Ring>
       </section>
 
+      <section id="descripcion" className="hu-descripcion" style={{ scrollMarginTop: "var(--header-height)" }}>
+        <Card kicker="DETALLE DE LA HISTORIA" title={h.nombre}>
+          {h.nombre && (
+            <div className="hu-user-story">
+              <h3>Historia de usuario</h3>
+              <p>{h.nombre}</p>
+            </div>
+          )}
+          {h.justificacion && (
+            <div className="hu-description">
+              <h3>Descripción</h3>
+              <p>{h.justificacion}</p>
+            </div>
+          )}
+          {h.dependencias && (
+            <div className="hu-dependencies">
+              <h3>Dependencias</h3>
+              <p>{h.dependencias}</p>
+            </div>
+          )}
+          <div className="hu-meta-details">
+            {h.epica && (
+              <div>
+                <strong>Épica:</strong> {h.epica}
+              </div>
+            )}
+            {h.feature && (
+              <div>
+                <strong>Funcionalidad:</strong> {h.feature}
+              </div>
+            )}
+            {h.prioridad && (
+              <div>
+                <strong>Prioridad:</strong> {h.prioridad}
+              </div>
+            )}
+            {h.sp && (
+              <div>
+                <strong>SP:</strong> {h.sp}
+              </div>
+            )}
+            {h.sprintId && (
+              <div>
+                <strong>Sprint:</strong> {h.sprintId}
+              </div>
+            )}
+          </div>
+        </Card>
+      </section>
+
       <div className="detail-layout">
         <div className="detail-main">
           <Card kicker="EJECUCIÓN" title="Tareas por área">
