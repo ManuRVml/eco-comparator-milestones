@@ -30,7 +30,8 @@
     "check:capas": "node scripts/e2e-capas.mjs",
     "check:palette": "node scripts/check-palette.mjs",
     "check:readonly": "node scripts/e2e-readonly.mjs",
-    "check:copy": "node scripts/check-copy.mjs"
+    "check:copy": "node scripts/check-copy.mjs",
+    "check:vocab": "node scripts/check-copy.mjs --vocab"
   },
   "dependencies": {
     "@fontsource-variable/roboto": "5.3.0",
