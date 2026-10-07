@@ -3,7 +3,7 @@ import { MilestonePanel } from "@/components/milestone-panel/panel";
 import { Ring } from "@/components/ui";
 import { LaneSlot, PanelProvider, RoadmapNode } from "@/components/milestone-panel/panel-client";
 import { addDays, daysBetween, fmtCorta, fmtDiaSemana, isoWeekday, mesLargo } from "@/lib/dates";
-import { colorEstado, colorLinea, fmtPct, textoLinea } from "@/lib/format";
+import { colorEstado, colorLinea, fmtPct, textoLinea, tono } from "@/lib/format";
 import type { MilestoneView, Model } from "@/lib/model";
 import { SprintCheckpointRow } from "@/components/sprint-checkpoint-row";
 import { progresoLinea } from "@/lib/line-progress";
@@ -131,13 +131,22 @@ export function Roadmap({ model, areaId, inicial, canEdit, isAdmin = false }: { 
             const ms = model.milestones.filter((m) => m.lineaId === l.id);
             const { nodos, filas } = ubicar(ms, areaId);
             const progreso = progresoLinea(model, l.id, areaId);
+            const proximo = ms.filter((m) => !m.cierreVerificado && m.fechaObjetivo && m.fechaObjetivo >= model.hoy).sort((a, b) => a.fechaObjetivo!.localeCompare(b.fechaObjetivo!))[0];
             return (
               <div className="rm-row rm-lane" key={l.id} style={{ "--filas": filas, "--linea": colorLinea(l.id), "--linea-text": textoLinea(l.id) } as CSSProperties}>
                 <div className="rm-lane-label">
                   <span className="rm-lane-id">{l.id}</span>
                   <strong>{l.nombre}</strong>
                   <span className="rm-lane-meta">
-                    {ms.length} hitos de entrega · {fmtPct(progreso.pctReal)} {model.capa === "oficial" ? "entregado" : "técnico"} ponderado
+                    {ms.length} hitos ·{" "}
+                    {proximo ? (
+                      <>
+                        próximo: {proximo.id} el {fmtCorta(proximo.fechaObjetivo)} · <span className={`chip tone-${tono(proximo.estadoFinal)}`}>{proximo.estadoFinal.toLowerCase()}</span>
+                      </>
+                    ) : (
+                      "todos cumplidos"
+                    )}
+                    {canEdit && ` · avance ${fmtPct(progreso.pctReal)} vs ${fmtPct(progreso.pctPlan)} previsto`}
                   </span>
                 </div>
                 <div className="rm-track">
