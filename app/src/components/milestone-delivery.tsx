@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { MilestoneView, Model } from "@/lib/model";
+import { riesgosParaCliente, type MilestoneView, type Model } from "@/lib/model";
 import { tono } from "@/lib/format";
 import { contractPending, criterionAccepted } from "@/lib/milestone-contract/domain";
 import { fmtCorta } from "@/lib/dates";
@@ -20,10 +20,20 @@ function Necesidades({ m, model }: { m: MilestoneView; model: Model }) {
   </>;
 }
 
-/** Hook de C7: aquí entrarán los riesgos con consecuencia en fecha (hoy no renderiza nada). */
-export function MilestoneRiesgos({ m }: { m: MilestoneView }) {
-  void m;
-  return null;
+/** Riesgos que podrían mover la fecha, solo si el hito está en riesgo/atrasado o tiene riesgos vinculados. */
+export function MilestoneRiesgos({ m, model }: { m: MilestoneView; model: Model }) {
+  const items = riesgosParaCliente(m, model.riesgoById);
+  const enRiesgo = m.estadoFinal === "En riesgo" || m.estadoFinal === "Atrasado";
+  if (!enRiesgo && items.length === 0) return null;
+  return <>
+    <h4>Riesgos que podrían mover la fecha</h4>
+    {items.length === 0
+      ? <p data-testid={`riesgos-${m.id}`}>Estamos evaluando el efecto en la fecha.</p>
+      : <ul className="acceptance-list" data-testid={`riesgos-${m.id}`}>{items.map((r) => <li key={r.id}>
+        <b>{r.consecuencia}</b>
+        {r.mitigacion && <p className="muted small">Qué hacemos al respecto: {r.mitigacion}</p>}
+      </li>)}</ul>}
+  </>;
 }
 
 const ETIQUETA_CAPACIDAD = { pendiente: "Pendiente", "en curso": "En curso", entregada: "Entregada" } as const;
@@ -43,7 +53,7 @@ export function MilestoneValor({ m, model }: { m: MilestoneView; model: Model })
     <h4>Evidencia</h4>
     <p>{evidencia ? (/^https?:\/\//.test(evidencia) ? <a href={evidencia}>{evidencia}</a> : evidencia) : "Disponible al cierre"}</p>
     <Necesidades m={m} model={model} />
-    <MilestoneRiesgos m={m} />
+    <MilestoneRiesgos m={m} model={model} />
     <h4>Qué sigue</h4>
     <p>{siguiente ? `${siguiente.id} · ${siguiente.nombre} · ${ddmm(siguiente.fechaObjetivo)}` : "Es el último hito de esta línea."}</p>
     <Link href={`/milestones/${m.id}`} className="btn btn-sm">Ver detalles</Link>
