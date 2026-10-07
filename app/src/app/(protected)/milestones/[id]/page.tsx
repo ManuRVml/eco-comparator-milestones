@@ -124,7 +124,9 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
             )}
             {!resumen && (
               <div>
-                <span>SP {model.config.progreso_incluye_lista_demo === "1" ? "aceptados o en demo" : "aceptados"}</span>
+                <span>
+                  SP {model.config.progreso_incluye_lista_demo === "1" ? "aceptados o en demo" : "aceptados"} <small className="muted">(historias aceptadas por el equipo Ecopetrol)</small>
+                </span>
                 <strong>
                   {m.spCompletos}/{m.spTotal}
                 </strong>

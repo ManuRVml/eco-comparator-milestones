@@ -52,6 +52,6 @@ export function TaskWorkflow({ tarea: t, model }: { tarea: Tarea; model: Model }
     ]} />
     <h4>Referencias reconciliadas</h4>
     {refs.map((r) => <p className="small" key={r.id}>{w.fuentes.find((f) => f.id === r.fuenteId)?.nombre} · {r.idOrigen} · {r.nombre}</p>)}
-    {!refs.length && <p className="muted small">Actividad conservada; correspondencia pendiente o adicional al plan de 80 tareas.</p>}
+    {!refs.length && <p className="muted small">Actividad conservada; correspondencia pendiente o adicional al plan ({w.referencias.length} referencias reconciliadas).</p>}
   </Card>;
 }
