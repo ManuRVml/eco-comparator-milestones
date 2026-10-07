@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Fragment } from "react";
 import type { CSSProperties } from "react";
 import { ESTADOS_HISTORIA } from "@/db/schema";
 import { EstadoControl } from "@/components/editor/estado-control";
@@ -11,7 +12,7 @@ import { AreaDot, Breadcrumb, Card, Chip, Empty, ProgressBar, Ring, StatusBadge 
 import { getModel, requireSession } from "@/lib/data";
 import { fmtCorta, fmtDiaSemana, fmtLarga, relativo } from "@/lib/dates";
 import { colorArea, colorEstado, colorLinea, fmtPct, textoLinea } from "@/lib/format";
-import { ESTADOS_MILESTONE, type Model, type Tarea } from "@/lib/model";
+import { ESTADOS_MILESTONE, type Historia, type Model, type Tarea } from "@/lib/model";
 import { MetricNote } from "@/components/metric-note";
 import { MilestoneDelivery } from "@/components/milestone-delivery";
 import { CheckpointProgress } from "@/components/checkpoint-progress";
@@ -59,19 +60,35 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
                 {fmtDiaSemana(m.fechaObjetivo ?? "", true)} {fmtLarga(m.fechaObjetivo)} <em>· {relativo(model.hoy, m.fechaObjetivo ?? model.hoy)}</em>
               </dd>
             </div>
-            <div>
-              <dt>Sprints relacionados</dt>
-              <dd>{m.sprintsTexto ?? "—"}</dd>
-            </div>
-            <div>
-              <dt>Historias</dt>
-              <dd>
-                {m.huIds.length} HU · {m.spTotal} SP
-              </dd>
-            </div>
+            {session.canEdit && (
+              <div>
+                <dt>Sprints relacionados</dt>
+                <dd>{m.sprintsTexto ?? "—"}</dd>
+              </div>
+            )}
+            {session.canEdit && (
+              <div>
+                <dt>Historias</dt>
+                <dd>
+                  <Link href={`/milestones/${m.id}?tab=hu${q}#historias`} className="link-underline">{m.huIds.length} HU · {m.spTotal} SP</Link>
+                </dd>
+              </div>
+            )}
             <div>
               <dt>Épicas</dt>
-              <dd>{m.epicas?.replaceAll(";", " · ") ?? "—"}</dd>
+              <dd>
+                {m.epicas
+                  ? m.epicas.split(";").map((epica, i) => {
+                      const code = epica.trim();
+                      return (
+                        <Fragment key={code}>
+                          {i > 0 && " · "}
+                          {session.canEdit ? <Link href={`/milestones/${m.id}?tab=hu${q}#${epicAnchor(m.huIds, model, code)}`} className="link-underline">{code}</Link> : code}
+                        </Fragment>
+                      );
+                    })
+                  : "—"}
+              </dd>
             </div>
           </dl>
         </div>
@@ -301,62 +318,82 @@ function DepList({ titulo, ids, model, vacio }: { titulo: string; ids: string[];
   );
 }
 
-function HuTab({ model, huIds, canEdit }: { model: Model; huIds: string[]; canEdit: boolean }) {
-  const hus = huIds.map((h) => model.huById.get(h)).filter((h) => !!h);
-  if (hus.length === 0) return <Empty>No hay historias visibles en este milestone.</Empty>;
+/** Ancla de la épica `code` si alguna HU del milestone la tiene; si no, la lista de historias. */
+function epicAnchor(huIds: string[], model: Model, code: string) {
+  return huIds.some((id) => model.huById.get(id)?.epicaId?.trim() === code) ? `epica-${code}` : "historias";
+}
+
+function HuItem({ h, model, canEdit }: { h: Historia; model: Model; canEdit: boolean }) {
+  const ts = (model.tareasPorHu.get(h.id) ?? []).map((t) => model.tareaById.get(t)).filter((t): t is Tarea => !!t);
+  const hechas = ts.filter((t) => t.estado === "Hecha").length;
+  const weekly = model.weeklyPorHu.get(h.id);
   return (
-    <ul className="hu-list">
-      {hus.map((h) => {
-        const ts = (model.tareasPorHu.get(h.id) ?? []).map((t) => model.tareaById.get(t)).filter((t): t is Tarea => !!t);
-        const hechas = ts.filter((t) => t.estado === "Hecha").length;
-        const weekly = model.weeklyPorHu.get(h.id);
-        return (
-          <li key={h.id}>
-            <details className="hu-item">
-              <summary>
-                <span className="hu-id">
-                  <Link href={`/historias/${h.id}`}>{h.id}</Link>
-                </span>
-                <span className="hu-name">{h.nombre}</span>
-                <span className="hu-meta">
-                  <StatusBadge estado={h.estado} size="sm" />
-                  <span className="sp-pill">{h.sp ?? 0} SP</span>
-                  {weekly && <span className="muted small">Demo {fmtCorta(weekly)}</span>}
-                  <span className="muted small">
-                    {hechas}/{ts.length} tareas
-                  </span>
-                </span>
-              </summary>
-              <div className="hu-body">
-                {canEdit && (
-                  <div className="hu-edit">
-                    <span className="field-label">Estado de la HU</span>
-                    <EstadoControl tipo="historia" id={h.id} estado={h.estado} estados={ESTADOS_HISTORIA} evidencia={h.evidencia} compact />
-                    <VisibilidadToggle tipo="historia" id={h.id} visible={h.visibleCliente} />
-                  </div>
-                )}
-                {model.areas
-                  .filter((a) => ts.some((t) => t.areaId === a.id))
-                  .map((a) => (
-                    <div key={a.id} className="hu-area">
-                      <h5>
-                        <AreaDot areaId={a.id} /> {a.nombre}
-                      </h5>
-                      <ul className="tarea-list">
-                        {ts
-                          .filter((t) => t.areaId === a.id)
-                          .map((t) => (
-                            <TareaRow key={t.id} t={t} model={model} canEdit={canEdit} />
-                          ))}
-                      </ul>
-                    </div>
-                  ))}
-                {ts.length === 0 && <Empty>Esta HU no tiene tareas técnicas propias.</Empty>}
+    <li>
+      <details className="hu-item">
+        <summary>
+          <span className="hu-id">
+            <Link href={`/historias/${h.id}`}>{h.id}</Link>
+          </span>
+          <span className="hu-name">{h.nombre}</span>
+          <span className="hu-meta">
+            <StatusBadge estado={h.estado} size="sm" />
+            <span className="sp-pill">{h.sp ?? 0} SP</span>
+            {weekly && <span className="muted small">Demo {fmtCorta(weekly)}</span>}
+            <span className="muted small">
+              {hechas}/{ts.length} tareas
+            </span>
+          </span>
+        </summary>
+        <div className="hu-body">
+          {canEdit && (
+            <div className="hu-edit">
+              <span className="field-label">Estado de la HU</span>
+              <EstadoControl tipo="historia" id={h.id} estado={h.estado} estados={ESTADOS_HISTORIA} evidencia={h.evidencia} compact />
+              <VisibilidadToggle tipo="historia" id={h.id} visible={h.visibleCliente} />
+            </div>
+          )}
+          {model.areas
+            .filter((a) => ts.some((t) => t.areaId === a.id))
+            .map((a) => (
+              <div key={a.id} className="hu-area">
+                <h5>
+                  <AreaDot areaId={a.id} /> {a.nombre}
+                </h5>
+                <ul className="tarea-list">
+                  {ts
+                    .filter((t) => t.areaId === a.id)
+                    .map((t) => (
+                      <TareaRow key={t.id} t={t} model={model} canEdit={canEdit} />
+                    ))}
+                </ul>
               </div>
-            </details>
-          </li>
+            ))}
+          {ts.length === 0 && <Empty>Esta HU no tiene tareas técnicas propias.</Empty>}
+        </div>
+      </details>
+    </li>
+  );
+}
+
+function HuTab({ model, huIds, canEdit }: { model: Model; huIds: string[]; canEdit: boolean }) {
+  const hus = huIds.map((h) => model.huById.get(h)).filter((h): h is Historia => !!h);
+  if (hus.length === 0) return <Empty>No hay historias visibles en este milestone.</Empty>;
+  // Las épicas del milestone (m.epicas) son códigos E#; se agrupa por epicaId, no por el nombre.
+  const codes = Array.from(new Set(hus.map((h) => h.epicaId?.trim()).filter((c): c is string => !!c)));
+  return (
+    <ul className="hu-list" id="historias">
+      {codes.map((code) => {
+        const group = hus.filter((h) => h.epicaId?.trim() === code);
+        return (
+          <Fragment key={code}>
+            <li id={`epica-${code}`}>
+              <h4 className="epica-heading">{code} · {group[0].epica}</h4>
+            </li>
+            {group.map((h) => <HuItem key={h.id} h={h} model={model} canEdit={canEdit} />)}
+          </Fragment>
         );
       })}
+      {hus.filter((h) => !h.epicaId?.trim()).map((h) => <HuItem key={h.id} h={h} model={model} canEdit={canEdit} />)}
     </ul>
   );
 }
