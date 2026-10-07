@@ -3,7 +3,7 @@ import { contractPending, criterionAccepted } from "@/lib/milestone-contract/dom
 import { fmtCorta } from "@/lib/dates";
 import { CompletionCheck } from "./completion-check";
 
-export function MilestoneDelivery({ m, model }: { m: MilestoneView; model: Model }) {
+export function MilestoneDelivery({ m, model, canEdit }: { m: MilestoneView; model: Model; canEdit: boolean }) {
   const contract = model.contratosMilestone?.[m.id], d = contract?.definicion;
   const pending = contract ? contractPending(contract) : ["definición"];
   const abiertas = (contract?.decisionesPendientes ?? []).filter((dec) => !dec.resuelta);
@@ -33,7 +33,7 @@ export function MilestoneDelivery({ m, model }: { m: MilestoneView; model: Model
     <details className="delivery-context"><summary>Necesidad del usuario, resultado, responsables y alcance</summary>
       <dl className="definition-grid">
         {[["Necesidad del usuario (JTBD)", d?.job], ["Resultado esperado", d?.outcome], ["Objetivo de negocio", d?.meta], ["Responsable", d?.responsable], ["Aprobador del negocio", d?.aprobador], ["Incluido en la entrega", d?.alcanceIncluido], ["Fuera de alcance", d?.fueraAlcance]].map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value || "Por definir"}</dd></div>)}
-        <div><dt>Alcance relacionado</dt><dd>{m.huIds.length} historias · {m.tareaIds.length} tareas · {m.epicas?.replaceAll(";", " · ") || "Épicas sin registrar"}</dd></div>
+        {canEdit && <div><dt>Alcance relacionado</dt><dd>{m.huIds.length} historias · {m.tareaIds.length} tareas · {m.epicas?.replaceAll(";", " · ") || "Épicas sin registrar"}</dd></div>}
       </dl>
     </details>
     {m.publicado && <p className="muted small"><b>{m.cierreVerificado ? "Registro de publicación" : "Registro anterior; aceptación por criterios pendiente de confirmar"}:</b> {m.evidencia}</p>}
