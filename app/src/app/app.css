@@ -891,3 +891,4 @@
 .capability-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; width: 100%; }
 .capability-head h4 { margin: 0; font-size: 14px; }
 .capability-desc { margin: 0; font-size: 13px; color: var(--color-text-secondary); display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+.rm-start-note { display: flex; align-items: center; gap: 8px; padding: 6px 22px; color: var(--color-text-muted); font-size: 11.5px; }
