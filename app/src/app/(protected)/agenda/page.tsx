@@ -24,7 +24,7 @@ export default async function AgendaPage() {
               <strong>{fechas.length}</strong>
               <span>fechas planificadas</span>
             </div>
-            {!session.canEdit && (
+            {session.canEdit && (
               <div>
                 <strong>{totalHu}</strong>
                 <span>HU a demostrar</span>
