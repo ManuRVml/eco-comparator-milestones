@@ -116,8 +116,14 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
                 <th>Línea</th>
                 <th>Fecha objetivo</th>
                 <th>Seguimiento</th><th>Cumplimiento</th>
-                <th className="w-bar">{areaId ? "Trabajo del área" : model.capa === "oficial" ? "Trabajo publicado" : "Trabajo técnico"}</th>
-                <th className="num">SP</th>
+                {session.canEdit ? (
+                  <>
+                    <th className="w-bar">{areaId ? "Trabajo del área" : model.capa === "oficial" ? "Trabajo publicado" : "Trabajo técnico"}</th>
+                    <th className="num">SP</th>
+                  </>
+                ) : (
+                  <th>Prevista</th>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -144,6 +150,8 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
                       <StatusBadge estado={m.estadoFinal} size="sm" />
                     </td>
                     <td><span className={`chip tone-${m.cierreVerificado ? "green" : "slate"}`}>{m.cierreVerificado ? "Cumplido" : "Pendiente"}</span></td>
+                    {session.canEdit ? (
+                      <>
                     <td>
                       {areaId && !a ? (
                         <span className="muted">Sin tareas del área</span>
@@ -159,6 +167,10 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
                     <td className="num">
                       {m.spCompletos}/{m.spTotal}
                     </td>
+                      </>
+                    ) : (
+                      <td className="nowrap">{fmtCorta(m.fechaObjetivo)}</td>
+                    )}
                   </tr>
                 );
               })}
