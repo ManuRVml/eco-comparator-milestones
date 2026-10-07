@@ -126,7 +126,7 @@ export function Roadmap({ model, areaId, inicial, canEdit, isAdmin = false }: { 
             )}
           </div>
 
-          <SprintCheckpointRow model={model} areaId={areaId} canEdit={canEdit} position={x} />
+          {canEdit && <SprintCheckpointRow model={model} areaId={areaId} canEdit={canEdit} position={x} />}
           {model.lineas.map((l) => {
             const ms = model.milestones.filter((m) => m.lineaId === l.id);
             const { nodos, filas } = ubicar(ms, areaId);
@@ -169,6 +169,9 @@ export function Roadmap({ model, areaId, inicial, canEdit, isAdmin = false }: { 
                           <Ring value={n.pct} size={44} stroke={5} color={color} track="var(--color-border-default)">
                             <span className="rm-dot-inner">{n.m.id.replace("M-", "M")}</span>
                           </Ring>
+                          {canEdit && <Ring value={n.pct} size={44} stroke={5} color={color} track="var(--color-border-default)">
+                            <span className="rm-dot-inner">{n.m.id.replace("M-", "M")}</span>
+                          </Ring>}
                           <CompletionCheck complete={n.m.cierreVerificado ?? milestoneCompletado(n.m, model)} label={`${n.m.id}: entrega completa verificada`} id={n.m.id} />
                         </span>
                         <span className="rm-label">
@@ -178,8 +181,8 @@ export function Roadmap({ model, areaId, inicial, canEdit, isAdmin = false }: { 
                           </span>
                           <span className="rm-name">{n.m.nombre}</span>
                           <span className="rm-stat">
-                            <i style={{ background: color }} />
-                            {n.sinTareas ? `Sin tareas de ${areaNombre}` : areaId ? `${areaNombre} · ${fmtPct(area?.pctReal ?? 0)}` : `Trabajo ${fmtPct(n.m.pctPonderado)}`}
+                            {!canEdit && <i style={{ background: color }} />}
+                            {n.sinTareas ? `Sin tareas de ${areaNombre}` : areaId ? `${areaNombre} · ${fmtPct(area?.pctReal ?? 0)}` : canEdit ? `Trabajo ${fmtPct(n.m.pctPonderado)}` : null}
                           </span>
                           {areaId && <span className="rm-comparison">Total milestone {fmtPct(n.m.pctPonderado)} · aporte del área {aporteArea.toFixed(1).replace(".", ",")} pts</span>}
                           <span className="rm-comparison">{n.m.cierreVerificado ? "Milestone cumplido" : "Milestone pendiente"}</span>
