@@ -40,6 +40,19 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
           { label: t.id },
         ]}
       />
+      <div className="alert tone-amber" role="status">
+        <p>
+          <b>Detalle técnico · información para el equipo</b>
+          {ms.length > 0 && (
+            <>
+              {" · "}
+              <Link href={`/milestones/${ms[0].id}`} className="alert-link">
+                Volver al hito
+              </Link>
+            </>
+          )}
+        </p>
+      </div>
       <section className="entity-hero">
         <div>
           <div className="ms-hero-tags">
