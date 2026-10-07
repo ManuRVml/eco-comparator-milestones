@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import type { CSSProperties } from "react";
 import { AreaBullets } from "@/components/area-chart";
 import { AreaDot, Card, Empty, MiniRing, ProgressBar, Ring, StatusBadge } from "@/components/ui";
@@ -18,33 +19,7 @@ const HU_ORDEN = ["Aceptada", "Lista para demo", "En curso", "No iniciada", "Blo
 export default async function DashboardPage() {
   const session = await requireSession();
   const model = await getModel(session);
-  if (!session.canEdit) {
-    const siguientes = model.milestones.filter((m) => (m.fechaObjetivo ?? "") >= model.hoy).slice(0, 3);
-    return (
-      <main className="page" data-testid="dashboard">
-        <MilestoneOverview model={model} cliente />
-        <Card kicker="ROADMAP" title="Próximos milestones" actions={<Link className="card-link" href="/lineas">Líneas de tiempo →</Link>}>
-          {siguientes.length === 0 ? (
-            <Empty>No hay milestones próximos.</Empty>
-          ) : (
-            <ul className="upcoming" data-testid="proximos-milestones">
-              {siguientes.map((m) => (
-                <li key={m.id}>
-                  <Link href={`/milestones/${m.id}`} className="upcoming-item">
-                    <div className="upcoming-body">
-                      <strong>{m.nombre}</strong>
-                      <span className="muted small">Fecha comprometida: {fmtCorta(m.fechaObjetivo)}</span>
-                    </div>
-                    <StatusBadge estado={m.estadoFinal} size="sm" />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
-      </main>
-    );
-  }
+  if (!session.canEdit) redirect("/lineas");
   const k = model.kpis;
   const verAreas = session.canEdit || model.config.resumen_area_ecopetrol === "1";
   const diasWeekly = daysBetween(model.hoy, model.proximoWeekly);

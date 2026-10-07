@@ -77,7 +77,7 @@ export function MilestoneDelivery({ m, model, canEdit }: { m: MilestoneView; mod
     <ol className="acceptance-list">
       {(contract?.criterios ?? []).map((c) => <li key={c.id} data-testid={`criterion-${c.id}`}>
         <div className="delivery-heading"><b>{c.descripcion}</b><span className={`chip tone-${contract && criterionAccepted(c, contract, model.hoy) ? "green" : "slate"}`}>{contract && criterionAccepted(c, contract, model.hoy) ? "Aceptado" : "Pendiente"}</span><small>{c.obligatorio ? "Obligatorio" : "Complementario"}</small></div>
-        <p className="muted small">Evidencia requerida: {c.evidenciaRequerida||(canEdit?"Por definir":"Disponible al cierre")}</p>
+        <p className="muted small">{c.evidenciaRequerida||canEdit?`Evidencia requerida: ${c.evidenciaRequerida||"Por definir"}`:"Evidencia: disponible al cierre"}</p>
         {contract && criterionAccepted(c, contract, model.hoy) ? <p><b>Evidencia:</b> {c.evidencia} · <b>Aprobó:</b> {c.aprobador} · <b>Fecha:</b> {fmtCorta(c.fecha)}{c.resultadoMedido!==null&&` · Valor medido: ${c.resultadoMedido}`}{c.resultadoCualitativo&&` · Resultado: ${c.resultadoCualitativo}`}{c.muestraEvaluada!==null&&` · Muestra evaluada: ${c.muestraEvaluada}`}</p> : <p className="muted small">Sin aceptación vigente. {c.evidencia && "Hay una evidencia anterior pendiente de revisión."}</p>}
       </li>)}
     </ol>
