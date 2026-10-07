@@ -202,7 +202,7 @@ export default async function EditorPage({ searchParams }: PageProps<"/editor">)
           {hus.map((h) => (
                 <tr key={h.id}>
                   <td>
-                    <Link href={`/historias/${h.id}`} className="ms-cell">
+                    <Link href={`/historias/${h.id}#descripcion`} className="ms-cell">
                       <b>{h.id}</b>
                       <span>{h.nombre}</span>
                     </Link>

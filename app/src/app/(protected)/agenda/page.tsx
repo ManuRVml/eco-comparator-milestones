@@ -86,7 +86,7 @@ export default async function AgendaPage() {
                   <ul className="agenda-hu">
                     {hus.map((h) => (
                       <li key={h.id}>
-                        <Link href={`/historias/${h.id}`}>
+                        <Link href={`/historias/${h.id}#descripcion`}>
                           <span className="agenda-hu-dot" style={{ background: colorEstado(h.estado) }} title={h.estado} />
                           <b>{h.id}</b>
                           <span>{h.nombre}</span>
