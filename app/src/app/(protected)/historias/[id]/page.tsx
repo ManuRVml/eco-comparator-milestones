@@ -121,7 +121,7 @@ export default async function HistoriaPage({
       </section>
 
       <section id="descripcion" className="hu-descripcion">
-        <Card kicker="DETALLE DE LA HISTORIA" title={h.nombre}>
+        <Card kicker="DETALLE DE LA HISTORIA" title="Lo que pide esta historia">
           <dl className="hu-detalle">
             {detalle.map(([label, value]) => (
               <div key={label}>
