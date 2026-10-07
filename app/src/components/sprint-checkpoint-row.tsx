@@ -7,20 +7,55 @@ import { Ring } from "@/components/ui";
 import { LaneSlot, RoadmapNode } from "@/components/milestone-panel/panel-client";
 import { SprintCheckpointPanel } from "@/components/sprint-checkpoint-panel";
 import { CompletionCheck } from "@/components/completion-check";
+import { MilestonePanel } from "@/components/milestone-panel/panel";
+import type { MilestoneView } from "@/lib/model";
+
+/** Adaptador: el alistamiento (S0) se presenta con el mismo panel de valor que los milestones, sin crear uno nuevo en el modelo. */
+export function inicioComoMilestone(model: Model, c: NonNullable<ReturnType<typeof sprintCheckpoint>>): MilestoneView | null {
+  const base = model.milestones[0];
+  if (!base) return null;
+  return {
+    ...base, id: "S0", nombre: "Proyecto listo para arrancar", lineaId: "CP", linea: null, fechaObjetivo: c.sprint.fechaFin,
+    valorCliente: "Infraestructura y accesos preparados; nada visible aún para ti.", criterio: null, descripcion: null,
+    estado: c.estado, estadoFinal: c.estado, cierreVerificado: c.completo, publicado: false, override: false, evidencia: null, fechaCierre: null,
+    huIds: [], tareaIds: [], dependeDe: [], dependientes: [], riesgoIds: [], pctPonderado: c.total.pctReal, areas: [], criticasVencidas: [],
+  };
+}
 
 export function SprintCheckpointRow({ model, areaId, canEdit, position }: { model: Model; areaId: string | null; canEdit: boolean; position: (date: string) => number }) {
   const todos = model.sprints.map((s) => sprintCheckpoint(model, s.numero, areaId)).filter((c) => c !== null);
   const inicio = todos.find((c) => c.sprint.numero === 0);
-  // El editor abre S0 como un punto más del carril; el cliente solo ve la nota de partida.
+  // El editor abre S0 como un punto más del carril de sprints; el cliente lo ve como un nodo propio con el panel de valor.
   const checkpoints = canEdit ? todos : [];
-  const nota = inicio && !canEdit && (
-    <div className="rm-start-note">
-      <div>
-        <strong>Proyecto listo para arrancar</strong> · ambientes y arquitectura base · {fmtCorta(inicio.sprint.fechaFin)}{" "}
-        {inicio.completo ? <CompletionCheck complete label="Ambientes y arquitectura base desplegados" id="S0" /> : <span className={`chip tone-${tono(inicio.estado)}`}>{inicio.estado.toLowerCase()}</span>}
-        {inicio.completo && " Cumplido"}
-        <div>Qué obtienes: infraestructura y accesos preparados; nada visible aún para ti.</div>
+  const m = !canEdit && inicio ? inicioComoMilestone(model, inicio) : null;
+  const nota = m && inicio && (
+    <div className="rm-row rm-lane" style={{ "--filas": 1, "--linea": "var(--color-brand-primary)" } as CSSProperties}>
+      <div className="rm-lane-label">
+        <span className="rm-lane-id">S0</span>
+        <strong>Inicio del proyecto</strong>
+        <span className="rm-lane-meta">ambientes y arquitectura base</span>
       </div>
+      <div className="rm-track">
+        <span className="rm-line" />
+        {(() => {
+          const left = position(inicio.sprint.fechaFin), color = colorEstado(inicio.estado);
+          return (
+            <RoadmapNode id="S0" href="/lineas?m=S0" className={`rm-node ${left < 7 ? "is-left" : ""}`} style={{ left: `${left}%`, "--fila": 0, "--c": color } as CSSProperties} title={`${m.nombre} (clic para ver qué obtienes)`}>
+              <span className="rm-dot rm-milestone-dot">
+                <span style={{ display: "block", width: 20, height: 20, borderRadius: "50%", background: color }} />
+                <CompletionCheck complete={inicio.completo} label="Ambientes y arquitectura base desplegados" id="S0" />
+              </span>
+              <span className="rm-label">
+                <span className="rm-kind">Punto de partida</span>
+                <span className="rm-date">{fmtDiaSemana(inicio.sprint.fechaFin)} {fmtCorta(inicio.sprint.fechaFin)}</span>
+                <span className="rm-name">{m.nombre}</span>
+                <span className="rm-comparison">{inicio.completo ? "Hito cumplido" : "Hito pendiente"}</span>
+              </span>
+            </RoadmapNode>
+          );
+        })()}
+      </div>
+      <LaneSlot lineaId="CP" panels={{ S0: <MilestonePanel m={m} model={model} canEdit={false} /> }} />
     </div>
   );
   if (!checkpoints.length) return nota || null;
