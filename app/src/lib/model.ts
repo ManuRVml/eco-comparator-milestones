@@ -399,7 +399,7 @@ export function computeModel(raw: Raw, hoy: string, capa: Capa = "tecnica"): Mod
       if (cumplido) sugerido = "Cumplido";
       else if (m.fechaObjetivo && m.fechaObjetivo < hoy) sugerido = "Atrasado";
       else if (criticasVencidas.length) sugerido = "En riesgo";
-      else if (res.hechas + res.enCurso > 0 || hs.some((h) => h.estado !== "No iniciada")) sugerido = "En curso";
+      else if (res.hechas + res.enCurso > 0) sugerido = "En curso";
       else sugerido = "Pendiente";
       const override = m.estadoOrigen === "editor" && (ESTADOS_MILESTONE as readonly string[]).includes(m.estado);
       return {
@@ -430,8 +430,11 @@ export function computeModel(raw: Raw, hoy: string, capa: Capa = "tecnica"): Mod
       };
     });
 
-  const areaResumen = progresoAreas(raw.tareas, areasOrd, hoy, festivosSet, true);
-  const total = resumir("*", "Total", raw.tareas, hoy, festivosSet);
+  // Proyecto y líneas comparten el mismo conjunto: las tareas que alimentan algún milestone (progresoLinea parte de ahí).
+  const idsEnMilestones = new Set(milestonesView.flatMap((m) => m.tareaIds));
+  const tareasProyecto = raw.tareas.filter((t) => idsEnMilestones.has(t.id));
+  const areaResumen = progresoAreas(tareasProyecto, areasOrd, hoy, festivosSet, true);
+  const total = resumir("*", "Total", tareasProyecto, hoy, festivosSet);
 
   const huPorEstado: Record<string, number> = {};
   let spTotal = 0;
