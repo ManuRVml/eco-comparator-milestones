@@ -8,9 +8,11 @@ import { getModel, requireSession } from "@/lib/data";
 import { fmtCorta } from "@/lib/dates";
 import { colorArea, colorLinea, fmtPct, textoLinea } from "@/lib/format";
 import { MetricNote } from "@/components/metric-note";
+import { redirect } from "next/navigation";
 
 export default async function AreasPage({ searchParams }: PageProps<"/areas">) {
   const session = await requireSession();
+  if (!session.canEdit) redirect("/lineas");
   const model = await getModel(session);
   const sp = await searchParams;
   const areaId = typeof sp.area === "string" && model.areaById.has(sp.area) ? sp.area : null;
