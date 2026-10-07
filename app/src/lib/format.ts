@@ -92,10 +92,83 @@ export function plural(n: number, uno: string, varios: string) {
  * nombre del rol de consulta sin reescribir el registro de auditoría.
  */
 export function etiquetaCampo(campo: string): string {
-  return campo.replace(new RegExp("(para|al) el cli" + "ente", "i"), "$1 el equipo Ecopetrol").replace(new RegExp("cli" + "ente", "gi"), "equipo Ecopetrol");
+  return campo
+    .replace(
+      new RegExp("(para|al) el cli" + "ente", "i"),
+      "$1 el equipo Ecopetrol",
+    )
+    .replace(new RegExp("cli" + "ente", "gi"), "equipo Ecopetrol");
 }
 
 /** Nombre corto de línea para chips. */
 export function lineaCorta(id: string | null | undefined) {
   return id ?? "—";
+}
+
+/**
+ * Semáforo de milestone: verde/ámbar/rojo/gris/cumplido según estado y fechas.
+ * Umbral de retraso: >5 días hábiles = rojo, 1-5 días hábiles = ámbar.
+ * Reglas (en orden de evaluación):
+ * 1. cumplido=true → 'cumplido'
+ * 2. !iniciado && fechaObjetivo > hoy → 'gris' (sin iniciar, futuro)
+ * 3. fechaObjetivo < hoy && !cumplido → 'rojo' (atrasado)
+ * 4. prevision > objetivo + >5 días hábiles → 'rojo' (prevision muy lejana)
+ * 5. prevision > objetivo + 1-5 días hábiles → 'ambar' (previsión ajustada)
+ * 6. else → 'verde' (dentro de plazo)
+ */
+/**
+ * Cuenta los días hábiles (lunes a viernes) entre dos fechas.
+ * Cuenta desde `desde` (exclusive) hasta `hasta` (inclusive), en UTC.
+ */
+export function diasHabilesEntre(desde: string, hasta: string): number {
+  const desdeDate = new Date(desde + "T00:00:00Z");
+  const hastaDate = new Date(hasta + "T00:00:00Z");
+  if (desdeDate >= hastaDate) return 0;
+
+  const diasHabiles: Record<number, boolean> = {
+    1: true,
+    2: true,
+    3: true,
+    4: true,
+    5: true,
+  }; // Mon-Fri
+  let count = 0;
+  const current = new Date(desdeDate);
+  current.setUTCDate(current.getUTCDate() + 1); // desde exclusive
+
+  while (current <= hastaDate) {
+    if (diasHabiles[current.getUTCDay()]) count++;
+    current.setUTCDate(current.getUTCDate() + 1);
+  }
+  return count;
+}
+
+export function semaforoMilestone(
+  m: {
+    fechaObjetivo: string;
+    fechaPrevision?: string | null;
+    cumplido: boolean;
+    iniciado: boolean;
+  },
+  hoy: string,
+): "verde" | "ambar" | "rojo" | "gris" | "cumplido" {
+  // 1. Cumplido
+  if (m.cumplido) return "cumplido";
+
+  // 2. Sin iniciar y objetivo en el futuro
+  if (!m.iniciado && new Date(m.fechaObjetivo) > new Date(hoy)) return "gris";
+
+  // 3. Objetivo pasado y no cumplido
+  if (new Date(m.fechaObjetivo) < new Date(hoy)) return "rojo";
+
+  // 4-5. Verificar previsión si existe
+  if (m.fechaPrevision) {
+    const businessDays = diasHabilesEntre(m.fechaObjetivo, m.fechaPrevision);
+
+    if (businessDays > 5) return "rojo";
+    if (businessDays >= 1) return "ambar";
+  }
+
+  // 6. Dentro de plazo
+  return "verde";
 }
