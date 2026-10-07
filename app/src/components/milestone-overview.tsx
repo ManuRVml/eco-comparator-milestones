@@ -4,11 +4,11 @@ import { fmtCorta, fmtLarga } from "@/lib/dates";
 
 export function MilestoneOverview({ model, cliente = false }: { model: Model; cliente?: boolean }) {
   if (cliente) {
-    // A tiempo = cumplido, o su fecha objetivo aún no pasó.
-    const aTiempo = model.milestones.filter((m) => m.cierreVerificado || (m.fechaObjetivo ?? model.hoy) >= model.hoy).length;
-    const prox = model.milestones.find((m) => !m.cierreVerificado && (m.fechaObjetivo ?? "") >= model.hoy);
+    const enFecha = model.milestones.filter((m) => m.cierreVerificado || !['En riesgo', 'Atrasado'].includes(m.estadoFinal ?? '')).length;
+    const enRiesgo = model.milestones.filter((m) => ['En riesgo', 'Atrasado'].includes(m.estadoFinal ?? '')).length;
+    const prox = model.milestones.find((m) => !m.cierreVerificado);
     return <section className="milestone-overview" data-testid="milestone-overview" aria-label="Resumen de milestones">
-      <p data-testid="hitos-resumen"><strong>{aTiempo} de {model.milestones.length} hitos a tiempo.</strong>{prox && <> Próximo: {prox.nombre} el {fmtLarga(prox.fechaObjetivo ?? model.hoy)}</>}</p>
+      <p data-testid="hitos-resumen"><strong>{enFecha} de {model.milestones.length} hitos en fecha</strong>{enRiesgo > 0 && <> · {enRiesgo} en riesgo</>}{prox && <>. Próximo: {prox.nombre} el {fmtLarga(prox.fechaObjetivo ?? model.hoy)}</>}.</p>
       <Link href="/lineas" className="btn btn-primary btn-sm">Ver timeline →</Link>
     </section>;
   }
