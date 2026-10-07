@@ -5,6 +5,8 @@ import {
   areas,
   avanceAreaBase,
   calendario,
+  capacidadHistoria,
+  capacidades,
   configuracion,
   festivos,
   historias,
@@ -44,6 +46,8 @@ export async function loadRaw(db: Db): Promise<Raw> {
     agendaHuR,
     baseR,
     configR,
+    capacidadesR,
+    capacidadHuR,
   ] = await Promise.all([
     db.select().from(lineas),
     db.select().from(areas),
@@ -64,6 +68,8 @@ export async function loadRaw(db: Db): Promise<Raw> {
     db.select().from(agendaHu),
     db.select().from(avanceAreaBase),
     db.select().from(configuracion),
+    db.select().from(capacidades),
+    db.select().from(capacidadHistoria),
   ]);
   return {
     lineas: lineasR,
@@ -79,6 +85,8 @@ export async function loadRaw(db: Db): Promise<Raw> {
     msTarea: msTareaR,
     msDep: msDepR,
     msRiesgo: msRiesgoR,
+    capacidades: capacidadesR,
+    capacidadHu: capacidadHuR,
     riesgos: riesgosR,
     notas: notasR,
     agendaWeekly: weeklyR,

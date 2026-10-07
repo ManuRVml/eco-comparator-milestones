@@ -17,6 +17,7 @@ import type {
   avanceAreaBase,
   bitacora,
   calendario,
+  capacidades,
   festivos,
   historias,
   lineas,
@@ -40,6 +41,14 @@ export type MilestoneRow = typeof milestones.$inferSelect;
 export type Historia = typeof historias.$inferSelect;
 export type Tarea = typeof tareas.$inferSelect;
 export type Riesgo = typeof riesgos.$inferSelect;
+export type Capacidad = typeof capacidades.$inferSelect;
+export const ESTADOS_CAPACIDAD = ["pendiente", "en curso", "entregada"] as const;
+export type EstadoCapacidad = (typeof ESTADOS_CAPACIDAD)[number];
+export interface CapacidadView extends Capacidad {
+  huIds: string[];
+  /** Derivado de sus HU: entregada si todas están completas, en curso si alguna empezó, si no pendiente. */
+  estado: EstadoCapacidad;
+}
 export type Nota = typeof notas.$inferSelect;
 export type Bitacora = typeof bitacora.$inferSelect;
 export type AgendaWeekly = typeof agendaWeekly.$inferSelect;
@@ -82,6 +91,8 @@ export interface Raw {
   msTarea: { milestoneId: string; tareaId: string }[];
   msDep: { milestoneId: string; dependeDeId: string }[];
   msRiesgo: { milestoneId: string; riesgoId: string }[];
+  capacidades: Capacidad[];
+  capacidadHu: { capacidadId: string; historiaId: string }[];
   riesgos: Riesgo[];
   notas: Nota[];
   agendaWeekly: AgendaWeekly[];
@@ -184,6 +195,8 @@ export interface Model {
   tareaById: Map<string, Tarea>;
   areaById: Map<string, Area>;
   milestonesPorHu: Map<string, string[]>;
+  /** Capacidades de cada milestone (por orden), con su estado derivado de las HU. */
+  capacidadesPorMilestone: Map<string, CapacidadView[]>;
   milestonesPorTarea: Map<string, string[]>;
   tareasPorHu: Map<string, string[]>;
   predecesoras: Map<string, string[]>;
@@ -328,6 +341,11 @@ export function aplicarCapaOficial(raw: Raw, hoy: string): Raw {
   };
 }
 
+export function estadoCapacidad(hus: Historia[], config: Config): EstadoCapacidad {
+  if (hus.length > 0 && hus.every((h) => huCuentaCompleta(h.estado, config))) return "entregada";
+  return hus.some((h) => h.estado !== "No iniciada") ? "en curso" : "pendiente";
+}
+
 export function computeModel(raw: Raw, hoy: string, capa: Capa = "tecnica"): Model {
   if (capa === "oficial") raw = aplicarCapaOficial(raw, hoy);
   const config = readConfig(raw.config);
@@ -351,6 +369,16 @@ export function computeModel(raw: Raw, hoy: string, capa: Capa = "tecnica"): Mod
   );
   const predecesoras = groupPairs(raw.predecesoras, (r) => r.tareaId, (r) => r.predecesoraId);
   const sucesoras = groupPairs(raw.predecesoras, (r) => r.predecesoraId, (r) => r.tareaId);
+
+  const huPorCap = groupPairs(raw.capacidadHu, (r) => r.capacidadId, (r) => r.historiaId);
+  const capacidadesPorMilestone = new Map<string, CapacidadView[]>();
+  for (const c of [...raw.capacidades].sort((a, b) => a.orden - b.orden || a.id.localeCompare(b.id))) {
+    const huIds = huPorCap.get(c.id) ?? [];
+    const hus = huIds.map((id) => huById.get(id)).filter((h): h is Historia => !!h);
+    const lista = capacidadesPorMilestone.get(c.milestoneId) ?? [];
+    lista.push({ ...c, huIds, estado: estadoCapacidad(hus, config) });
+    capacidadesPorMilestone.set(c.milestoneId, lista);
+  }
 
   const milestonesView: MilestoneView[] = [...raw.milestones]
     .sort((a, b) => (a.fechaObjetivo ?? "").localeCompare(b.fechaObjetivo ?? "") || a.orden - b.orden)
@@ -447,6 +475,7 @@ export function computeModel(raw: Raw, hoy: string, capa: Capa = "tecnica"): Mod
     tareaById,
     areaById: new Map(areasOrd.map((a) => [a.id, a])),
     milestonesPorHu,
+    capacidadesPorMilestone,
     milestonesPorTarea,
     tareasPorHu,
     predecesoras,
@@ -518,6 +547,11 @@ export function vistaCliente(m: Model): Model {
     planesSprint: m.planesSprint?.map((p) => ({ ...p, tareaIds: p.tareaIds.filter((id) => idsT.has(id)) })),
     milestones: milestonesCliente,
     milestoneById: new Map(milestonesCliente.map((x) => [x.id, x])),
+    capacidadesPorMilestone: new Map(
+      [...m.capacidadesPorMilestone]
+        .filter(([id]) => idsMs.has(id))
+        .map(([id, list]) => [id, list.filter((c) => !c.borrador).map((c) => ({ ...c, huIds: c.huIds.filter((h) => idsHu.has(h)) }))]),
+    ),
     historias: huVisibles,
     huById: new Map(huVisibles.map((h) => [h.id, h])),
     tareas: tareasVisibles,
