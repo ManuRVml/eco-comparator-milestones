@@ -4,10 +4,13 @@ import Link from "next/link";
 import {
   useCallback,
   useEffect,
+  cloneElement,
+  isValidElement,
   useId,
   useLayoutEffect,
   useRef,
   useState,
+  type ReactElement,
   type ReactNode,
   type RefObject,
 } from "react";
@@ -32,10 +35,12 @@ const MARGIN = 8;
 export function HuQuickView({
   data,
   badge,
+  canEdit,
   children,
 }: {
   data: HuQuickViewData;
   badge: ReactNode;
+  canEdit: boolean;
   children: ReactNode;
 }) {
   const [open, setOpen] = useState(false);
@@ -54,22 +59,29 @@ export function HuQuickView({
 
   useEffect(() => () => clearTimeout(timer.current), []);
 
-  // Toque fuera cierra la vista rápida.
+  const close = useCallback((restoreFocus: boolean) => {
+    clearTimeout(timer.current);
+    setOpen(false);
+    if (restoreFocus && wrapRef.current?.contains(document.activeElement))
+      wrapRef.current.querySelector<HTMLElement>("a")?.focus();
+  }, []);
+
+  // Toque fuera o Escape (aunque el foco esté en otro lado) cierran la vista rápida.
   useEffect(() => {
     if (!open) return;
     const onDown = (e: PointerEvent) => {
       if (!wrapRef.current?.contains(e.target as Node)) setOpen(false);
     };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close(false);
+    };
     document.addEventListener("pointerdown", onDown);
-    return () => document.removeEventListener("pointerdown", onDown);
-  }, [open]);
-
-  const close = (restoreFocus: boolean) => {
-    clearTimeout(timer.current);
-    setOpen(false);
-    if (restoreFocus && wrapRef.current?.contains(document.activeElement))
-      wrapRef.current.querySelector<HTMLElement>("a")?.focus();
-  };
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open, close]);
 
   return (
     <div
@@ -104,9 +116,19 @@ export function HuQuickView({
         }
       }}
     >
-      {children}
+      {isValidElement(children)
+        ? cloneElement(children as ReactElement<{ "aria-describedby"?: string }>, {
+            "aria-describedby": open ? popId : undefined,
+          })
+        : children}
       {open && (
-        <HuQuickViewPop id={popId} data={data} badge={badge} anchor={wrapRef} />
+        <HuQuickViewPop
+          id={popId}
+          data={data}
+          badge={badge}
+          canEdit={canEdit}
+          anchor={wrapRef}
+        />
       )}
     </div>
   );
@@ -116,11 +138,13 @@ function HuQuickViewPop({
   id,
   data,
   badge,
+  canEdit,
   anchor,
 }: {
   id: string;
   data: HuQuickViewData;
   badge: ReactNode;
+  canEdit: boolean;
   anchor: RefObject<HTMLElement | null>;
 }) {
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
@@ -174,18 +198,22 @@ function HuQuickViewPop({
       </div>
       <strong className="hu-qv-name">{data.nombre}</strong>
       <dl className="hu-qv-meta">
-        <div>
-          <dt>SP</dt>
-          <dd>{data.sp ?? 0}</dd>
-        </div>
-        <div>
-          <dt>Épica</dt>
-          <dd>{data.epica ?? "—"}</dd>
-        </div>
-        <div>
-          <dt>Sprint</dt>
-          <dd>{data.sprint ?? "—"}</dd>
-        </div>
+        {canEdit && (
+          <>
+            <div>
+              <dt>SP</dt>
+              <dd>{data.sp ?? 0}</dd>
+            </div>
+            <div>
+              <dt>Épica</dt>
+              <dd>{data.epica ?? "—"}</dd>
+            </div>
+            <div>
+              <dt>Sprint</dt>
+              <dd>{data.sprint ?? "—"}</dd>
+            </div>
+          </>
+        )}
         {data.demo && (
           <div>
             <dt>Demo</dt>
@@ -203,7 +231,7 @@ function HuQuickViewPop({
         </span>
         <small>{progreso}</small>
       </div>
-      <Link className="hu-qv-link" href={`/historias/${data.id}`}>
+      <Link className="hu-qv-link" href={`/historias/${data.id}#descripcion`}>
         Ver historia →
       </Link>
     </div>

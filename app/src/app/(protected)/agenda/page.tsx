@@ -92,12 +92,13 @@ export default async function AgendaPage() {
                           <HuQuickView
                             data={{ id: h.id, nombre: h.nombre, sp: h.sp, epica: h.epica, sprint: h.sprintId, tareasHechas: ts.filter((t) => t.estado === "Hecha").length, tareasTotal: ts.length, demo: fmtCorta(f) }}
                             badge={<StatusBadge estado={h.estado} size="sm" />}
+                            canEdit={session.canEdit}
                           >
                             <Link href={`/historias/${h.id}#descripcion`}>
                               <span className="agenda-hu-dot" style={{ background: colorEstado(h.estado) }} title={h.estado} />
                               <b>{h.id}</b>
                               <span>{h.nombre}</span>
-                              <em>{h.sp ?? 0} SP</em>
+                              {session.canEdit && <em>{h.sp ?? 0} SP</em>}
                             </Link>
                           </HuQuickView>
                         </li>
