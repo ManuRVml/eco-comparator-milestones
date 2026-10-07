@@ -43,6 +43,13 @@
       "when": 1791223190797,
       "tag": "0005_loose_scourge",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1791375945747,
+      "tag": "0006_decisiones_pendientes",
+      "breakpoints": true
     }
   ]
 }
