@@ -125,7 +125,13 @@ export function diasHabilesEntre(desde: string, hasta: string): number {
   const hastaDate = new Date(hasta + "T00:00:00Z");
   if (desdeDate >= hastaDate) return 0;
 
-  const diasHabiles = { 1: true, 2: true, 3: true, 4: true, 5: true }; // Mon-Fri
+  const diasHabiles: Record<number, boolean> = {
+    1: true,
+    2: true,
+    3: true,
+    4: true,
+    5: true,
+  }; // Mon-Fri
   let count = 0;
   const current = new Date(desdeDate);
   current.setUTCDate(current.getUTCDate() + 1); // desde exclusive
