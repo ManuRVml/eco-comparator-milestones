@@ -91,3 +91,14 @@ export const LogoutIcon = (p: P) => (
     <path d="M8 12.5l2.5 2.5L16 9.5" />
   </Base>
 );
+export const BookIcon = (p: P) => (
+  <Base {...p}>
+    <path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zM4 19a2 2 0 0 1 2-2h13" />
+  </Base>
+);
+
+export const GaugeIcon = (p: P) => (
+  <Base {...p}>
+    <path d="M4 17a8 8 0 1 1 16 0M12 17l4-5" />
+  </Base>
+);
