@@ -112,6 +112,12 @@ async function main() {
     console.log(
       `Milestones M-xx sin hito: ${sinHito.length ? sinHito.map((m) => `${m.id} ${m.nombre} (${m.fecha ?? "sin fecha"})`).join("; ") : "ninguno"}`,
     );
+    const compartidos = [...usados]
+      .filter(([, v]) => v.includes("+"))
+      .map(([m, v]) => `${m} <- ${v}`);
+    console.log(
+      `Milestones que absorben mas de un hito: ${compartidos.length ? compartidos.join("; ") : "ninguno"}`,
+    );
     console.log(`Hitos ${hitos.length} vs milestones ${ms.length}.\n`);
 
     const todasM = new Set([...mHu.values()].flatMap((s) => [...s]));
