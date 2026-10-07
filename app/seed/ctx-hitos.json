@@ -1,0 +1,147 @@
+{
+  "fuente": "BenchHub_Contexto_USM_y_Plan.md §3.3/§3.5/§3.7 (hu = HU_Incluidas del sprint del hito; hu_por_tareas = HU_ID de las tareas del hito, sin N/A)",
+  "hitos": [
+    {
+      "id": "H-01",
+      "nombre_tecnico": "Ambientes y Arquitectura Base Listos",
+      "fecha": "2026-09-25",
+      "sprint": "Sprint 0",
+      "criterio": "Workspace Databricks Apps, repositorios, SSO Entra ID y arquitectura de datos Medallion definidos.",
+      "tareas": ["T-001", "T-002", "T-003", "T-004", "T-005", "T-006", "T-007"],
+      "hu": [],
+      "hu_por_tareas": []
+    },
+    {
+      "id": "H-02",
+      "nombre_tecnico": "Autenticación y Navegación Operativa",
+      "fecha": "2026-10-09",
+      "sprint": "Sprint 1",
+      "criterio": "Inicio de sesión con RBAC, listado de análisis, catálogos Medallion e ingesta Bronze de fuentes internas y de mercado operativos.",
+      "tareas": ["T-009", "T-011", "T-013", "T-016", "T-017", "T-018", "T-025"],
+      "hu": [
+        "HU-001",
+        "HU-002",
+        "HU-003",
+        "HU-004",
+        "HU-005",
+        "HU-006",
+        "HU-008",
+        "HU-010",
+        "HU-018",
+        "HU-019",
+        "HU-020",
+        "HU-021",
+        "HU-022",
+        "HU-023"
+      ],
+      "hu_por_tareas": ["HU-001", "HU-004", "HU-018", "HU-029"]
+    },
+    {
+      "id": "H-03",
+      "nombre_tecnico": "Definición del Análisis e Ingesta Lista",
+      "fecha": "2026-10-23",
+      "sprint": "Sprint 2",
+      "criterio": "Wizard de 5 pasos completado, ingesta Bronze de Capital IQ y homologación Silver de todas las fuentes validadas.",
+      "tareas": ["T-030", "T-032", "T-039", "T-040", "T-041", "T-042"],
+      "hu": [
+        "HU-024",
+        "HU-025",
+        "HU-026",
+        "HU-027",
+        "HU-028",
+        "HU-029",
+        "HU-030",
+        "HU-031",
+        "HU-085"
+      ],
+      "hu_por_tareas": [
+        "HU-021",
+        "HU-024",
+        "HU-029",
+        "HU-030",
+        "HU-031",
+        "HU-032"
+      ]
+    },
+    {
+      "id": "H-04",
+      "nombre_tecnico": "Homologación y Resultados Calculados",
+      "fecha": "2026-11-06",
+      "sprint": "Sprint 3",
+      "criterio": "Tablas Gold publicadas y orquestadas, motor de cobertura funcional, grilla comparativa y dashboard de KPIs visible.",
+      "tareas": ["T-044", "T-046", "T-047", "T-049", "T-051", "T-054", "T-055"],
+      "hu": [
+        "HU-032",
+        "HU-033",
+        "HU-035",
+        "HU-036",
+        "HU-037",
+        "HU-039",
+        "HU-041",
+        "HU-042",
+        "HU-043"
+      ],
+      "hu_por_tareas": ["HU-032", "HU-036", "HU-037", "HU-041"]
+    },
+    {
+      "id": "H-05",
+      "nombre_tecnico": "Monitor de Valor y Simulación Operativa",
+      "fecha": "2026-11-20",
+      "sprint": "Sprint 4",
+      "criterio": "Gold del Monitor de Valor, tabla de KVIs con edición inline y simulador de palancas calculando brechas.",
+      "tareas": ["T-059", "T-062", "T-063", "T-064", "T-065", "T-067"],
+      "hu": [
+        "HU-046",
+        "HU-047",
+        "HU-048",
+        "HU-050",
+        "HU-051",
+        "HU-052",
+        "HU-053",
+        "HU-054",
+        "HU-059",
+        "HU-060",
+        "HU-061"
+      ],
+      "hu_por_tareas": ["HU-050", "HU-051", "HU-059"]
+    },
+    {
+      "id": "H-06",
+      "nombre_tecnico": "Presentaciones y Yarbis Integrados",
+      "fecha": "2026-12-04",
+      "sprint": "Sprint 5",
+      "criterio": "PPTX descargable, notificaciones con eventos del servidor y Yarbis respondiendo con cifras Gold e índice documental.",
+      "tareas": ["T-074", "T-077", "T-082", "T-086", "T-087", "T-089", "T-091"],
+      "hu": [
+        "HU-062",
+        "HU-063",
+        "HU-064",
+        "HU-065",
+        "HU-072",
+        "HU-073",
+        "HU-074",
+        "HU-075",
+        "HU-076",
+        "HU-077",
+        "HU-078",
+        "HU-079",
+        "HU-080",
+        "HU-082",
+        "HU-083",
+        "HU-084",
+        "HU-087"
+      ],
+      "hu_por_tareas": ["HU-074", "HU-078", "HU-079", "HU-084", "HU-087"]
+    },
+    {
+      "id": "H-07",
+      "nombre_tecnico": "Salida a Producción MVP",
+      "fecha": "2026-12-18",
+      "sprint": "Sprint 6",
+      "criterio": "Aplicación desplegada en ambiente PRD con pruebas E2E aprobadas y sin defectos críticos.",
+      "tareas": ["T-094", "T-095", "T-098", "T-099"],
+      "hu": [],
+      "hu_por_tareas": []
+    }
+  ]
+}

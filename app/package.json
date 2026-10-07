@@ -22,6 +22,7 @@
     "import:milestones": "tsx scripts/import-milestones.ts",
     "import:progress": "tsx scripts/import-progress.ts",
     "verify:milestones": "tsx scripts/verify-milestones.ts",
+    "verify:hitos": "tsx scripts/verify-hitos.ts",
     "db:clean-test-artifacts": "tsx scripts/clean-test-artifacts.ts",
     "db:sin-publicaciones": "tsx scripts/sin-publicaciones-iniciales.ts",
     "screens": "node scripts/screens.mjs",
