@@ -60,7 +60,7 @@ export default async function AgendaPage() {
                   <div>
                     {esProxima && <span className="next-pill">Próxima demo</span>}
                     <h3>{fmtLarga(f)}</h3>
-                    <p>{hus.length ? `${hus.length} historias · ${sp} SP${epicas.length ? ` · ${epicas.join(" · ")}` : ""}` : "Fecha objetivo de milestone · resultado por revisar"}</p>
+                    {session.canEdit && <p>{hus.length ? `${hus.length} historias · ${sp} SP${epicas.length ? ` · ${epicas.join(" · ")}` : ""}` : "Fecha objetivo de milestone · resultado por revisar"}</p>}
                   </div>
                 </header>
                 {ms.length > 0 && (
