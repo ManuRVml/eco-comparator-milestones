@@ -116,6 +116,27 @@ export function lineaCorta(id: string | null | undefined) {
  * 5. prevision > objetivo + 1-5 días hábiles → 'ambar' (previsión ajustada)
  * 6. else → 'verde' (dentro de plazo)
  */
+/**
+ * Cuenta los días hábiles (lunes a viernes) entre dos fechas.
+ * Cuenta desde `desde` (exclusive) hasta `hasta` (inclusive), en UTC.
+ */
+function diasHabilesEntre(desde: string, hasta: string): number {
+  const desdeDate = new Date(desde + "T00:00:00Z");
+  const hastaDate = new Date(hasta + "T00:00:00Z");
+  if (desdeDate >= hastaDate) return 0;
+
+  const diasHabiles = { 1: true, 2: true, 3: true, 4: true, 5: true }; // Mon-Fri
+  let count = 0;
+  const current = new Date(desdeDate);
+  current.setDate(current.getDate() + 1); // desde exclusive
+
+  while (current <= hastaDate) {
+    if (diasHabiles[current.getUTCDay()]) count++;
+    current.setDate(current.getDate() + 1);
+  }
+  return count;
+}
+
 export function semaforoMilestone(
   m: {
     fechaObjetivo: string;
@@ -136,16 +157,10 @@ export function semaforoMilestone(
 
   // 4-5. Verificar previsión si existe
   if (m.fechaPrevision) {
-    const objetivo = new Date(m.fechaObjetivo);
-    const prevision = new Date(m.fechaPrevision);
-    const diffDays =
-      (prevision.getTime() - objetivo.getTime()) / (1000 * 60 * 60 * 24);
+    const businessDays = diasHabilesEntre(m.fechaObjetivo, m.fechaPrevision);
 
-    // Días hábiles aproximados (excluyendo fines de semana)
-    const diffBusinessDays = Math.floor((diffDays * 5) / 7);
-
-    if (diffBusinessDays > 5) return "rojo";
-    if (diffBusinessDays >= 1) return "ambar";
+    if (businessDays > 5) return "rojo";
+    if (businessDays >= 1) return "ambar";
   }
 
   // 6. Dentro de plazo

@@ -31,12 +31,12 @@ describe("semaforoMilestone", () => {
     ).toBe("rojo");
   });
 
-  it('returns "rojo" when previsions is more than 5 business days after objective', () => {
-    // Oct 7 to Oct 20 = 13 calendar days ≈ 9 business days > 5
+  it('returns "rojo" when prevision is more than 5 business days after objective', () => {
+    // Mon 2026-10-12 to Tue 2026-10-20 = 6 business days (rojo)
     expect(
       semaforoMilestone(
         {
-          fechaObjetivo: "2026-10-07",
+          fechaObjetivo: "2026-10-12",
           fechaPrevision: "2026-10-20",
           cumplido: false,
           iniciado: true,
@@ -46,7 +46,22 @@ describe("semaforoMilestone", () => {
     ).toBe("rojo");
   });
 
-  it('returns "ambar" when previsions is 1-5 business days after objective', () => {
+  it('returns "ambar" when prevision is exactly 5 business days after objective', () => {
+    // Mon 2026-10-12 to Fri 2026-10-16 = 5 business days (ambar)
+    expect(
+      semaforoMilestone(
+        {
+          fechaObjetivo: "2026-10-12",
+          fechaPrevision: "2026-10-16",
+          cumplido: false,
+          iniciado: true,
+        },
+        hoy,
+      ),
+    ).toBe("ambar");
+  });
+
+  it('returns "ambar" when prevision is 1-5 business days after objective', () => {
     // Oct 7 to Oct 12 = 5 calendar days ≈ 3 business days
     expect(
       semaforoMilestone(
@@ -74,7 +89,7 @@ describe("semaforoMilestone", () => {
     ).toBe("verde");
   });
 
-  it('returns "verde" when previsions is same day or within tolerance', () => {
+  it('returns "verde" when prevision is same day', () => {
     expect(
       semaforoMilestone(
         {
@@ -113,5 +128,35 @@ describe("semaforoMilestone", () => {
         hoy,
       ),
     ).toBe("verde");
+  });
+
+  it('returns "ambar" for Fri->Mon span (1 business day)', () => {
+    // Fri 2026-10-09 to Mon 2026-10-12 = 1 business day (ambar)
+    expect(
+      semaforoMilestone(
+        {
+          fechaObjetivo: "2026-10-09",
+          fechaPrevision: "2026-10-12",
+          cumplido: false,
+          iniciado: true,
+        },
+        hoy,
+      ),
+    ).toBe("ambar");
+  });
+
+  it('returns "rojo" for span crossing weekend with >5 business days', () => {
+    // Fri 2026-10-09 to Wed 2026-10-21 = 9 business days (rojo)
+    expect(
+      semaforoMilestone(
+        {
+          fechaObjetivo: "2026-10-09",
+          fechaPrevision: "2026-10-21",
+          cumplido: false,
+          iniciado: true,
+        },
+        hoy,
+      ),
+    ).toBe("rojo");
   });
 });
