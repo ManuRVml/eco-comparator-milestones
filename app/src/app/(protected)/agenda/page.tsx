@@ -1,8 +1,9 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
+import { HuQuickView } from "@/components/hu-quickview";
 import { PageHeading, StatusBadge } from "@/components/ui";
 import { getModel, requireSession } from "@/lib/data";
-import { daysBetween, fmtDiaSemana, fmtLarga, mesCorto, relativo } from "@/lib/dates";
+import { daysBetween, fmtCorta, fmtDiaSemana, fmtLarga, mesCorto, relativo } from "@/lib/dates";
 import { colorEstado, colorLinea, textoLinea } from "@/lib/format";
 
 export default async function AgendaPage() {
@@ -84,16 +85,24 @@ export default async function AgendaPage() {
                 )}
                 {hus.length > 0 ? (
                   <ul className="agenda-hu">
-                    {hus.map((h) => (
-                      <li key={h.id}>
-                        <Link href={`/historias/${h.id}`}>
-                          <span className="agenda-hu-dot" style={{ background: colorEstado(h.estado) }} title={h.estado} />
-                          <b>{h.id}</b>
-                          <span>{h.nombre}</span>
-                          <em>{h.sp ?? 0} SP</em>
-                        </Link>
-                      </li>
-                    ))}
+                    {hus.map((h) => {
+                      const ts = (model.tareasPorHu.get(h.id) ?? []).map((t) => model.tareaById.get(t)).filter((t) => !!t);
+                      return (
+                        <li key={h.id}>
+                          <HuQuickView
+                            data={{ id: h.id, nombre: h.nombre, sp: h.sp, epica: h.epica, sprint: h.sprintId, tareasHechas: ts.filter((t) => t.estado === "Hecha").length, tareasTotal: ts.length, demo: fmtCorta(f) }}
+                            badge={<StatusBadge estado={h.estado} size="sm" />}
+                          >
+                            <Link href={`/historias/${h.id}#descripcion`}>
+                              <span className="agenda-hu-dot" style={{ background: colorEstado(h.estado) }} title={h.estado} />
+                              <b>{h.id}</b>
+                              <span>{h.nombre}</span>
+                              <em>{h.sp ?? 0} SP</em>
+                            </Link>
+                          </HuQuickView>
+                        </li>
+                      );
+                    })}
                   </ul>
                 ) : (
                   <p className="muted small">Cierre y aceptación: se valida en producción lo construido en las demos anteriores.</p>
