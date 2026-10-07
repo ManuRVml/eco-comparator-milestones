@@ -37,6 +37,7 @@ const pasos: [string, string[]][] = [
   ["Milestones, líneas y riesgos", ["scripts/import-milestones.ts", milestones]],
   ["Calendario, días hábiles y agenda", ["scripts/import-progress.ts", dataDir]],
   ["Estados iniciales desde la matriz de evidencia (capa técnica)", ["scripts/seed-evidence.ts"]],
+  ["Decisiones pendientes del cliente (borrador)", ["scripts/seed-decisiones.ts"]],
   ["Sin publicaciones iniciales", ["scripts/sin-publicaciones-iniciales.ts"]],
 ];
 for (const [titulo, args] of pasos) {

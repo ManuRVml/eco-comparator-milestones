@@ -1,7 +1,8 @@
-import type { MilestoneDefinition, criteriosMilestone, metricasMilestone } from "../../db/milestone-schema";
+import type { MilestoneDefinition, criteriosMilestone, decisionesPendientes, metricasMilestone } from "../../db/milestone-schema";
 export type MilestoneCriterion = typeof criteriosMilestone.$inferSelect;
 export type MilestoneMetric = typeof metricasMilestone.$inferSelect;
-export interface MilestoneContract { definicion: MilestoneDefinition; criterios: MilestoneCriterion[]; metricas: MilestoneMetric[] }
+export type PendingDecision = typeof decisionesPendientes.$inferSelect;
+export interface MilestoneContract { definicion: MilestoneDefinition; criterios: MilestoneCriterion[]; metricas: MilestoneMetric[]; decisionesPendientes?: PendingDecision[] }
 export const EMPTY_DEFINITION: MilestoneDefinition = { job: "", outcome: "", meta: "", alcanceIncluido: "", fueraAlcance: "", responsable: "", aprobador: "", fechaPrevision: "", motivoPrevision: "" };
 export function definitionPending(d: MilestoneDefinition): string[] {
   const labels = { job: "Necesidad del usuario", outcome: "Resultado esperado", meta: "Objetivo de negocio", alcanceIncluido: "Alcance incluido", fueraAlcance: "Fuera de alcance", responsable: "Responsable", aprobador: "Aprobador del negocio" };

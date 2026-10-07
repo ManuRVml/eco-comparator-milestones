@@ -36,3 +36,12 @@ export const criteriosMilestone = sqliteTable("criterios_milestone", {
   evidencia: text("evidencia").notNull().default(""), aprobador: text("aprobador").notNull().default(""),
   fecha: text("fecha").notNull().default(""),
 }, t => [index("criterios_milestone_idx").on(t.milestoneId), check("criterio_estado",sql`${t.estado} in ('Pendiente','Verificado')`), check("criterio_obligatorio",sql`${t.obligatorio} in (0,1)`), check("criterio_muestra",sql`${t.muestraEvaluada} is null or (typeof(${t.muestraEvaluada}) = 'integer' and ${t.muestraEvaluada} >= 1)`)]);
+export const decisionesPendientes = sqliteTable("decisiones_pendientes", {
+  id: text("id").primaryKey(), milestoneId: text("milestone_id").notNull().references(() => milestones.id),
+  texto: text("texto").notNull(), responsableCliente: text("responsable_cliente").notNull().default(""),
+  fechaLimite: text("fecha_limite").notNull().default(""),
+  resuelta: integer("resuelta", { mode: "boolean" }).notNull().default(false),
+  /** Borrador: propuesto por el equipo, aún no confirmado para mostrarse al cliente. */
+  borrador: integer("borrador", { mode: "boolean" }).notNull().default(true),
+  creadoEn: text("creado_en").notNull().default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))`),
+}, t => [index("decisiones_pendientes_idx").on(t.milestoneId), check("decision_resuelta",sql`${t.resuelta} in (0,1)`), check("decision_borrador",sql`${t.borrador} in (0,1)`)]);
