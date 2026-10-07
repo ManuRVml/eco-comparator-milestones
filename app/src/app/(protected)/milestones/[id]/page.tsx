@@ -110,7 +110,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
         </div>
         <div className="ms-hero-gauge">
           <Ring value={m.pctPonderado} size={148} stroke={13} color={color}>
-            <span className="gauge-pct is-dark">{Math.round(m.pctPonderado)}%</span>
+            <span className="gauge-pct is-dark">{fmtPct(m.pctPonderado, 1)}</span>
             <span className="gauge-sub is-dark">
               Trabajo hacia el milestone
             </span>
