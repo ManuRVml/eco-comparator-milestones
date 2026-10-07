@@ -8,7 +8,7 @@ import { PublicarControl } from "@/components/editor/publicar-control";
 import { PanelClose } from "./panel-client";
 import { MilestoneWorkflow } from "../workflow/milestone-panel";
 import { MetricNote } from "../metric-note";
-import { MilestoneDelivery } from "../milestone-delivery";
+import { MilestoneDelivery, MilestoneValor } from "../milestone-delivery";
 
 function plazo(hoy: string, fecha: string | null, cumplido: boolean) {
   if (!fecha) return { texto: "Sin fecha", tono: "slate" };
@@ -35,7 +35,7 @@ export function MilestonePanel({ m, model, canEdit, isAdmin = false, areaId = nu
       <span className="ms-panel-grip" aria-hidden="true" />
       <header className="ms-panel-head">
         <Ring value={porcentaje} size={84} stroke={8} color={color}>
-          <span className="mini-ring-label is-lg">{Math.round(porcentaje)}%</span>
+          {canEdit && <span className="mini-ring-label is-lg">{Math.round(porcentaje)}%</span>}
         </Ring>
         <div className="ms-panel-title">
           <div className="ms-panel-tags">
@@ -47,32 +47,40 @@ export function MilestonePanel({ m, model, canEdit, isAdmin = false, areaId = nu
             <span className={`chip tone-${p.tono}`}>{p.texto}</span>
           </div>
           <h3 id={`panel-heading-${m.id}`}>{m.nombre}</h3>
-          <p className="muted small">{areaId ? "Trabajo del área hacia el milestone" : "Trabajo hacia el milestone"}: {Math.round(porcentaje)} %. Cumplimiento: {m.cierreVerificado ? "confirmado" : "pendiente"}.</p>
+          {canEdit && <p className="muted small">{areaId ? "Trabajo del área hacia el milestone" : "Trabajo hacia el milestone"}: {Math.round(porcentaje)} %. Cumplimiento: {m.cierreVerificado ? "confirmado" : "pendiente"}.</p>}
           <p className="ms-panel-meta">
             <b>
               {fmtDiaSemana(m.fechaObjetivo ?? model.hoy, true)} {fmtCorta(m.fechaObjetivo)}
             </b>{" "}
-            · {m.linea?.nombre} ·{" "}
-            {model.capa === "oficial"
-              ? `${hechas}/${tareas.length} tareas entregadas`
-              : `${hechas}/${tareas.length} hechas (técnico interno) · ${tareas.filter((t) => t.publicadoCliente).length} publicadas`}{" "}
-            · {m.spTotal} SP
+            · {m.linea?.nombre}
+            {canEdit && (
+              <>
+                {" "}·{" "}
+                {model.capa === "oficial"
+                  ? `${hechas}/${tareas.length} tareas entregadas`
+                  : `${hechas}/${tareas.length} hechas (técnico interno) · ${tareas.filter((t) => t.publicadoCliente).length} publicadas`}{" "}
+                · {m.spTotal} SP
+              </>
+            )}
             {areaId && <> · Área: {model.areaById.get(areaId)?.nombre}</>}
           </p>
         </div>
         <div className="ms-panel-actions">
           {isAdmin && <PublicarControl tipo="milestone" id={m.id} estado={m.estado} publicada={m.publicado} fecha={m.fechaCierre} nota={m.evidencia} />}
-          <Link href={`/milestones/${m.id}`} className="btn btn-ghost btn-sm">
-            Ver detalle completo →
-          </Link>
+          {canEdit && (
+            <Link href={`/milestones/${m.id}`} className="btn btn-ghost btn-sm">
+              Ver detalle completo →
+            </Link>
+          )}
           <PanelClose />
         </div>
       </header>
 
-      <MilestoneDelivery m={m} model={model} canEdit={canEdit} />
-      <MetricNote capa={model.capa} hoy={model.hoy} alcance={`${m.id}${areaId ? ` · ${model.areaById.get(areaId)?.nombre}` : " · tareas de este milestone"}`} />
+      {!canEdit && <MilestoneValor m={m} model={model} />}
+      {canEdit && <MilestoneDelivery m={m} model={model} canEdit={canEdit} />}
+      {canEdit && <MetricNote capa={model.capa} hoy={model.hoy} alcance={`${m.id}${areaId ? ` · ${model.areaById.get(areaId)?.nombre}` : " · tareas de este milestone"}`} />}
 
-      <div className="ms-panel-body">
+      {canEdit && <div className="ms-panel-body">
         <div className="ms-panel-col">
           {canEdit && <MilestoneWorkflow id={m.id} model={model} editar />}
           {m.cierreVerificado && (
@@ -185,7 +193,7 @@ export function MilestonePanel({ m, model, canEdit, isAdmin = false, areaId = nu
               })}
           </div>
         </div>
-      </div>
+      </div>}
     </section>
   );
 }

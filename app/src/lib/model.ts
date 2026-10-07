@@ -566,3 +566,35 @@ export function vistaCliente(m: Model): Model {
 export function diasEntre(a: string, b: string) {
   return daysBetween(a, b);
 }
+
+export interface RiesgoCliente {
+  id: string;
+  /** "Si <causa>, esta entrega se mueve ~N días" (sin el "~N" cuando no hay un número de días en el texto). */
+  consecuencia: string;
+  mitigacion: string | null;
+}
+
+/** Días de atraso mencionados en el texto de impacto/mitigación ("3 días", "2 semanas"); null si no hay número. */
+export function diasDeImpacto(...textos: (string | null | undefined)[]): number | null {
+  for (const t of textos) {
+    const mt = t?.match(/(\d+)\s*(d[ií]as?|semanas?)(?![\p{L}])/iu);
+    if (mt) return Number(mt[1]) * (/^s/i.test(mt[2]) ? 5 : 1);
+  }
+  return null;
+}
+
+/** Riesgos de un milestone redactados como consecuencia en la fecha, en lenguaje llano para el cliente. */
+export function riesgosParaCliente(m: Pick<MilestoneView, "riesgoIds">, byId: Map<string, Riesgo>): RiesgoCliente[] {
+  return m.riesgoIds.flatMap((id) => {
+    const r = byId.get(id);
+    if (!r) return [];
+    const causa = r.descripcion.trim().replace(/\.$/, "");
+    const dias = diasDeImpacto(r.impacto, r.mitigacion);
+    const cola = dias ? ` ~${dias} ${dias === 1 ? "día" : "días"}` : "";
+    return [{
+      id: r.id,
+      consecuencia: `Si se presenta ${causa.charAt(0).toLowerCase()}${causa.slice(1)}, esta entrega se mueve${cola}.`,
+      mitigacion: r.mitigacion?.trim() || null,
+    }];
+  });
+}
