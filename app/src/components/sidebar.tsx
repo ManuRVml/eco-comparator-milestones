@@ -10,7 +10,7 @@ type Item = { href: string; label: string; icon: ComponentType<{ size?: number }
 
 function getItems(canEdit: boolean): Item[] {
   return [
-    { href: "/", label: "Resumen de milestones", icon: HomeIcon, match: (p) => p === "/" },
+    { href: "/", label: "Resumen de milestones", icon: HomeIcon, match: (p) => p === "/", equipo: true },
     { href: "/lineas", label: "Timeline de milestones", icon: TimelineIcon, match: (p) => p.startsWith("/lineas") || p.startsWith("/milestones") },
     { href: "/areas", label: "Avance por área", icon: AreasIcon, match: (p) => p.startsWith("/areas"), equipo: true },
     { href: "/agenda", label: canEdit ? "Agenda de milestones" : "Entregas por fecha", icon: CalendarIcon, match: (p) => p.startsWith("/agenda") },

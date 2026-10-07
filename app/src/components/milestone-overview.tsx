@@ -9,7 +9,6 @@ export function MilestoneOverview({ model, cliente = false }: { model: Model; cl
     const prox = model.milestones.find((m) => !m.cierreVerificado);
     return <section className="milestone-overview" data-testid="milestone-overview" aria-label="Resumen de milestones">
       <p data-testid="hitos-resumen"><strong>{enFecha} de {model.milestones.length} hitos en fecha</strong>{enRiesgo > 0 && <> · {enRiesgo} en riesgo</>}{prox && <>. Próximo: {prox.nombre} el {fmtLarga(prox.fechaObjetivo ?? model.hoy)}</>}.</p>
-      <Link href="/lineas" className="btn btn-primary btn-sm">Ver timeline →</Link>
     </section>;
   }
   const cumplidos = model.milestones.filter((m) => m.cierreVerificado).length;

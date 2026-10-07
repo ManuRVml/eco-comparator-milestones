@@ -9,6 +9,7 @@ import { ESTADOS_MILESTONE } from "@/lib/model";
 import { MetricNote } from "@/components/metric-note";
 import { DeliveryNote } from "@/components/delivery-note";
 import { InfoToolbar } from "@/components/info-toolbar";
+import { MilestoneOverview } from "@/components/milestone-overview";
 
 export default async function LineasPage({ searchParams }: PageProps<"/lineas">) {
   const session = await requireSession();
@@ -25,6 +26,7 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
   return (
     <main className="page" data-testid="timeline">
       <PageHeading kicker="ROADMAP 21 SEP – 18 DIC 2026" title="Timeline de milestones" />
+      {!session.canEdit && <MilestoneOverview model={model} cliente />}
 
       <InfoToolbar
         label="Información del timeline"
@@ -82,7 +84,7 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
       />
 
       <div className="toolbar">
-        <AreaFilter areas={model.areas} actual={areaId} base="/lineas" />
+        {session.canEdit && <AreaFilter areas={model.areas} actual={areaId} base="/lineas" />}
         <ul className="legend">
           {ESTADOS_MILESTONE.map((e) => (
             <li key={e}>
