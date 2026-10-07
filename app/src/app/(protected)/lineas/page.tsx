@@ -47,7 +47,7 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
             id: "trabajo",
             label: "Trabajo hacia el milestone",
             icon: "gauge",
-            content: <MetricNote capa={model.capa} hoy={model.hoy} alcance={areaId ? `Área: ${model.areaById.get(areaId)?.nombre}; cada nodo usa sus propias tareas` : "Cada nodo usa sus propias tareas; el total usa el proyecto completo"} checkpoints />,
+            content: <MetricNote capa={model.capa} hoy={model.hoy} alcance={areaId ? `Área: ${model.areaById.get(areaId)?.nombre}; cada nodo usa sus propias tareas` : "Cada nodo usa sus propias tareas; el total usa el proyecto completo"} checkpoints cliente={!session.canEdit} />,
           },
           {
             id: "proyecto",
