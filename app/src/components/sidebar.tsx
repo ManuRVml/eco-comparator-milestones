@@ -17,6 +17,7 @@ const ITEMS: Item[] = [
   { href: "/flujo", label: "Trabajo por equipo", icon: AreasIcon, match: (p) => p.startsWith("/flujo"), equipo: true },
   { href: "/reconciliacion", label: "Fuentes y compromisos", icon: ReportIcon, match: (p) => p.startsWith("/reconciliacion"), equipo: true },
   { href: "/verificacion", label: "Verificación", icon: CheckIcon, match: (p) => p.startsWith("/verificacion"), equipo: true },
+  { href: "/pendientes", label: "Pendientes", icon: CheckIcon, match: (p) => p.startsWith("/pendientes") },
   { href: "/bitacora", label: "Bitácora", icon: ReportIcon, match: (p) => p.startsWith("/bitacora"), equipo: true },
 ];
 
@@ -31,6 +32,7 @@ const TITULOS: [RegExp, string][] = [
   [/^\/reconciliacion/, "Fuentes y compromisos"],
   [/^\/bitacora/, "Bitácora"],
   [/^\/verificacion/, "Pendiente de verificación"],
+  [/^\/pendientes/, "Pendientes"],
   [/^\/historias/, "Historia de usuario"],
   [/^\/tareas/, "Tarea"],
 ];
