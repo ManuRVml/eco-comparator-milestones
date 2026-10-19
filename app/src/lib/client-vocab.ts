@@ -10,6 +10,20 @@ export function terminoProhibido(texto: string): string | null {
   return null;
 }
 
+/** True when an externo title or detail already stored would be rejected. */
+export function textoExternoNoApto(titulo: string, detalle: string | null): boolean {
+  return rechazoTextoExterno("externo", titulo, null) != null
+    || rechazoTextoExterno("externo", detalle ?? "", null) != null;
+}
+
+export function filtrarVisibles<T extends { lado: string; titulo: string; detalle: string | null }>(
+  rows: readonly T[],
+  canEdit: boolean,
+): T[] {
+  if (canEdit) return [...rows];
+  return rows.filter((row) => row.lado !== "externo" || !textoExternoNoApto(row.titulo, row.detalle));
+}
+
 /** Null when the text may be stored. Interno is not checked. */
 export function rechazoTextoExterno(
   lado: string,

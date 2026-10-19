@@ -3,6 +3,7 @@ import { Chip, Card, Empty, PageHeading } from "@/components/ui";
 import { createPendienteAction, resolvePendienteAction } from "@/app/(protected)/pendientes/actions";
 import { getModel, requireSession } from "@/lib/data";
 import { fmtCorta } from "@/lib/dates";
+import { textoExternoNoApto } from "@/lib/client-vocab";
 import { pendientesVisibles, type TipoPendiente } from "@/lib/pendientes";
 
 const TIPO_LABEL: Record<TipoPendiente, string> = {
@@ -105,7 +106,13 @@ function PendientesTable({ items, canEdit }: { items: Awaited<ReturnType<typeof 
       <tbody>
         {items.map((item) => (
           <tr key={item.id} className={item.estado === "resuelto" ? "muted" : undefined}>
-            <td>{item.titulo}{item.detalle && <div className="small">{item.detalle}</div>}</td>
+            <td>
+              {item.titulo}
+              {canEdit && item.lado === "externo" && textoExternoNoApto(item.titulo, item.detalle) && (
+                <> <Chip tone="red">Texto no apto para Equipo Ecopetrol</Chip></>
+              )}
+              {item.detalle && <div className="small">{item.detalle}</div>}
+            </td>
             <td><Chip tone="slate">{etiquetaTipo(item.tipo)}</Chip></td>
             <td>{item.responsable || "—"}</td>
             <td className="nowrap">{fmtCorta(item.fechaLimite)}</td>

@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 import { and, asc, eq, sql } from "drizzle-orm";
 import { db } from "@/db/client";
 import { pendientes, type NewPendiente } from "@/db/schema";
+import { filtrarVisibles } from "@/lib/client-vocab";
 import type { Session } from "@/lib/data";
 
 export const LADOS_PENDIENTE = ["externo", "interno"] as const;
@@ -37,5 +38,6 @@ export async function resolvePendiente(id: string) {
 }
 
 export async function pendientesVisibles(session: Session) {
-  return session.canEdit ? listPendientes() : listPendientes({ lado: "externo" });
+  const rows = session.canEdit ? await listPendientes() : await listPendientes({ lado: "externo" });
+  return filtrarVisibles(rows, session.canEdit);
 }
