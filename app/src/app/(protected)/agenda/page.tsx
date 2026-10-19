@@ -66,7 +66,7 @@ export default async function AgendaPage() {
                 {ms.length > 0 && (
                   <div className="agenda-ms">
                     {ms.map((m) => (
-                      <Link key={m.id} href={`/milestones/${m.id}`} className="agenda-ms-item" style={{ "--linea": colorLinea(m.lineaId) } as CSSProperties}>
+                      <div key={m.id} className="agenda-ms-item" style={{ "--linea": colorLinea(m.lineaId) } as CSSProperties}>
                         <span className="agenda-ms-head">
                           <span className="line-pill" style={{ background: colorLinea(m.lineaId), color: textoLinea(m.lineaId) }}>
                             {m.lineaId}
@@ -77,9 +77,12 @@ export default async function AgendaPage() {
                             Trabajo {Math.round(m.pctPonderado)} % · {m.cierreVerificado ? "Milestone cumplido" : "Milestone pendiente"}
                           </em>
                         </span>
-                        <strong>{m.nombre}</strong>
-                        {m.valorCliente && <span className="agenda-value">{m.valorCliente}</span>}
-                      </Link>
+                        <Link href={`/milestones/${m.id}`} className="agenda-ms-link">
+                          <span className="sr-only">{m.id}</span>
+                          <strong>{m.nombre}</strong>
+                          {m.valorCliente && <span className="agenda-value">{m.valorCliente}</span>}
+                        </Link>
+                      </div>
                     ))}
                   </div>
                 )}

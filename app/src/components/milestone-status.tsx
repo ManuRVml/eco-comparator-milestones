@@ -42,6 +42,7 @@ export function MilestoneStatus({ m, size }: { m: { estadoFinal: EstadoMilestone
   const buttonRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const panelId = useId();
+  const titleId = useId();
   const riesgo = m.estadoFinal === "En riesgo" && m.causasRiesgo.length > 0;
 
   useEffect(() => {
@@ -52,6 +53,7 @@ export function MilestoneStatus({ m, size }: { m: { estadoFinal: EstadoMilestone
 
     const place = () => placePopover(button, panel);
     place();
+    panel.focus({ preventScroll: true });
 
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
@@ -65,8 +67,7 @@ export function MilestoneStatus({ m, size }: { m: { estadoFinal: EstadoMilestone
       if (!(target instanceof Node)) return;
       if (button.contains(target) || panel.contains(target)) return;
       setOpen(false);
-      const next = target instanceof Element ? target : null;
-      if (!next?.closest("a, button, input, select, textarea, summary, [tabindex]")) button.focus();
+      button.focus();
     };
 
     document.addEventListener("keydown", onKey, true);
@@ -115,10 +116,13 @@ export function MilestoneStatus({ m, size }: { m: { estadoFinal: EstadoMilestone
             id={panelId}
             className="status-popover"
             role="dialog"
+            tabIndex={-1}
+            aria-labelledby={titleId}
             aria-label="Causas del riesgo"
             onPointerDown={(e) => e.stopPropagation()}
             onClick={guard}
           >
+            <h3 id={titleId}>Causas del riesgo</h3>
             <CauseGroup titulo="Causa técnica" causas={tecnicas} />
             <CauseGroup titulo="Causa de negocio" causas={negocio} />
           </div>,
