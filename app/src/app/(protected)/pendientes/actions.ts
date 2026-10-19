@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { requireSession } from "@/lib/data";
+import { rechazoTextoExterno } from "@/lib/client-vocab";
 import { createPendiente, LADOS_PENDIENTE, resolvePendiente, TIPOS_PENDIENTE } from "@/lib/pendientes";
 import { HttpError } from "@/lib/http-error";
 import { fecha, opcion, texto } from "@/lib/workflow/validation";
@@ -25,6 +26,8 @@ export async function createPendienteAction(formData: FormData) {
   const milestoneId = campo(formData, "milestone_id").trim() || null;
   const fechaLimite = campo(formData, "fecha_limite").trim();
   if (fechaLimite) fecha({ fecha_limite: fechaLimite }, "fecha_limite");
+  const rechazo = rechazoTextoExterno(lado, titulo, detalle);
+  if (rechazo) throw new HttpError(rechazo.status, rechazo.message);
 
   await createPendiente({ titulo, lado, tipo, detalle, responsable, milestoneId, fechaLimite: fechaLimite || null });
   revalidatePath("/pendientes");

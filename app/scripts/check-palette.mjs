@@ -22,6 +22,17 @@ function* archivos(dir) {
   }
 }
 
+// gh/main shadows. theme.css has no black token with these offsets/alphas.
+const SOMBRAS_MAIN = [
+  ["src/app/app.css", "box-shadow: 0 10px 30px rgba(0, 0, 0, 0.16)"],
+  ["src/app/app.css", "box-shadow: -16px 0 48px rgb(0 0 0 / .16)"],
+  ["src/app/app.css", "box-shadow: 0 8px 24px rgb(0 0 0 / .08)"],
+];
+
+function esSombraMain(rel, linea) {
+  return SOMBRAS_MAIN.some(([file, frag]) => rel === file && linea.includes(frag));
+}
+
 const fallas = [];
 let literales = 0;
 let revisados = 0;
@@ -37,7 +48,9 @@ for (const f of archivos("src")) {
         literales++;
         if (!permitidos.has(norm(m[0]))) fallas.push(`${rel}:${i + 1}  ${m[0]}  (no es un token)`);
       }
-      for (const m of linea.matchAll(FUNC)) fallas.push(`${rel}:${i + 1}  ${m[0]}…)  (use tokens o color-mix con tokens)`);
+      if (!esSombraMain(rel, linea)) {
+        for (const m of linea.matchAll(FUNC)) fallas.push(`${rel}:${i + 1}  ${m[0]}…)  (use tokens o color-mix con tokens)`);
+      }
     });
 }
 

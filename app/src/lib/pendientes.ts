@@ -7,7 +7,7 @@ import { pendientes, type NewPendiente } from "@/db/schema";
 import type { Session } from "@/lib/data";
 
 export const LADOS_PENDIENTE = ["externo", "interno"] as const;
-export const TIPOS_PENDIENTE = ["licencia", "creditos", "acceso", "informacion", "decision", "otro"] as const;
+export const TIPOS_PENDIENTE = ["licencia", "creditos", "acceso", "informacion", "otro"] as const;
 export type LadoPendiente = (typeof LADOS_PENDIENTE)[number];
 export type TipoPendiente = (typeof TIPOS_PENDIENTE)[number];
 

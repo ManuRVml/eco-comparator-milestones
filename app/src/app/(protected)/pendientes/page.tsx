@@ -10,9 +10,12 @@ const TIPO_LABEL: Record<TipoPendiente, string> = {
   creditos: "Créditos",
   acceso: "Acceso",
   informacion: "Información",
-  decision: "Decisión",
   otro: "Otro",
 };
+
+function etiquetaTipo(tipo: string): string {
+  return tipo in TIPO_LABEL ? TIPO_LABEL[tipo as TipoPendiente] : "Otro";
+}
 
 export default async function PendientesPage() {
   const session = await requireSession();
@@ -103,7 +106,7 @@ function PendientesTable({ items, canEdit }: { items: Awaited<ReturnType<typeof 
         {items.map((item) => (
           <tr key={item.id} className={item.estado === "resuelto" ? "muted" : undefined}>
             <td>{item.titulo}{item.detalle && <div className="small">{item.detalle}</div>}</td>
-            <td><Chip tone="slate">{TIPO_LABEL[item.tipo]}</Chip></td>
+            <td><Chip tone="slate">{etiquetaTipo(item.tipo)}</Chip></td>
             <td>{item.responsable || "—"}</td>
             <td className="nowrap">{fmtCorta(item.fechaLimite)}</td>
             <td>{item.milestoneId ? <Link href={`/milestones/${item.milestoneId}`}>{item.milestoneId}</Link> : "—"}</td>
