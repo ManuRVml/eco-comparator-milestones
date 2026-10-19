@@ -108,7 +108,7 @@ function PendientesTable({ items, canEdit }: { items: Awaited<ReturnType<typeof 
           <tr key={item.id} className={item.estado === "resuelto" ? "muted" : undefined}>
             <td>
               {item.titulo}
-              {canEdit && item.lado === "externo" && textoExternoNoApto(item.titulo, item.detalle) && (
+              {canEdit && item.lado === "externo" && textoExternoNoApto(item.titulo, item.detalle, item.responsable) && (
                 <> <Chip tone="red">Texto no apto para Equipo Ecopetrol</Chip></>
               )}
               {item.detalle && <div className="small">{item.detalle}</div>}

@@ -22,6 +22,29 @@ test("no revisa el vocabulario de un pendiente interno", () => {
   assert.equal(rechazoTextoExterno("interno", "QA del sprint", "backlog"), null);
 });
 
+test("rechaza el responsable de un pendiente externo con un término prohibido", () => {
+  const rechazo = rechazoTextoExterno("externo", "Entregar acceso", null, "equipo de QA");
+  assert.ok(rechazo);
+  assert.equal(rechazo.status, 400);
+  assert.match(rechazo.message, /«QA»/);
+});
+
+test("rechaza «Cliente» en el título de un pendiente externo", () => {
+  const rechazo = rechazoTextoExterno("externo", "Pendiente del Cliente", null);
+  assert.ok(rechazo);
+  assert.equal(rechazo.status, 400);
+  assert.match(rechazo.message, /«cliente»/);
+});
+
+test("oculta un pendiente externo ya guardado con responsable no apto", () => {
+  const rows = [
+    { id: "resp", lado: "externo", titulo: "Entregar acceso", detalle: null, responsable: "equipo de QA" },
+    { id: "limpio", lado: "externo", titulo: "Entregar licencia", detalle: null, responsable: "Ana" },
+  ];
+  assert.deepEqual(filtrarVisibles(rows, false).map((row) => row.id), ["limpio"]);
+  assert.deepEqual(filtrarVisibles(rows, true).map((row) => row.id), ["resp", "limpio"]);
+});
+
 test("oculta pendientes externos ya guardados con vocabulario interno a quien no edita", () => {
   const rows = [
     { id: "qa", lado: "externo", titulo: "Revisión de QA", detalle: null },

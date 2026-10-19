@@ -10,18 +10,23 @@ export function terminoProhibido(texto: string): string | null {
   return null;
 }
 
-/** True when an externo title or detail already stored would be rejected. */
-export function textoExternoNoApto(titulo: string, detalle: string | null): boolean {
-  return rechazoTextoExterno("externo", titulo, null) != null
-    || rechazoTextoExterno("externo", detalle ?? "", null) != null;
+const CLIENTE = /cliente/i;
+
+function terminoVisible(texto: string): string | null {
+  return terminoProhibido(texto) ?? (CLIENTE.test(texto) ? "cliente" : null);
 }
 
-export function filtrarVisibles<T extends { lado: string; titulo: string; detalle: string | null }>(
+/** True when stored externo text would be rejected. check-copy keeps its own cliente scan. */
+export function textoExternoNoApto(titulo: string, detalle: string | null, responsable: string | null = null): boolean {
+  return rechazoTextoExterno("externo", titulo, detalle, responsable) != null;
+}
+
+export function filtrarVisibles<T extends { lado: string; titulo: string; detalle: string | null; responsable?: string | null }>(
   rows: readonly T[],
   canEdit: boolean,
 ): T[] {
   if (canEdit) return [...rows];
-  return rows.filter((row) => row.lado !== "externo" || !textoExternoNoApto(row.titulo, row.detalle));
+  return rows.filter((row) => row.lado !== "externo" || !textoExternoNoApto(row.titulo, row.detalle, row.responsable ?? null));
 }
 
 /** Null when the text may be stored. Interno is not checked. */
@@ -29,9 +34,12 @@ export function rechazoTextoExterno(
   lado: string,
   titulo: string,
   detalle: string | null,
+  responsable: string | null = null,
 ): { status: 400; message: string } | null {
   if (lado !== "externo") return null;
-  const termino = terminoProhibido(titulo) ?? (detalle ? terminoProhibido(detalle) : null);
+  const termino = terminoVisible(titulo)
+    ?? (detalle ? terminoVisible(detalle) : null)
+    ?? (responsable ? terminoVisible(responsable) : null);
   if (!termino) return null;
   return {
     status: 400,

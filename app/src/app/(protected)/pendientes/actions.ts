@@ -26,7 +26,7 @@ export async function createPendienteAction(formData: FormData) {
   const milestoneId = campo(formData, "milestone_id").trim() || null;
   const fechaLimite = campo(formData, "fecha_limite").trim();
   if (fechaLimite) fecha({ fecha_limite: fechaLimite }, "fecha_limite");
-  const rechazo = rechazoTextoExterno(lado, titulo, detalle);
+  const rechazo = rechazoTextoExterno(lado, titulo, detalle, responsable);
   if (rechazo) throw new HttpError(rechazo.status, rechazo.message);
 
   await createPendiente({ titulo, lado, tipo, detalle, responsable, milestoneId, fechaLimite: fechaLimite || null });
