@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { HuQuickView } from "@/components/hu-quickview";
+import { MilestoneStatus } from "@/components/milestone-status";
 import { PageHeading, StatusBadge } from "@/components/ui";
 import { getModel, requireSession } from "@/lib/data";
 import { daysBetween, fmtCorta, fmtDiaSemana, fmtLarga, mesCorto, relativo } from "@/lib/dates";
@@ -62,26 +63,29 @@ export default async function AgendaPage() {
                   <div>
                     {esProxima && <span className="next-pill">Próxima demo</span>}
                     <h3>{fmtLarga(f)}</h3>
-                    {session.canEdit && <p>{hus.length ? `${hus.length} historias · ${sp} SP${epicas.length ? ` · ${epicas.join(" · ")}` : ""}` : "Fecha objetivo de milestone · resultado por revisar"}</p>}
-                    {!session.canEdit && <p>Fecha objetivo de milestone · resultado por revisar</p>}
+                    {session.canEdit && <p>{hus.length ? `${hus.length} historias · ${sp} SP${epicas.length ? ` · ${epicas.join(" · ")}` : ""}` : "Deadline / Fin del Hito · resultado por revisar"}</p>}
+                    {!session.canEdit && <p>Deadline / Fin del Hito · resultado por revisar</p>}
                   </div>
                 </header>
                 {ms.length > 0 && (
                   <div className="agenda-ms">
                     {ms.map((m) => (
-                      <Link key={m.id} href={`/milestones/${m.id}`} className="agenda-ms-item" style={{ "--linea": colorLinea(m.lineaId) } as CSSProperties}>
+                      <div key={m.id} className="agenda-ms-item" style={{ "--linea": colorLinea(m.lineaId) } as CSSProperties}>
                         <span className="agenda-ms-head">
                           <span className="line-pill" style={{ background: colorLinea(m.lineaId), color: textoLinea(m.lineaId) }}>
                             {m.lineaId}
                           </span>
                           <b>{m.id}</b>
-                          <StatusBadge estado={m.estadoFinal} size="sm" />
+                          <MilestoneStatus m={m} size="sm" />
                           {!session.canEdit && <em>Milestone {m.cierreVerificado ? "cumplido" : "pendiente"}</em>}
                           {session.canEdit && <em>Trabajo {Math.round(m.pctPonderado)} % · {m.cierreVerificado ? "Milestone cumplido" : "Milestone pendiente"}</em>}
                         </span>
-                        <strong>{m.nombre}</strong>
-                        {m.valorCliente && <span className="agenda-value">{m.valorCliente}</span>}
-                      </Link>
+                        <Link href={`/milestones/${m.id}`} className="agenda-ms-link">
+                          <span className="sr-only">{m.id}</span>
+                          <strong>{m.nombre}</strong>
+                          {m.valorCliente && <span className="agenda-value">{m.valorCliente}</span>}
+                        </Link>
+                      </div>
                     ))}
                   </div>
                 )}

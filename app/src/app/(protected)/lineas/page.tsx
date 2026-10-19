@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AreaFilter } from "@/components/area-filter";
 import { Roadmap } from "@/components/roadmap";
+import { MilestoneStatus } from "@/components/milestone-status";
 import { Card, PageHeading, ProgressBar, StatusBadge } from "@/components/ui";
 import { getModel, requireSession } from "@/lib/data";
 import { fmtCorta, fmtLarga } from "@/lib/dates";
@@ -128,7 +129,7 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
               <tr>
                 <th>Milestone (hito)</th>
                 <th>Línea</th>
-                <th>Fecha objetivo</th>
+                <th>Deadline / Fin del Hito</th>
                 <th>Seguimiento</th><th>Cumplimiento</th>
                 {session.canEdit ? (
                   <>
@@ -172,7 +173,7 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
                       {fmtCorta(m.fechaObjetivo)}
                     </td>
                     <td>
-                      <StatusBadge estado={m.estadoFinal} size="sm" />
+                      <MilestoneStatus m={m} size="sm" />
                     </td>
                     <td><span className={`chip tone-${m.cierreVerificado ? "green" : "slate"}`}>{m.cierreVerificado ? "Cumplido" : "Pendiente"}</span></td>
                     {session.canEdit ? (

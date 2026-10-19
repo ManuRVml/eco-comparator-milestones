@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
+import { MilestoneStatus } from "@/components/milestone-status";
 import { AreaDot, Ring, StatusBadge } from "@/components/ui";
 import { daysBetween, fmtCorta, fmtDiaSemana } from "@/lib/dates";
 import { colorEstado, colorLinea, fmtPct, textoLinea } from "@/lib/format";
@@ -43,12 +44,13 @@ export function MilestonePanel({ m, model, canEdit, isAdmin = false, areaId = nu
               {m.id === "S0" ? "Inicio" : m.lineaId}
             </span>
             <span className="ms-id">{m.id}</span>
-            <StatusBadge estado={m.estadoFinal} size="sm" />
+            <MilestoneStatus m={m} size="sm" />
             <span className={`chip tone-${p.tono}`}>{p.texto}</span>
           </div>
           <h3 id={`panel-heading-${m.id}`}>{m.nombre}</h3>
           {canEdit && <p className="muted small">{areaId ? "Trabajo del área hacia el milestone" : "Trabajo hacia el milestone"}: {fmtPct(porcentaje, 1)}. Cumplimiento: {m.cierreVerificado ? "confirmado" : "pendiente"}.</p>}
           <p className="ms-panel-meta">
+            Deadline / Fin del Hito:{" "}
             <b>
               {fmtDiaSemana(m.fechaObjetivo ?? model.hoy, true)} {fmtCorta(m.fechaObjetivo)}
             </b>{" "}

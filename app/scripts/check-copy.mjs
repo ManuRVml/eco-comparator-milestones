@@ -121,7 +121,7 @@ db.close();
 console.log(`Excepciones (nombres del plan que contienen la palabra): ${excepciones.length}`);
 for (const e of excepciones) console.log(`  · ${e.origen}: «${e.texto.length > 90 ? e.texto.slice(0, 90) + "…" : e.texto}»`);
 
-const PAGINAS_CLIENTE = ["/", "/lineas", "/lineas?m=M-01", "/lineas?m=M-04", "/milestones/M-01", "/milestones/M-04", "/areas", "/areas?area=frontend", "/historias/HU-001", "/tareas/T-005", "/tareas/T-014", "/agenda"];
+const PAGINAS_CLIENTE = ["/", "/lineas", "/lineas?m=M-01", "/lineas?m=M-04", "/milestones/M-01", "/milestones/M-04", "/areas", "/areas?area=frontend", "/historias/HU-001", "/tareas/T-005", "/tareas/T-014", "/agenda", "/pendientes"];
 const EQUIPO = ["/editor", "/editor?vista=hu", "/editor?vista=milestones", "/editor?vista=visibilidad", "/bitacora", "/bitacora?tipo=tarea", "/verificacion"];
 
 if (VOCAB_MODE) {

@@ -1,11 +1,11 @@
-export type Tone = "slate" | "cyan" | "green" | "amber" | "red" | "purple";
+export type Tone = "slate" | "cyan" | "green" | "amber" | "red" | "alert" | "purple";
 
 const TONOS: Record<string, Tone> = {
   // milestones
   Pendiente: "slate",
   "En curso": "cyan",
   Cumplido: "green",
-  "En riesgo": "amber",
+  "En riesgo": "alert",
   Atrasado: "red",
   // tareas
   Hecha: "green",
@@ -28,6 +28,7 @@ export const TONE_COLOR: Record<Tone, string> = {
   green: "var(--color-status-success-base)",
   amber: "var(--color-status-warning-base)",
   red: "var(--color-status-danger-base)",
+  alert: "var(--color-status-danger-base)",
   purple: "var(--color-brand-primary)",
 };
 
@@ -42,6 +43,7 @@ export const TONE_TEXT_COLOR: Record<Tone, string> = {
   green: "var(--color-dark-bg)",
   amber: "var(--color-status-warning-note-text)",
   red: "var(--color-dark-bg)",
+  alert: "var(--color-text-inverse)",
   purple: "var(--color-text-inverse)",
 };
 
