@@ -51,12 +51,15 @@
 .tone-green { color: var(--color-status-success-text); background: var(--color-status-success-bg); }
 .tone-amber { color: var(--color-status-warning-text); background: var(--color-status-warning-bg); }
 .tone-red { color: var(--color-status-danger-text); background: var(--color-status-danger-bg); }
+.status-badge.tone-alert { color: var(--color-text-inverse); background: var(--color-status-danger-text); font-weight: 600; }
 .tone-purple { color: var(--color-brand-primary-dark); background: var(--color-brand-primary-subtle); }
 .tone-slate .status-dot { background: var(--color-dimension-accent-fin-op); }
 .tone-cyan .status-dot { background: var(--color-ai-accent); }
 .tone-green .status-dot { background: var(--color-status-success-base); }
 .tone-amber .status-dot { background: var(--color-status-warning-base); }
 .tone-red .status-dot { background: var(--color-status-danger-base); }
+.status-badge.tone-alert .status-dot { display: none; }
+.status-badge.tone-alert::before { content: "⚠"; }
 .tone-purple .status-dot { background: var(--color-brand-primary); }
 .chip { display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 9px; border: 1px solid var(--color-border-default); border-radius: 999px; color: var(--color-text-body); background: var(--color-surface-card); font-size: 11.5px; font-weight: 500; white-space: nowrap; text-decoration: none; }
 .chip[class*="tone-"] { border-color: transparent; }
