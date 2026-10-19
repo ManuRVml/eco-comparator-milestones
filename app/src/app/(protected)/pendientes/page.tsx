@@ -34,7 +34,7 @@ export default async function PendientesPage() {
         <Card kicker="NUEVO" title="Registrar pendiente">
           <form action={createPendienteAction} className="workflow-form">
             <fieldset>
-              <legend>Registrar pendiente</legend>
+              <legend className="sr-only">Registrar pendiente</legend>
               <label className="workflow-field" htmlFor="pendiente-titulo">
                 <span>Título</span>
                 <input id="pendiente-titulo" name="titulo" required maxLength={200} />
