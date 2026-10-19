@@ -121,6 +121,7 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
       </Card>
 
       <p className="muted small timeline-scroll-hint">El timeline se desplaza horizontalmente. Desplaza dentro de esta sección para consultar fechas y entregas posteriores.</p>
+      <p className="muted small">Las fechas de cada hito son su Deadline / Fin del Hito.</p>
 
       <div className="ms-table-wrap" role="region" aria-label="Milestones: fecha y cumplimiento" tabIndex={0}>
         <Card kicker={areaId ? `FILTRO: ${model.areaById.get(areaId)?.nombre?.toUpperCase()}` : "DETALLE"} title="Milestones: fecha y cumplimiento">

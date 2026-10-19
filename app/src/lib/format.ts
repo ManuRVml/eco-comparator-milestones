@@ -15,6 +15,9 @@ const TONOS: Record<string, Tone> = {
   "Lista para demo": "purple",
   Aceptada: "green",
   "No iniciado": "slate",
+  // pendientes
+  Abierto: "slate",
+  Resuelto: "green",
 };
 
 export function tono(estado: string): Tone {

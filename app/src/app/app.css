@@ -757,6 +757,7 @@
   .role-avatar { width: 28px; height: 28px; }
   .app-header-right { gap: 6px; }
   .fchip, .branch-open, .panel-x, .ms-dot { min-width: 44px; min-height: 44px; }
+  .status-trigger { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; }
   .rm-date, .rm-name, .rm-stat, .rm-comparison { font-size: 12px; line-height: 1.35; }
   .workflow-field { font-size: 14px; }
   .workflow-field input:not([type="checkbox"]), .workflow-field select, .workflow-field textarea,
@@ -805,7 +806,8 @@
 .workflow-form fieldset { border: 1px solid var(--color-border-default); border-radius: 12px; padding: 1rem; display: grid; gap: .75rem; min-width: 0; }
 .workflow-form legend { font-weight: 600; }
 .workflow-field { display: grid; gap: .35rem; font-size: .85rem; }
-.workflow-field input:not([type="checkbox"]), .workflow-field textarea { width: 100%; padding: .6rem; border: 1px solid var(--color-border-default); border-radius: 6px; background: var(--color-surface-card); color: inherit; font: inherit; }
+.workflow-field input:not([type="checkbox"]), .workflow-field textarea { width: 100%; min-width: 0; max-width: 100%; padding: .6rem; border: 1px solid var(--color-border-default); border-radius: 6px; background: var(--color-surface-card); color: inherit; font: inherit; }
+.workflow-field select { width: 100%; min-width: 0; max-width: 100%; }
 .workflow-summary, .workflow-block { margin: .75rem 0; padding: .75rem; border: 1px solid var(--color-border-default); border-radius: 10px; overflow-wrap: anywhere; }
 .workflow-summary p, .workflow-block p { margin: .5rem 0; }
 .workflow-columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 1rem; }

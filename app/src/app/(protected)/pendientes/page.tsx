@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Chip, Card, Empty, PageHeading } from "@/components/ui";
+import { Chip, Card, Empty, PageHeading, StatusBadge } from "@/components/ui";
 import { createPendienteAction, resolvePendienteAction } from "@/app/(protected)/pendientes/actions";
 import { getModel, requireSession } from "@/lib/data";
 import { fmtCorta } from "@/lib/dates";
@@ -32,44 +32,47 @@ export default async function PendientesPage() {
 
       {session.canEdit && (
         <Card kicker="NUEVO" title="Registrar pendiente">
-          <form action={createPendienteAction} className="toolbar">
-            <label>
-              Título
-              <input className="select" name="titulo" required maxLength={200} />
-            </label>
-            <label>
-              Lado
-              <select className="select" name="lado" defaultValue="externo" required>
-                <option value="externo">Equipo Ecopetrol</option>
-                <option value="interno">Interno del equipo</option>
-              </select>
-            </label>
-            <label>
-              Tipo
-              <select className="select" name="tipo" defaultValue="otro" required>
-                {Object.entries(TIPO_LABEL).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
-              </select>
-            </label>
-            <label>
-              Responsable
-              <input className="select" name="responsable" maxLength={200} />
-            </label>
-            <label>
-              Fecha límite
-              <input className="select" type="date" name="fecha_limite" />
-            </label>
-            <label>
-              Milestone
-              <select className="select" name="milestone_id" defaultValue="">
-                <option value="">Sin asignar</option>
-                {model.milestones.map((milestone) => <option key={milestone.id} value={milestone.id}>{milestone.id} · {milestone.nombre}</option>)}
-              </select>
-            </label>
-            <label>
-              Detalle
-              <input className="select" name="detalle" maxLength={2000} />
-            </label>
-            <button className="btn btn-primary btn-sm" type="submit">Crear pendiente</button>
+          <form action={createPendienteAction} className="workflow-form">
+            <fieldset>
+              <legend>Registrar pendiente</legend>
+              <label className="workflow-field" htmlFor="pendiente-titulo">
+                <span>Título</span>
+                <input id="pendiente-titulo" name="titulo" required maxLength={200} />
+              </label>
+              <label className="workflow-field" htmlFor="pendiente-lado">
+                <span>Lado</span>
+                <select className="select" id="pendiente-lado" name="lado" defaultValue="externo" required>
+                  <option value="externo">Equipo Ecopetrol</option>
+                  <option value="interno">Interno del equipo</option>
+                </select>
+              </label>
+              <label className="workflow-field" htmlFor="pendiente-tipo">
+                <span>Tipo</span>
+                <select className="select" id="pendiente-tipo" name="tipo" defaultValue="otro" required>
+                  {Object.entries(TIPO_LABEL).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                </select>
+              </label>
+              <label className="workflow-field" htmlFor="pendiente-responsable">
+                <span>Responsable</span>
+                <input id="pendiente-responsable" name="responsable" maxLength={200} />
+              </label>
+              <label className="workflow-field" htmlFor="pendiente-fecha">
+                <span>Fecha límite</span>
+                <input id="pendiente-fecha" type="date" name="fecha_limite" />
+              </label>
+              <label className="workflow-field" htmlFor="pendiente-milestone">
+                <span>Milestone</span>
+                <select className="select" id="pendiente-milestone" name="milestone_id" defaultValue="">
+                  <option value="">Sin asignar</option>
+                  {model.milestones.map((milestone) => <option key={milestone.id} value={milestone.id}>{milestone.id} · {milestone.nombre}</option>)}
+                </select>
+              </label>
+              <label className="workflow-field" htmlFor="pendiente-detalle">
+                <span>Detalle</span>
+                <textarea id="pendiente-detalle" name="detalle" rows={2} maxLength={2000} />
+              </label>
+              <button className="btn btn-primary btn-sm" type="submit">Crear pendiente</button>
+            </fieldset>
           </form>
         </Card>
       )}
@@ -105,7 +108,7 @@ function PendientesTable({ items, canEdit }: { items: Awaited<ReturnType<typeof 
       </thead>
       <tbody>
         {items.map((item) => (
-          <tr key={item.id} className={item.estado === "resuelto" ? "muted" : undefined}>
+          <tr key={item.id} className={item.estado === "resuelto" ? "is-muted" : undefined}>
             <td>
               {item.titulo}
               {canEdit && item.lado === "externo" && textoExternoNoApto(item.titulo, item.detalle, item.responsable) && (
@@ -117,7 +120,7 @@ function PendientesTable({ items, canEdit }: { items: Awaited<ReturnType<typeof 
             <td>{item.responsable || "—"}</td>
             <td className="nowrap">{fmtCorta(item.fechaLimite)}</td>
             <td>{item.milestoneId ? <Link href={`/milestones/${item.milestoneId}`}>{item.milestoneId}</Link> : "—"}</td>
-            <td>{item.estado === "abierto" ? "Abierto" : "Resuelto"}</td>
+            <td><StatusBadge estado={item.estado === "abierto" ? "Abierto" : "Resuelto"} size="sm" /></td>
             {canEdit && <td>{item.estado === "abierto" && (
               <form action={resolvePendienteAction}>
                 <input type="hidden" name="id" value={item.id} />
