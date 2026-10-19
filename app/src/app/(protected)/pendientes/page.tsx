@@ -51,7 +51,7 @@ export default async function PendientesPage() {
               <input className="select" name="responsable" maxLength={200} />
             </label>
             <label>
-              Deadline / Fin del Hito
+              Fecha límite
               <input className="select" type="date" name="fecha_limite" />
             </label>
             <label>
@@ -93,7 +93,7 @@ function PendientesTable({ items, canEdit }: { items: Awaited<ReturnType<typeof 
           <th>Título</th>
           <th>Tipo</th>
           <th>Responsable</th>
-          <th>Deadline / Fin del Hito</th>
+          <th>Fecha límite</th>
           <th>Milestone</th>
           <th>Estado</th>
           {canEdit && <th>Acción</th>}
