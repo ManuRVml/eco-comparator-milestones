@@ -3,7 +3,8 @@ import type { CSSProperties } from "react";
 import { AreaBullets } from "@/components/area-chart";
 import { AreaFilter } from "@/components/area-filter";
 import { TareaRow } from "@/components/tarea-row";
-import { AreaDot, Card, Empty, PageHeading, ProgressBar, Ring, StatusBadge } from "@/components/ui";
+import { MilestoneStatus } from "@/components/milestone-status";
+import { AreaDot, Card, Empty, PageHeading, ProgressBar, Ring } from "@/components/ui";
 import { getModel, requireSession } from "@/lib/data";
 import { fmtCorta } from "@/lib/dates";
 import { colorArea, colorLinea, fmtPct, textoLinea } from "@/lib/format";
@@ -189,7 +190,7 @@ function AreaDetalle({ areaId, model, canEdit, verResumen }: { areaId: string; m
                   <b>
                     {ap.hechas}/{ap.total}
                   </b>{" "}
-                  · {fmtCorta(m.fechaObjetivo)} <StatusBadge estado={m.estadoFinal} size="sm" />
+                  · {fmtCorta(m.fechaObjetivo)} <MilestoneStatus m={m} size="sm" />
                 </span>
               </summary>
               <Link className="branch-open" href={`/milestones/${m.id}?area=${areaId}`}>Ver entrega de {m.id}</Link>

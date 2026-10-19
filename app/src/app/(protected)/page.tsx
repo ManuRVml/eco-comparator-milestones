@@ -1,7 +1,8 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { AreaBullets } from "@/components/area-chart";
-import { AreaDot, Card, Empty, MiniRing, ProgressBar, Ring, StatusBadge } from "@/components/ui";
+import { MilestoneStatus } from "@/components/milestone-status";
+import { AreaDot, Card, Empty, MiniRing, ProgressBar, Ring } from "@/components/ui";
 import { getModel, requireSession } from "@/lib/data";
 import { daysBetween, fmtCorta, fmtDiaSemana, fmtLarga, relativo } from "@/lib/dates";
 import { colorEstado, colorLinea, fmtPct, TONE_COLOR, TONE_TEXT_COLOR, tono } from "@/lib/format";
@@ -255,7 +256,7 @@ export default async function DashboardPage() {
                       <strong>{m.nombre}</strong>
                       <span className="muted small">Trabajo hacia el milestone: {fmtPct(m.pctPonderado)} · {m.cierreVerificado ? "Cumplido" : "Pendiente de confirmación"}</span>
                     </div>
-                    <StatusBadge estado={m.estadoFinal} size="sm" />
+                    <MilestoneStatus m={m} size="sm" />
                   </Link>
                 </li>
               ))}
@@ -283,7 +284,7 @@ export default async function DashboardPage() {
                       <span className="line-ms-top">
                         <b>{m.id} <CompletionCheck complete={!!m.cierreVerificado} label="Hito de entrega confirmado" id={`summary-${m.id}`} /></b>
                         <span>{fmtCorta(m.fechaObjetivo)}</span>
-                        <StatusBadge estado={m.estadoFinal} size="sm" />
+                        <MilestoneStatus m={m} size="sm" />
                       </span>
                       <span className="line-ms-name">{m.nombre}</span>
                       <span className="muted small">{m.cierreVerificado ? "Milestone cumplido" : "Milestone pendiente"} · Trabajo realizado: {fmtPct(m.pctPonderado)}</span>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
-import { PageHeading, StatusBadge } from "@/components/ui";
+import { MilestoneStatus } from "@/components/milestone-status";
+import { PageHeading } from "@/components/ui";
 import { getModel, requireSession } from "@/lib/data";
 import { daysBetween, fmtDiaSemana, fmtLarga, mesCorto, relativo } from "@/lib/dates";
 import { colorEstado, colorLinea, textoLinea } from "@/lib/format";
@@ -71,7 +72,7 @@ export default async function AgendaPage() {
                             {m.lineaId}
                           </span>
                           <b>{m.id}</b>
-                          <StatusBadge estado={m.estadoFinal} size="sm" />
+                          <MilestoneStatus m={m} size="sm" />
                           <em>
                             Trabajo {Math.round(m.pctPonderado)} % · {m.cierreVerificado ? "Milestone cumplido" : "Milestone pendiente"}
                           </em>

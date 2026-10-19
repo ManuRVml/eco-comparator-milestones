@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
+import { MilestoneStatus } from "@/components/milestone-status";
 import { AreaDot, Ring, StatusBadge } from "@/components/ui";
 import { daysBetween, fmtCorta, fmtDiaSemana } from "@/lib/dates";
 import { colorEstado, colorLinea, textoLinea } from "@/lib/format";
@@ -43,7 +44,7 @@ export function MilestonePanel({ m, model, canEdit, isAdmin = false, areaId = nu
               {m.lineaId}
             </span>
             <span className="ms-id">{m.id}</span>
-            <StatusBadge estado={m.estadoFinal} size="sm" />
+            <MilestoneStatus m={m} size="sm" />
             <span className={`chip tone-${p.tono}`}>{p.texto}</span>
           </div>
           <h3 id={`panel-heading-${m.id}`}>{m.nombre}</h3>

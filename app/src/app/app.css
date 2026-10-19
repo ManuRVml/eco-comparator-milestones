@@ -842,3 +842,13 @@
   .contribution-table td:first-child { display: block; }
   .contribution-table td[data-label]::before { content: attr(data-label); color: var(--color-text-muted); font-size: 12px; }
 }
+
+/* ---------- causas de un milestone en riesgo ---------- */
+.status-trigger { display: inline-flex; margin: 0; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; line-height: inherit; cursor: pointer; vertical-align: middle; appearance: none; }
+.status-trigger:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 2px; border-radius: 999px; }
+.status-popover { position: fixed; z-index: 80; visibility: hidden; box-sizing: border-box; max-width: min(320px, calc(100vw - 16px)); padding: 10px 12px; border: 1px solid var(--color-border-default); border-radius: var(--radius-card); background: var(--color-surface-card); color: var(--color-text-body); box-shadow: var(--shadow-chat); text-align: left; white-space: normal; }
+.status-popover.is-placed { visibility: visible; }
+.status-popover h4 { margin: 0 0 4px; color: var(--color-text-heading); font-size: 11px; font-weight: 700; letter-spacing: .02em; }
+.status-popover ul { margin: 0 0 8px; padding-left: 16px; }
+.status-popover li { color: var(--color-text-body); font-size: 12px; font-weight: 500; line-height: 1.4; }
+.status-popover section:last-child ul { margin-bottom: 0; }

@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { AreaFilter } from "@/components/area-filter";
 import { Roadmap } from "@/components/roadmap";
-import { Card, PageHeading, ProgressBar, StatusBadge } from "@/components/ui";
+import { MilestoneStatus } from "@/components/milestone-status";
+import { Card, PageHeading, ProgressBar } from "@/components/ui";
 import { getModel, requireSession } from "@/lib/data";
 import { fmtCorta, fmtLarga } from "@/lib/dates";
 import { colorEstado, colorLinea, fmtPct, TONE_COLOR, textoLinea } from "@/lib/format";
@@ -119,7 +120,7 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
                       {fmtCorta(m.fechaObjetivo)}
                     </td>
                     <td>
-                      <StatusBadge estado={m.estadoFinal} size="sm" />
+                      <MilestoneStatus m={m} size="sm" />
                     </td>
                     <td><span className={`chip tone-${m.cierreVerificado ? "green" : "slate"}`}>{m.cierreVerificado ? "Cumplido" : "Pendiente"}</span></td>
                     <td>
