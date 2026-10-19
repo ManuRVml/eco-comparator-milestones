@@ -1,7 +1,8 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { AreaBullets } from "@/components/area-chart";
-import { AreaDot, Card, Empty, MiniRing, ProgressBar, Ring, StatusBadge } from "@/components/ui";
+import { MilestoneStatus } from "@/components/milestone-status";
+import { AreaDot, Card, Empty, MiniRing, ProgressBar, Ring } from "@/components/ui";
 import { getModel, requireSession } from "@/lib/data";
 import { daysBetween, fmtCorta, fmtDiaSemana, fmtLarga, relativo } from "@/lib/dates";
 import { colorEstado, colorLinea, fmtPct, TONE_COLOR, TONE_TEXT_COLOR, tono } from "@/lib/format";
@@ -245,18 +246,20 @@ export default async function DashboardPage() {
             <ul className="upcoming">
               {proximos.map((m) => (
                 <li key={m.id}>
-                  <Link href={`/milestones/${m.id}`} className="upcoming-item">
-                    <MiniRing value={m.pctPonderado} estado={m.estadoFinal} size={52} />
-                    <div className="upcoming-body">
-                      <span className="upcoming-top">
-                        <b style={{ color: colorLinea(m.lineaId) }}>{m.lineaId}</b> {m.id} · {fmtDiaSemana(m.fechaObjetivo ?? "")} {fmtCorta(m.fechaObjetivo)}
-                        <em>{relativo(model.hoy, m.fechaObjetivo ?? model.hoy)}</em>
-                      </span>
-                      <strong>{m.nombre}</strong>
-                      <span className="muted small">Trabajo hacia el milestone: {fmtPct(m.pctPonderado)} · {m.cierreVerificado ? "Cumplido" : "Pendiente de confirmación"}</span>
-                    </div>
-                    <StatusBadge estado={m.estadoFinal} size="sm" />
-                  </Link>
+                  <div className="upcoming-item">
+                    <Link href={`/milestones/${m.id}`} className="upcoming-link">
+                      <MiniRing value={m.pctPonderado} estado={m.estadoFinal} size={52} />
+                      <div className="upcoming-body">
+                        <span className="upcoming-top">
+                          <b style={{ color: colorLinea(m.lineaId) }}>{m.lineaId}</b> {m.id} · {fmtDiaSemana(m.fechaObjetivo ?? "")} {fmtCorta(m.fechaObjetivo)}
+                          <em>{relativo(model.hoy, m.fechaObjetivo ?? model.hoy)}</em>
+                        </span>
+                        <strong>{m.nombre}</strong>
+                        <span className="muted small">Trabajo hacia el milestone: {fmtPct(m.pctPonderado)} · {m.cierreVerificado ? "Cumplido" : "Pendiente de confirmación"}</span>
+                      </div>
+                    </Link>
+                    <MilestoneStatus m={m} size="sm" />
+                  </div>
                 </li>
               ))}
             </ul>
@@ -283,7 +286,6 @@ export default async function DashboardPage() {
                       <span className="line-ms-top">
                         <b>{m.id} <CompletionCheck complete={!!m.cierreVerificado} label="Hito de entrega confirmado" id={`summary-${m.id}`} /></b>
                         <span>{fmtCorta(m.fechaObjetivo)}</span>
-                        <StatusBadge estado={m.estadoFinal} size="sm" />
                       </span>
                       <span className="line-ms-name">{m.nombre}</span>
                       <span className="muted small">{m.cierreVerificado ? "Milestone cumplido" : "Milestone pendiente"} · Trabajo realizado: {fmtPct(m.pctPonderado)}</span>
@@ -294,6 +296,9 @@ export default async function DashboardPage() {
                         </em>
                       </span>
                     </Link>
+                    <span className="line-ms-status">
+                      <MilestoneStatus m={m} size="sm" />
+                    </span>
                   </li>
                 ))}
               </ul>

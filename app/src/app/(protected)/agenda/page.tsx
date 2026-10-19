@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
-import { PageHeading, StatusBadge } from "@/components/ui";
+import { MilestoneStatus } from "@/components/milestone-status";
+import { PageHeading } from "@/components/ui";
 import { getModel, requireSession } from "@/lib/data";
 import { daysBetween, fmtDiaSemana, fmtLarga, mesCorto, relativo } from "@/lib/dates";
 import { colorEstado, colorLinea, textoLinea } from "@/lib/format";
@@ -65,20 +66,23 @@ export default async function AgendaPage() {
                 {ms.length > 0 && (
                   <div className="agenda-ms">
                     {ms.map((m) => (
-                      <Link key={m.id} href={`/milestones/${m.id}`} className="agenda-ms-item" style={{ "--linea": colorLinea(m.lineaId) } as CSSProperties}>
+                      <div key={m.id} className="agenda-ms-item" style={{ "--linea": colorLinea(m.lineaId) } as CSSProperties}>
                         <span className="agenda-ms-head">
                           <span className="line-pill" style={{ background: colorLinea(m.lineaId), color: textoLinea(m.lineaId) }}>
                             {m.lineaId}
                           </span>
                           <b>{m.id}</b>
-                          <StatusBadge estado={m.estadoFinal} size="sm" />
+                          <MilestoneStatus m={m} size="sm" />
                           <em>
                             Trabajo {Math.round(m.pctPonderado)} % · {m.cierreVerificado ? "Milestone cumplido" : "Milestone pendiente"}
                           </em>
                         </span>
-                        <strong>{m.nombre}</strong>
-                        {m.valorCliente && <span className="agenda-value">{m.valorCliente}</span>}
-                      </Link>
+                        <Link href={`/milestones/${m.id}`} className="agenda-ms-link">
+                          <span className="sr-only">{m.id}</span>
+                          <strong>{m.nombre}</strong>
+                          {m.valorCliente && <span className="agenda-value">{m.valorCliente}</span>}
+                        </Link>
+                      </div>
                     ))}
                   </div>
                 )}
