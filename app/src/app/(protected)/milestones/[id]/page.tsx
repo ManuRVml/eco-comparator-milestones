@@ -8,6 +8,7 @@ import { PublicarControl } from "@/components/editor/publicar-control";
 import { VisibilidadToggle } from "@/components/editor/visibilidad-toggle";
 import { Notas } from "@/components/notas";
 import { TareaRow } from "@/components/tarea-row";
+import { MilestoneStatus } from "@/components/milestone-status";
 import { AreaDot, Breadcrumb, Card, Chip, Empty, ProgressBar, Ring, StatusBadge } from "@/components/ui";
 import { getModel, requireSession } from "@/lib/data";
 import { fmtCorta, fmtDiaSemana, fmtLarga, relativo } from "@/lib/dates";
@@ -62,14 +63,14 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
               {m.lineaId} · {m.linea?.nombre}
             </span>
             <span className="ms-id">{m.id}</span>
-            <StatusBadge estado={m.estadoFinal} />
+            <MilestoneStatus m={m} />
             <span className="muted small">{m.override ? "Estado ajustado por el editor" : "Estado sugerido automáticamente"}</span>
           </div>
           <h2>{m.nombre}</h2>
           <span className={`chip tone-${m.cierreVerificado ? "green" : "slate"}`}>{m.cierreVerificado ? "Cumplido y confirmado" : "Cumplimiento pendiente"}</span>
           <dl className="ms-meta">
             <div>
-              <dt>Fecha objetivo</dt>
+              <dt>Deadline / Fin del Hito</dt>
               <dd>
                 {fmtDiaSemana(m.fechaObjetivo ?? "", true)} {fmtLarga(m.fechaObjetivo)} <em>· {relativo(model.hoy, m.fechaObjetivo ?? model.hoy)}</em>
               </dd>

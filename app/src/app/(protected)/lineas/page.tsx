@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AreaFilter } from "@/components/area-filter";
 import { Roadmap } from "@/components/roadmap";
+import { MilestoneStatus } from "@/components/milestone-status";
 import { Card, PageHeading, ProgressBar, StatusBadge } from "@/components/ui";
 import { getModel, requireSession } from "@/lib/data";
 import { fmtCorta, fmtLarga } from "@/lib/dates";
@@ -120,6 +121,7 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
       </Card>
 
       <p className="muted small timeline-scroll-hint">El timeline se desplaza horizontalmente. Desplaza dentro de esta sección para consultar fechas y entregas posteriores.</p>
+      <p className="muted small">Las fechas de cada hito son su Deadline / Fin del Hito.</p>
 
       <div className="ms-table-wrap" role="region" aria-label="Milestones: fecha y cumplimiento" tabIndex={0}>
         <Card kicker={areaId ? `FILTRO: ${model.areaById.get(areaId)?.nombre?.toUpperCase()}` : "DETALLE"} title="Milestones: fecha y cumplimiento">
@@ -128,7 +130,7 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
               <tr>
                 <th>Milestone (hito)</th>
                 <th>Línea</th>
-                <th>Fecha objetivo</th>
+                <th>Deadline / Fin del Hito</th>
                 <th>Seguimiento</th><th>Cumplimiento</th>
                 {session.canEdit ? (
                   <>
@@ -172,7 +174,7 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
                       {fmtCorta(m.fechaObjetivo)}
                     </td>
                     <td>
-                      <StatusBadge estado={m.estadoFinal} size="sm" />
+                      <MilestoneStatus m={m} size="sm" />
                     </td>
                     <td><span className={`chip tone-${m.cierreVerificado ? "green" : "slate"}`}>{m.cierreVerificado ? "Cumplido" : "Pendiente"}</span></td>
                     {session.canEdit ? (

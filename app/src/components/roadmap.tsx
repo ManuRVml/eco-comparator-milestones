@@ -186,7 +186,7 @@ export function Roadmap({ model, areaId, inicial, canEdit, isAdmin = false }: { 
                         </span>
                         <span className="rm-label">
                           <span className="rm-kind">Milestone de entrega</span>
-                          <span className="rm-date">
+                          <span className="rm-date" title="Deadline / Fin del Hito">
                             {fmtDiaSemana(n.m.fechaObjetivo ?? INICIO)} {fmtCorta(n.m.fechaObjetivo)}
                           </span>
                           <span className="rm-name">{n.m.nombre}</span>

@@ -5,27 +5,12 @@ import { existsSync } from "node:fs";
 import { argv } from "node:process";
 import { createClient } from "@libsql/client";
 import { chromium } from "playwright";
+import { VOCABULARY_TERMS } from "../src/lib/client-vocab.mjs";
 import { startTestServer } from "./lib/test-server.mjs";
 
 for (const f of [".env.local", ".env"]) if (existsSync(f)) process.loadEnvFile(f);
 
 const VOCAB_MODE = argv.includes("--vocab") || process.env.CHECK_VOCAB === "1";
-
-const VOCABULARY_TERMS = [
-  { term: "HU-", regex: /HU-/gi },
-  { term: "SP", regex: /\bSP\b/gi },
-  { term: "story point", regex: /\bstory point\b/gi },
-  { term: "sprint", regex: /\bsprint\b/gi },
-  { term: "épica", regex: /\b(épica|epic)\b/gi },
-  { term: "backlog", regex: /\bbacklog\b/gi },
-  { term: "ruta crítica", regex: /\bruta crítica\b/gi },
-  { term: "velocity", regex: /\bvelocity\b/gi },
-  { term: "QA", regex: /\bQA\b/gi },
-  { term: "E2E", regex: /\bE2E\b/gi },
-  { term: "Gold", regex: /\bGold\b/gi },
-  { term: "Silver", regex: /\bSilver\b/gi },
-  { term: "Bronze", regex: /\bBronze\b/gi },
-];
 
 // Rutas técnicas permitidas (editor, tareas, historias, milestones/[id] team tabs, /detalle)
 const RUTAS_TECNICAS = [
@@ -121,7 +106,7 @@ db.close();
 console.log(`Excepciones (nombres del plan que contienen la palabra): ${excepciones.length}`);
 for (const e of excepciones) console.log(`  · ${e.origen}: «${e.texto.length > 90 ? e.texto.slice(0, 90) + "…" : e.texto}»`);
 
-const PAGINAS_CLIENTE = ["/", "/lineas", "/lineas?m=M-01", "/lineas?m=M-04", "/milestones/M-01", "/milestones/M-04", "/areas", "/areas?area=frontend", "/historias/HU-001", "/tareas/T-005", "/tareas/T-014", "/agenda"];
+const PAGINAS_CLIENTE = ["/", "/lineas", "/lineas?m=M-01", "/lineas?m=M-04", "/milestones/M-01", "/milestones/M-04", "/areas", "/areas?area=frontend", "/historias/HU-001", "/tareas/T-005", "/tareas/T-014", "/agenda", "/pendientes"];
 const EQUIPO = ["/editor", "/editor?vista=hu", "/editor?vista=milestones", "/editor?vista=visibilidad", "/bitacora", "/bitacora?tipo=tarea", "/verificacion"];
 
 if (VOCAB_MODE) {

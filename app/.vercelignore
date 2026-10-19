@@ -6,8 +6,6 @@ data/
 *.db-shm
 docs/screens/
 seed/
-scripts/
-drizzle/
 test-results/
 playwright-report/
 .env*

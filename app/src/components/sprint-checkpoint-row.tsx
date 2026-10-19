@@ -20,7 +20,7 @@ export function inicioComoMilestone(_model: Model, c: NonNullable<ReturnType<typ
     trabajo: t, cierreVerificado: c.completo, linea: null, huIds: [], tareaIds: c.tareas.map((x) => x.id), dependeDe: [], dependientes: [], riesgoIds: ["R-05"],
     tareasTotal: t.total, tareasHechas: t.hechas, tareasEnCurso: t.enCurso, tareasPublicadas: c.tareas.filter((x) => x.publicadoCliente).length,
     pctTareas: t.pctTareas, pctPonderado: t.pctReal, spTotal: 0, spCompletos: 0, pctSp: 0, huCompletas: 0,
-    estadoSugerido: c.estado, publicado: false, estadoFinal: c.estado, override: false, criticasVencidas: [], areas: c.areas,
+    estadoSugerido: c.estado, publicado: false, estadoFinal: c.estado, override: false, criticasVencidas: [], causasRiesgo: [], areas: c.areas,
   };
 }
 

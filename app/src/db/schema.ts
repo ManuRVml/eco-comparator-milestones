@@ -200,6 +200,25 @@ export const milestoneRiesgo = sqliteTable(
   (t) => [primaryKey({ columns: [t.milestoneId, t.riesgoId] })],
 );
 
+export const pendientes = sqliteTable("pendientes", {
+  id: text("id").primaryKey(),
+  titulo: text("titulo").notNull(),
+  detalle: text("detalle"),
+  lado: text("lado", { enum: ["externo", "interno"] }).notNull(),
+  tipo: text("tipo", {
+    enum: ["licencia", "creditos", "acceso", "informacion", "decision", "otro"],
+  }).notNull().default("otro"),
+  responsable: text("responsable"),
+  milestoneId: text("milestone_id").references(() => milestones.id),
+  fechaLimite: text("fecha_limite"),
+  estado: text("estado", { enum: ["abierto", "resuelto"] }).notNull().default("abierto"),
+  creadoEn: creadoEn(),
+  resueltoEn: text("resuelto_en"),
+});
+
+export type Pendiente = typeof pendientes.$inferSelect;
+export type NewPendiente = typeof pendientes.$inferInsert;
+
 /** Calendario hábil (progress/calendario_habil.csv): sin fines de semana ni festivos. */
 export const calendario = sqliteTable("calendario", {
   fecha: text("fecha").primaryKey(),
