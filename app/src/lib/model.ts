@@ -109,6 +109,8 @@ export interface AreaProgreso {
   brecha: number;
 }
 
+export type CausaRiesgo = { tipo: "tecnica" | "negocio"; texto: string; ref?: string };
+
 export interface MilestoneView extends MilestoneRow {
   trabajo: AreaProgreso;
   cierreVerificado?: boolean;
@@ -134,6 +136,7 @@ export interface MilestoneView extends MilestoneRow {
   estadoFinal: EstadoMilestone;
   override: boolean;
   criticasVencidas: string[];
+  causasRiesgo: CausaRiesgo[];
   areas: AreaProgreso[];
 }
 
@@ -335,6 +338,7 @@ export function computeModel(raw: Raw, hoy: string, capa: Capa = "tecnica"): Mod
   const areasOrd = [...raw.areas].sort((a, b) => a.orden - b.orden);
   const huById = new Map(raw.historias.map((h) => [h.id, h]));
   const tareaById = new Map(raw.tareas.map((t) => [t.id, t]));
+  const riesgoById = new Map(raw.riesgos.map((r) => [r.id, r]));
   const lineaById = new Map(raw.lineas.map((l) => [l.id, l]));
 
   const huPorMs = groupPairs(raw.msHu, (r) => r.milestoneId, (r) => r.historiaId);
@@ -363,9 +367,9 @@ export function computeModel(raw: Raw, hoy: string, capa: Capa = "tecnica"): Mod
       const spTotal = hs.reduce((s, h) => s + (h.sp ?? 0), 0);
       const completas = hs.filter((h) => huCuentaCompleta(h.estado, config));
       const spCompletos = completas.reduce((s, h) => s + (h.sp ?? 0), 0);
-      const criticasVencidas = ts
-        .filter((t) => t.rutaCritica && t.estado !== "Hecha" && t.fechaFin && t.fechaFin < hoy)
-        .map((t) => t.id);
+      const criticas = ts.filter((t): t is Tarea & { fechaFin: string } => !!(t.rutaCritica && t.estado !== "Hecha" && t.fechaFin && t.fechaFin < hoy));
+      const criticasVencidas = criticas.map((t) => t.id);
+      const riesgoIds = riesgosPorMs.get(m.id) ?? [];
       const cumplido = hs.length > 0 && completas.length === hs.length && ts.length > 0 && res.hechas === ts.length;
       let sugerido: EstadoMilestone;
       if (cumplido) sugerido = "Cumplido";
@@ -381,7 +385,7 @@ export function computeModel(raw: Raw, hoy: string, capa: Capa = "tecnica"): Mod
         tareaIds,
         dependeDe: depPorMs.get(m.id) ?? [],
         dependientes: dependientesPorMs.get(m.id) ?? [],
-        riesgoIds: riesgosPorMs.get(m.id) ?? [],
+        riesgoIds,
         tareasTotal: res.total,
         tareasHechas: res.hechas,
         tareasEnCurso: res.enCurso,
@@ -398,6 +402,7 @@ export function computeModel(raw: Raw, hoy: string, capa: Capa = "tecnica"): Mod
         estadoFinal: override ? (m.estado as EstadoMilestone) : sugerido,
         override,
         criticasVencidas,
+        causasRiesgo: causasDeMilestone(criticas, riesgoIds, riesgoById, capa),
         areas: progresoAreas(ts, areasOrd, hoy, festivosSet),
       };
     });
@@ -452,7 +457,7 @@ export function computeModel(raw: Raw, hoy: string, capa: Capa = "tecnica"): Mod
     predecesoras,
     sucesoras,
     riesgos: [...raw.riesgos].sort((a, b) => a.id.localeCompare(b.id)),
-    riesgoById: new Map(raw.riesgos.map((r) => [r.id, r])),
+    riesgoById,
     notas: [...raw.notas].sort((a, b) => b.creadoEn.localeCompare(a.creadoEn)),
     agendaWeekly: [...raw.agendaWeekly].sort((a, b) => a.fecha.localeCompare(b.fecha)),
     weeklyPorHu: new Map(raw.agendaHu.map((a) => [a.historiaId, a.fechaWeekly])),
@@ -485,9 +490,36 @@ export function computeModel(raw: Raw, hoy: string, capa: Capa = "tecnica"): Mod
   };
 }
 
+function textoCausaNegocio(r: Riesgo): string {
+  const categoria = r.categoria?.trim();
+  return categoria ? `${categoria}: ${r.descripcion}` : r.descripcion;
+}
+
+function causasDeMilestone(criticas: Array<Tarea & { fechaFin: string }>, riesgoIds: string[], riesgoById: Map<string, Riesgo>, capa: Capa): CausaRiesgo[] {
+  const tecnicas: CausaRiesgo[] = criticas.map((t) => ({ tipo: "tecnica", texto: `${t.nombre} venció ${t.fechaFin}`, ref: t.id }));
+  const negocio: CausaRiesgo[] = [];
+  for (const id of riesgoIds) {
+    const r = riesgoById.get(id);
+    if (!r || (capa === "oficial" && r.interno)) continue;
+    negocio.push({ tipo: "negocio", texto: textoCausaNegocio(r), ref: r.id });
+  }
+  return [...tecnicas, ...negocio];
+}
+
+/** Títulos solo si la tarea sobrevivió a visibleCliente. Las críticas ocultas se colapsan en un conteo sin ref. */
+function causasVisiblesCliente(causas: CausaRiesgo[], idsTarea: Set<string>, idsRiesgo: Set<string>): CausaRiesgo[] {
+  const tecnicas = causas.filter((c) => c.tipo === "tecnica");
+  const nombradas = tecnicas.filter((c) => !!c.ref && idsTarea.has(c.ref));
+  const ocultas = tecnicas.length - nombradas.length;
+  const negocio = causas.filter((c) => c.tipo === "negocio" && !!c.ref && idsRiesgo.has(c.ref));
+  const colapso: CausaRiesgo[] = ocultas > 0 ? [{ tipo: "tecnica", texto: `${ocultas} tareas críticas vencidas` }] : [];
+  return [...nombradas, ...colapso, ...negocio];
+}
+
 /**
  * Vista del cliente: quita milestones, HU y tareas no visibles, notas internas y riesgos internos.
  * Los indicadores se conservan (se calculan sobre el plan completo).
+ * Las causas se refiltran por los ids finales: un publicadoCliente no basta para nombrar la tarea.
  */
 export function vistaCliente(m: Model): Model {
   const huVisibles = m.historias.filter((h) => h.visibleCliente);
@@ -510,6 +542,7 @@ export function vistaCliente(m: Model): Model {
     riesgoIds: x.riesgoIds.filter((id) => idsR.has(id)),
     dependeDe: x.dependeDe.filter((id) => idsMs.has(id)),
     dependientes: x.dependientes.filter((id) => idsMs.has(id)),
+    causasRiesgo: causasVisiblesCliente(x.causasRiesgo, idsT, idsR),
   }));
   return {
     ...m,
