@@ -49,6 +49,7 @@ export function MilestonePanel({ m, model, canEdit, isAdmin = false, areaId = nu
           <h3 id={`panel-heading-${m.id}`}>{m.nombre}</h3>
           <p className="muted small">{areaId ? "Trabajo del área hacia el milestone" : "Trabajo hacia el milestone"}: {Math.round(porcentaje)} %. Cumplimiento: {m.cierreVerificado ? "confirmado" : "pendiente"}.</p>
           <p className="ms-panel-meta">
+            Deadline / Fin del Hito:{" "}
             <b>
               {fmtDiaSemana(m.fechaObjetivo ?? model.hoy, true)} {fmtCorta(m.fechaObjetivo)}
             </b>{" "}

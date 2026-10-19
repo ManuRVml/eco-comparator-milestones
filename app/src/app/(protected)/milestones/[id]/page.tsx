@@ -54,7 +54,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
           <span className={`chip tone-${m.cierreVerificado ? "green" : "slate"}`}>{m.cierreVerificado ? "Cumplido y confirmado" : "Cumplimiento pendiente"}</span>
           <dl className="ms-meta">
             <div>
-              <dt>Fecha objetivo</dt>
+              <dt>Deadline / Fin del Hito</dt>
               <dd>
                 {fmtDiaSemana(m.fechaObjetivo ?? "", true)} {fmtLarga(m.fechaObjetivo)} <em>· {relativo(model.hoy, m.fechaObjetivo ?? model.hoy)}</em>
               </dd>

@@ -92,7 +92,7 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
               <tr>
                 <th>Milestone (hito)</th>
                 <th>Línea</th>
-                <th>Fecha objetivo</th>
+                <th>Deadline / Fin del Hito</th>
                 <th>Seguimiento</th><th>Cumplimiento</th>
                 <th className="w-bar">{areaId ? "Trabajo del área" : model.capa === "oficial" ? "Trabajo publicado" : "Trabajo técnico"}</th>
                 <th className="num">SP</th>
