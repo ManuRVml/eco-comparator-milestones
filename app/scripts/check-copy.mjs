@@ -38,7 +38,7 @@ function contar(cuerpo) {
   return libres;
 }
 
-const PAGINAS = ["/", "/lineas", "/lineas?m=M-01", "/lineas?m=M-04", "/milestones/M-01", "/milestones/M-04", "/areas", "/areas?area=frontend", "/historias/HU-001", "/tareas/T-005", "/tareas/T-014", "/agenda"];
+const PAGINAS = ["/", "/lineas", "/lineas?m=M-01", "/lineas?m=M-04", "/milestones/M-01", "/milestones/M-04", "/areas", "/areas?area=frontend", "/historias/HU-001", "/tareas/T-005", "/tareas/T-014", "/agenda", "/pendientes"];
 const EQUIPO = ["/editor", "/editor?vista=hu", "/editor?vista=milestones", "/editor?vista=visibilidad", "/bitacora", "/bitacora?tipo=tarea", "/verificacion"];
 let total = 0;
 let fallas = 0;
