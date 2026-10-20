@@ -18,7 +18,7 @@ export default async function AgendaPage() {
     <main className="page" data-testid="agenda">
       <PageHeading
         kicker="QUÉ VERÁS Y CUÁNDO"
-        title="Agenda de milestones y demostraciones"
+        title={session.canEdit ? "Agenda de milestones y demostraciones" : "Entregas por fecha"}
         aside={
           <div className="agenda-summary">
             <div>
@@ -56,15 +56,15 @@ export default async function AgendaPage() {
                 <span className="agenda-dow">{fmtDiaSemana(f)}</span>
                 <span className="agenda-day">{Number(f.slice(8))}</span>
                 <span className="agenda-month">{mesCorto(f)}</span>
-                <span className="agenda-rel">{dias >= 0 ? relativo(model.hoy, f) : "fecha transcurrida"}</span>
+                <span className="agenda-rel">{dias >= 0 ? relativo(model.hoy, f) : session.canEdit ? "fecha transcurrida" : "Fecha pasada"}</span>
               </div>
               <div className="agenda-card">
                 <header>
                   <div>
-                    {esProxima && <span className="next-pill">Próxima demo</span>}
+                    {esProxima && <span className="next-pill">{session.canEdit ? "Próxima demo" : "Próxima demostración"}</span>}
                     <h3>{fmtLarga(f)}</h3>
                     {session.canEdit && <p>{hus.length ? `${hus.length} historias · ${sp} SP${epicas.length ? ` · ${epicas.join(" · ")}` : ""}` : "Deadline / Fin del Hito · resultado por revisar"}</p>}
-                    {!session.canEdit && <p>Deadline / Fin del Hito · resultado por revisar</p>}
+                    {!session.canEdit && (ms.length > 0 ? <p>Deadline / Fin del Hito · resultado por revisar</p> : <p>Demostración semanal: revisamos el avance</p>)}
                   </div>
                 </header>
                 {ms.length > 0 && (
@@ -89,7 +89,7 @@ export default async function AgendaPage() {
                     ))}
                   </div>
                 )}
-                {session.canEdit && hus.length > 0 ? (
+                {session.canEdit ? (hus.length > 0 ? (
                   <ul className="agenda-hu">
                     {hus.map((h) => {
                       const ts = (model.tareasPorHu.get(h.id) ?? []).map((t) => model.tareaById.get(t)).filter((t) => !!t);
@@ -111,9 +111,9 @@ export default async function AgendaPage() {
                       );
                     })}
                   </ul>
-                ) : (
+                ) : <p className="muted small">Cierre y aceptación: se valida en producción lo construido en las demos anteriores.</p>) : ms.length > 0 ? (
                   <p className="muted small">Cierre y aceptación: se valida en producción lo construido en las demos anteriores.</p>
-                )}
+                ) : null}
               </div>
             </li>
           );

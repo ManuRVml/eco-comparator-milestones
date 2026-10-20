@@ -39,8 +39,8 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
   const color = colorEstado(m.estadoFinal);
   const q = areaFoco ? `&area=${areaFoco}` : "";
   const capacidades = model.capacidadesPorMilestone.get(m.id) ?? [];
-  // El cliente ve primero las capacidades (sin HU/SP); el detalle técnico queda tras "Ver detalle completo".
-  const resumen = !session.canEdit && capacidades.length > 0 && sp.vista !== "detalle";
+  // La vista pública muestra capacidades sin datos del equipo; el detalle técnico requiere rol de edición.
+  const resumen = !session.canEdit;
   // Siguiente milestone de la misma línea por fechaObjetivo
   const nextMilestone = model.milestones
     .filter((mm) => mm.lineaId === m.lineaId && mm.fechaObjetivo && m.fechaObjetivo && mm.fechaObjetivo > m.fechaObjetivo)
@@ -64,7 +64,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
             </span>
             <span className="ms-id">{m.id}</span>
             <MilestoneStatus m={m} />
-            <span className="muted small">{m.override ? "Estado ajustado por el editor" : "Estado sugerido automáticamente"}</span>
+            <span className="muted small">{session.canEdit ? (m.override ? "Estado ajustado por el editor" : "Estado sugerido automáticamente") : (m.override ? "Estado revisado por el equipo BenchHub" : "Estado calculado según el plan")}</span>
           </div>
           <h2>{m.nombre}</h2>
           <span className={`chip tone-${m.cierreVerificado ? "green" : "slate"}`}>{m.cierreVerificado ? "Cumplido y confirmado" : "Cumplimiento pendiente"}</span>

@@ -48,7 +48,7 @@ export function MilestonePanel({ m, model, canEdit, isAdmin = false, areaId = nu
             <span className={`chip tone-${p.tono}`}>{p.texto}</span>
           </div>
           <h3 id={`panel-heading-${m.id}`}>{m.nombre}</h3>
-          {canEdit && <p className="muted small">{areaId ? "Trabajo del área hacia el milestone" : "Trabajo hacia el milestone"}: {fmtPct(porcentaje, 1)}. Cumplimiento: {m.cierreVerificado ? "confirmado" : "pendiente"}.</p>}
+          {canEdit ? <p className="muted small">{areaId ? "Trabajo del área hacia el milestone" : "Trabajo hacia el milestone"}: {fmtPct(porcentaje, 1)}. Cumplimiento: {m.cierreVerificado ? "confirmado" : "pendiente"}.</p> : <p className="muted small">Trabajo hacia el hito {fmtPct(porcentaje, 1)}</p>}
           <p className="ms-panel-meta">
             Deadline / Fin del Hito:{" "}
             <b>
