@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Card, Chip, Empty } from "@/components/ui";
 import type { CapacidadView, EstadoCapacidad } from "@/lib/model";
+import { Tooltip } from "@/components/tooltip";
 
 const MAX_TARJETAS = 8;
 const TONO_ESTADO: Record<EstadoCapacidad, string> = { pendiente: "slate", "en curso": "amber", entregada: "green" };
@@ -21,15 +22,13 @@ export function CapabilityCards({ capacidades, detalleHref, canEdit }: { capacid
                 <h4>{c.titulo}</h4>
                 <Chip tone={TONO_ESTADO[c.estado]}>{ETIQUETA_ESTADO[c.estado]}</Chip>
               </div>
-              <p className="capability-desc">{c.descripcion}</p>
+              {canEdit ? <p className="capability-desc">{c.descripcion}</p> : <Tooltip label={c.descripcion}><p className="capability-desc" tabIndex={0} aria-label={c.descripcion}>{c.descripcion}</p></Tooltip>}
               {canEdit && c.borrador && <Chip tone="amber" title="Solo visible para el equipo hasta que se confirme">borrador</Chip>}
             </li>
           ))}
         </ul>
       )}
-      <Link className="btn btn-sm" href={detalleHref}>
-        Ver detalle completo
-      </Link>
+      {canEdit && <Link className="btn btn-sm" href={detalleHref}>Ver detalle completo</Link>}
     </Card>
   );
 }

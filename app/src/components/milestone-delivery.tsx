@@ -4,10 +4,7 @@ import { tono } from "@/lib/format";
 import { contractPending, criterionAccepted } from "@/lib/milestone-contract/domain";
 import { fmtCorta } from "@/lib/dates";
 import { CompletionCheck } from "./completion-check";
-
-function ddmm(iso: string | null | undefined) {
-  return iso ? `${iso.slice(8, 10)}/${iso.slice(5, 7)}` : "—";
-}
+import { Tooltip } from "@/components/tooltip";
 
 function Necesidades({ m, model }: { m: MilestoneView; model: Model }) {
   const abiertas = (model.contratosMilestone?.[m.id]?.decisionesPendientes ?? []).filter((dec) => !dec.resuelta);
@@ -50,13 +47,13 @@ export function MilestoneValor({ m, model }: { m: MilestoneView; model: Model })
     <p className="delivery-result">{d?.outcome || m.valorCliente || m.nombre}</p>
     {capacidades.length > 0 && <ul className="acceptance-list">{capacidades.map((c) => <li key={c.id}><b>{c.titulo}</b> <span className={`chip tone-${c.estado === "entregada" ? "green" : c.estado === "en curso" ? "amber" : "slate"}`}>{ETIQUETA_CAPACIDAD[c.estado]}</span></li>)}</ul>}
     <h4>Estado</h4>
-    <p><span className={`chip tone-${tono(m.estadoFinal)}`}>{m.estadoFinal}</span> comprometido {ddmm(m.fechaObjetivo)} · previsto {ddmm(d?.fechaPrevision || m.fechaObjetivo)}</p>
+    <p><span className={`chip tone-${tono(m.estadoFinal)}`}>{m.estadoFinal}</span> comprometido {fmtCorta(m.fechaObjetivo)} · previsto {fmtCorta(d?.fechaPrevision || m.fechaObjetivo)}</p>
     <h4>Evidencia</h4>
     <p>{evidencia ? (/^https?:\/\//.test(evidencia) ? <a href={evidencia}>{evidencia}</a> : evidencia) : "Disponible al cierre"}</p>
     <Necesidades m={m} model={model} />
     <MilestoneRiesgos m={m} model={model} />
     <h4>Qué sigue</h4>
-    <p>{siguiente ? `${siguiente.id} · ${siguiente.nombre} · ${ddmm(siguiente.fechaObjetivo)}` : "Es el último hito de esta línea."}</p>
+    <p>{siguiente ? `${siguiente.id} · ${siguiente.nombre} · ${fmtCorta(siguiente.fechaObjetivo)}` : "Es el último hito de esta línea."}</p>
     {m.id !== "S0" && <Link href={`/milestones/${m.id}`} className="btn btn-sm">Ver detalles</Link>}
   </section>;
 }
@@ -64,28 +61,29 @@ export function MilestoneValor({ m, model }: { m: MilestoneView; model: Model })
 export function MilestoneDelivery({ m, model, canEdit }: { m: MilestoneView; model: Model; canEdit: boolean }) {
   const contract = model.contratosMilestone?.[m.id], d = contract?.definicion;
   const pending = contract ? contractPending(contract) : ["definición"];
+  const metricas = contract?.metricas.filter((v) => v.activa) ?? [];
   return <section className="milestone-delivery" data-testid={`delivery-${m.id}`} aria-label="Cumplimiento del milestone">
-    <div className="delivery-heading"><h3>{m.cierreVerificado ? "Milestone cumplido" : "Milestone pendiente"}</h3><CompletionCheck complete={!!m.cierreVerificado} label="Criterios aceptados y cumplimiento publicado" id={`delivery-${m.id}`} /><span className={`chip tone-${m.cierreVerificado ? "green" : "slate"}`}>{m.id}</span></div>
+    <div className="delivery-heading"><h3>{m.cierreVerificado ? "Milestone cumplido" : "Milestone pendiente"}</h3><CompletionCheck complete={!!m.cierreVerificado} label="Criterios aceptados y cumplimiento publicado" id={`delivery-${m.id}`} />{canEdit && <span className={`chip tone-${m.cierreVerificado ? "green" : "slate"}`}>{m.id}</span>}</div>
     <p className="delivery-result"><b>Resultado esperado:</b> {d?.outcome || m.valorCliente || m.nombre}</p>
-    <dl className="delivery-dates"><div><dt>Fecha comprometida</dt><dd>{fmtCorta(m.fechaObjetivo)}</dd></div><div><dt>Previsión actual</dt><dd>{fmtCorta(d?.fechaPrevision || m.fechaObjetivo)}</dd></div><div><dt>Aceptación publicada</dt><dd>{m.cierreVerificado ? fmtCorta(m.fechaCierre) : "Pendiente"}</dd></div></dl>
+    <dl className="delivery-dates"><div><dt>Fecha comprometida</dt><dd>{fmtCorta(m.fechaObjetivo)}</dd></div><div><dt>{canEdit ? "Previsión actual" : "Fecha estimada actual"}</dt><dd>{fmtCorta(d?.fechaPrevision || m.fechaObjetivo)}</dd></div><div><dt>Aceptación publicada</dt><dd>{m.cierreVerificado ? fmtCorta(m.fechaCierre) : "Pendiente"}</dd></div></dl>
     {d?.fechaPrevision && <p><b>Motivo de la previsión:</b> {d.motivoPrevision}</p>}
     {canEdit && pending.length > 0 && <p className="definition-pending" role="status">Definición de valor pendiente: {pending.length} campo(s) por completar. El cumplimiento no se certifica hasta completar la ficha y aceptar los criterios obligatorios.</p>}
     <Necesidades m={m} model={model} />
-    <h4>Métricas y metas acordadas</h4>
-    <ul className="acceptance-list">{contract?.metricas.filter(v=>v.activa).map(v=><li key={v.id}><b>{v.nombre}</b> · Meta: {v.tipo==="Cuantitativa"?`${v.comparador} ${v.objetivo??"Por definir"} ${v.unidad}`:v.objetivoCualitativo||"Por definir"}<p className="small">Método: {v.metodo||"Por definir"}{v.tolerancia!==null&&` · Tolerancia: ${v.tolerancia} ${v.unidad}`}{v.muestraMinima!==null&&` · Muestra mínima: ${v.muestraMinima}`}</p></li>)}</ul>
+    {metricas.length > 0 && <><h4>Métricas y metas acordadas</h4>
+    <ul className="acceptance-list">{metricas.map(v=><li key={v.id}><b>{v.nombre}</b> · Meta: {v.tipo==="Cuantitativa"?`${!canEdit && [">=", "Mayor o igual"].includes(v.comparador) ? "al menos" : v.comparador} ${v.objetivo??"Por definir"} ${v.unidad}`:v.objetivoCualitativo||"Por definir"}<p className="small">Método: {v.metodo||"Por definir"}{v.tolerancia!==null&&` · Tolerancia: ${v.tolerancia} ${v.unidad}`}{v.muestraMinima!==null&&` · Muestra mínima: ${v.muestraMinima}`}</p></li>)}</ul></>}
     {canEdit&&!contract?.metricas.some(v=>v.activa)&&<p className="muted small">Métricas por definir.</p>}
     <h4>Criterios de aceptación y evidencia</h4>
     <ol className="acceptance-list">
       {(contract?.criterios ?? []).map((c) => <li key={c.id} data-testid={`criterion-${c.id}`}>
-        <div className="delivery-heading"><b>{c.descripcion}</b><span className={`chip tone-${contract && criterionAccepted(c, contract, model.hoy) ? "green" : "slate"}`}>{contract && criterionAccepted(c, contract, model.hoy) ? "Aceptado" : "Pendiente"}</span><small>{c.obligatorio ? "Obligatorio" : "Complementario"}</small></div>
+        <div className="delivery-heading"><b>{c.descripcion}</b><span className={`chip tone-${contract && criterionAccepted(c, contract, model.hoy) ? "green" : "slate"}`}>{contract && criterionAccepted(c, contract, model.hoy) ? "Aceptado" : "Pendiente"}</span>{canEdit ? <small>{c.obligatorio ? "Obligatorio" : "Complementario"}</small> : <Tooltip label={c.obligatorio ? "Obligatorio: debe aceptarse para cumplir el hito" : "Complementario: suma valor, no bloquea el cumplimiento"}><small tabIndex={0} aria-label={c.obligatorio ? "Obligatorio: debe aceptarse para cumplir el hito" : "Complementario: suma valor, no bloquea el cumplimiento"}>{c.obligatorio ? "Obligatorio" : "Complementario"}</small></Tooltip>}</div>
         <p className="muted small">{c.evidenciaRequerida||canEdit?`Evidencia requerida: ${c.evidenciaRequerida||"Por definir"}`:"Evidencia: disponible al cierre"}</p>
-        {contract && criterionAccepted(c, contract, model.hoy) ? <p><b>Evidencia:</b> {c.evidencia} · <b>Aprobó:</b> {c.aprobador} · <b>Fecha:</b> {fmtCorta(c.fecha)}{c.resultadoMedido!==null&&` · Valor medido: ${c.resultadoMedido}`}{c.resultadoCualitativo&&` · Resultado: ${c.resultadoCualitativo}`}{c.muestraEvaluada!==null&&` · Muestra evaluada: ${c.muestraEvaluada}`}</p> : <p className="muted small">Sin aceptación vigente. {c.evidencia && "Hay una evidencia anterior pendiente de revisión."}</p>}
+        {contract && criterionAccepted(c, contract, model.hoy) ? <p><b>Evidencia:</b> {c.evidencia} · <b>Aprobó:</b> {c.aprobador} · <b>Fecha:</b> {fmtCorta(c.fecha)}{c.resultadoMedido!==null&&` · Valor medido: ${c.resultadoMedido}`}{c.resultadoCualitativo&&` · Resultado: ${c.resultadoCualitativo}`}{c.muestraEvaluada!==null&&` · Muestra evaluada: ${c.muestraEvaluada}`}</p> : <p className="muted small">{canEdit ? "Sin aceptación vigente." : "Aún no aceptado."} {c.evidencia && "Hay una evidencia anterior pendiente de revisión."}</p>}
       </li>)}
     </ol>
     {!contract?.criterios.length && <p>Por definir; el milestone no puede certificarse.</p>}
     <details className="delivery-context"><summary>Necesidad del usuario, resultado, responsables y alcance</summary>
       <dl className="definition-grid">
-        {[["Necesidad del usuario (JTBD)", d?.job], ["Resultado esperado", d?.outcome], ["Objetivo de negocio", d?.meta], ["Responsable", d?.responsable], ["Aprobador del negocio", d?.aprobador], ["Incluido en la entrega", d?.alcanceIncluido], ["Fuera de alcance", d?.fueraAlcance]].map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value || "Por definir"}</dd></div>)}
+        {[[canEdit ? "Necesidad del usuario (JTBD)" : "Necesidad del usuario", d?.job], ["Resultado esperado", d?.outcome], ["Objetivo de negocio", d?.meta], ["Responsable", d?.responsable], ["Aprobador del negocio", d?.aprobador], ["Incluido en la entrega", d?.alcanceIncluido], ["Fuera de alcance", d?.fueraAlcance]].map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value || "Por definir"}</dd></div>)}
         {canEdit && <div><dt>Alcance relacionado</dt><dd>{m.huIds.length} historias · {m.tareaIds.length} tareas · {m.epicas?.replaceAll(";", " · ") || "Épicas sin registrar"}</dd></div>}
       </dl>
     </details>

@@ -1,18 +1,18 @@
 "use client";
 
-import { cloneElement, useEffect, useId, useRef, useState, type ReactElement } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { placePopover } from "@/lib/popover-position";
 
 type Side = "top" | "bottom";
-type TriggerProps = { "aria-describedby"?: string };
-
 /** Reusable, viewport-clamped tooltip for a single interactive trigger. */
-export function Tooltip({ label, side = "bottom", children }: { label: string; side?: Side; children: ReactElement<TriggerProps> }) {
+export function Tooltip({ label, side = "bottom", children }: { label: string; side?: Side; children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const id = useId();
   const rootRef = useRef<HTMLSpanElement>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
+  const describedTriggerRef = useRef<HTMLElement | null>(null);
+  const originalDescribedByRef = useRef<string | null>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -36,13 +36,28 @@ export function Tooltip({ label, side = "bottom", children }: { label: string; s
     };
   }, [open, side]);
 
+  useEffect(() => {
+    const trigger = rootRef.current?.firstElementChild;
+    if (!(trigger instanceof HTMLElement)) return;
+    triggerRef.current = trigger;
+    if (open) {
+      describedTriggerRef.current = trigger;
+      originalDescribedByRef.current = trigger.getAttribute("aria-describedby");
+      const describedBy = [originalDescribedByRef.current, id].filter(Boolean).join(" ");
+      trigger.setAttribute("aria-describedby", describedBy);
+    }
+    return () => {
+      if (describedTriggerRef.current !== trigger) return;
+      if (originalDescribedByRef.current === null) trigger.removeAttribute("aria-describedby");
+      else trigger.setAttribute("aria-describedby", originalDescribedByRef.current);
+      describedTriggerRef.current = null;
+      originalDescribedByRef.current = null;
+    };
+  }, [open, id]);
+
   useEffect(() => () => {
     if (timerRef.current) clearTimeout(timerRef.current);
   }, []);
-
-  const original = children.props["aria-describedby"];
-  const describedBy = open ? [original, id].filter(Boolean).join(" ") : original;
-  const trigger = cloneElement(children, { "aria-describedby": describedBy });
 
   return (
     <>
@@ -77,7 +92,7 @@ export function Tooltip({ label, side = "bottom", children }: { label: string; s
           }
         }}
       >
-        {trigger}
+        {children}
       </span>
       {open && typeof document !== "undefined" && createPortal(
         <div ref={tooltipRef} id={id} className="ui-tooltip" role="tooltip">{label}</div>,

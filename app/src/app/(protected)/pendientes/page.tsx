@@ -77,7 +77,7 @@ export default async function PendientesPage() {
         </Card>
       )}
 
-      <Card kicker="EXTERNO" title="Pendientes de Equipo Ecopetrol" className="card-flush">
+      <Card kicker={session.canEdit ? "EXTERNO" : "LO QUE NECESITAMOS DE ECOPETROL"} title="Pendientes de Equipo Ecopetrol" className="card-flush">
         <PendientesTable items={externos} canEdit={session.canEdit} />
       </Card>
 
@@ -101,7 +101,7 @@ function PendientesTable({ items, canEdit }: { items: Awaited<ReturnType<typeof 
           <th>Tipo</th>
           <th>Responsable</th>
           <th>Fecha límite</th>
-          <th>Milestone</th>
+          <th>{canEdit ? "Milestone" : "Hito"}</th>
           <th>Estado</th>
           {canEdit && <th>Acción</th>}
         </tr>

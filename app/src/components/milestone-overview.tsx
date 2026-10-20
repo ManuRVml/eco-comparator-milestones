@@ -8,7 +8,7 @@ export function MilestoneOverview({ model, cliente = false }: { model: Model; cl
     const enRiesgo = model.milestones.filter((m) => ['En riesgo', 'Atrasado'].includes(m.estadoFinal ?? '')).length;
     const prox = model.milestones.find((m) => !m.cierreVerificado);
     return <section className="milestone-overview" data-testid="milestone-overview" aria-label="Resumen de milestones">
-      <p data-testid="hitos-resumen"><strong>{enFecha} de {model.milestones.length} hitos en fecha</strong>{enRiesgo > 0 && <> · {enRiesgo} en riesgo</>}{prox && <>. Próximo: {prox.nombre} el {fmtLarga(prox.fechaObjetivo ?? model.hoy)}</>}.</p>
+      <p data-testid="hitos-resumen"><strong>{enFecha} de {model.milestones.length} hitos en fecha</strong>{enRiesgo > 0 && <> · {enRiesgo} en riesgo o atrasados</>}{prox && <>. Próximo: {prox.nombre} el {fmtLarga(prox.fechaObjetivo ?? model.hoy)}</>}.</p>
     </section>;
   }
   const cumplidos = model.milestones.filter((m) => m.cierreVerificado).length;

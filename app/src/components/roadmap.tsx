@@ -9,6 +9,8 @@ import { SprintCheckpointRow } from "@/components/sprint-checkpoint-row";
 import { progresoLinea } from "@/lib/line-progress";
 import { milestoneCompletado } from "@/lib/completion";
 import { CompletionCheck } from "@/components/completion-check";
+import { Tooltip } from "@/components/tooltip";
+import { puedeMostrarObjetivoCiclo } from "@/lib/client-vocab";
 
 const MIN_GAP = 22; // % mínimo entre nodos de una misma fila
 
@@ -83,30 +85,41 @@ export function Roadmap({ model, areaId, inicial, canEdit, isAdmin = false }: { 
             {model.festivos
               .filter((f) => f.fecha >= INICIO && f.fecha <= FIN)
               .map((f) => (
-                <span key={f.fecha} className="rm-fest-tag" style={{ left: `${x(f.fecha)}%` }} title={`Festivo · ${f.festividad}`}>
-                  F
-                </span>
+                <Tooltip key={f.fecha} label={`Festivo: ${f.festividad} (día no laborable)`}>
+                  <span className="rm-fest-tag" style={{ left: `${x(f.fecha)}%` }} aria-label={`Festivo: ${f.festividad} (día no laborable)`} tabIndex={0}>F</span>
+                </Tooltip>
               ))}
             {jueves.map((j) => (
-              <span key={j} className={`rm-thu ${demos.has(j) ? "is-demo" : ""}`} style={{ left: `${x(j)}%` }} title={`Weekly jue ${fmtCorta(j)}${demos.has(j) ? " · demo" : ""}`}>
-                {Number(j.slice(8))}
-              </span>
+              <Tooltip key={j} label={`${demos.has(j) ? "Demostración y fecha de entrega" : "Reunión semanal de seguimiento"} · ${fmtDiaSemana(j)} ${fmtCorta(j)}`}>
+                <span className={`rm-thu ${demos.has(j) ? "is-demo" : ""}`} style={{ left: `${x(j)}%` }} aria-label={`${demos.has(j) ? "Demostración y fecha de entrega" : "Reunión semanal de seguimiento"} · ${fmtDiaSemana(j)} ${fmtCorta(j)}`}>
+                  {Number(j.slice(8))}
+                </span>
+              </Tooltip>
             ))}
           </div>
         </div>
         <div className="rm-row rm-sprints">
-          <div className="rm-corner">Sprint</div>
+          <div className="rm-corner">{canEdit ? "Sprint" : "Ciclos de trabajo"}</div>
           <div className="rm-axis">
-            {model.sprints.map((sp) => (
-              <span
-                key={sp.id}
-                className="rm-sprint"
-                style={{ left: `${xStart(sp.fechaInicio)}%`, width: `${xStart(addDays(sp.fechaFin, 1)) - xStart(sp.fechaInicio)}%` }}
-                title={`${sp.id}: ${fmtCorta(sp.fechaInicio)} – ${fmtCorta(sp.fechaFin)}${sp.objetivo ? ` · ${sp.objetivo}` : ""}`}
-              >
-                S{sp.numero}
-              </span>
-            ))}
+            {model.sprints.map((sp) => {
+              const numero = sp.id.match(/\d+/)?.[0] ?? String(sp.numero);
+              const objetivo = sp.objetivo && (canEdit || puedeMostrarObjetivoCiclo(sp.objetivo)) ? sp.objetivo : "";
+              const label = sp.numero === 0
+                ? (canEdit ? "S0: Inicio del proyecto: ambientes y accesos listos antes del primer ciclo" : "Inicio del proyecto: ambientes y accesos listos antes del primer ciclo")
+                : `Ciclo de trabajo ${numero} (dos semanas): ${fmtCorta(sp.fechaInicio)} – ${fmtCorta(sp.fechaFin)}${objetivo ? ` · ${objetivo}` : ""}`;
+              return (
+                <Tooltip key={sp.id} label={label}>
+                  <span
+                    className="rm-sprint"
+                    style={{ left: `${xStart(sp.fechaInicio)}%`, width: `${xStart(addDays(sp.fechaFin, 1)) - xStart(sp.fechaInicio)}%` }}
+                    aria-label={label}
+                    tabIndex={0}
+                  >
+                    {sp.numero === 0 ? (canEdit ? "S0" : "Inicio") : (canEdit ? `S${sp.numero}` : `Ciclo ${numero}`)}
+                  </span>
+                </Tooltip>
+              );
+            })}
           </div>
         </div>
 
@@ -125,7 +138,7 @@ export function Roadmap({ model, areaId, inicial, canEdit, isAdmin = false }: { 
             {model.festivos
               .filter((f) => f.fecha >= INICIO && f.fecha <= FIN)
               .map((f) => (
-                <span key={f.fecha} className="rm-festivo" style={{ left: `${xStart(f.fecha)}%`, width: `${100 / SPAN}%` }} title={`Festivo · ${fmtDiaSemana(f.fecha)} ${fmtCorta(f.fecha)} · ${f.festividad}`}>
+                <span key={f.fecha} className="rm-festivo" aria-hidden="true" style={{ left: `${xStart(f.fecha)}%`, width: `${100 / SPAN}%` }}>
                 </span>
               ))}
             {hoyVisible && (
@@ -144,17 +157,21 @@ export function Roadmap({ model, areaId, inicial, canEdit, isAdmin = false }: { 
             return (
               <div className="rm-row rm-lane" key={l.id} style={{ "--filas": filas, "--linea": colorLinea(l.id), "--linea-text": textoLinea(l.id) } as CSSProperties}>
                 <div className="rm-lane-label">
-                  <span className="rm-lane-id">{l.id}</span>
+                  <Tooltip label={`Línea de valor ${l.id.replace(/^L/, "")}: ${l.nombre}`}>
+                    <span className="rm-lane-id" aria-label={`Línea de valor ${l.id.replace(/^L/, "")}: ${l.nombre}`} tabIndex={0}>{l.id}</span>
+                  </Tooltip>
                   <strong>{l.nombre}</strong>
                   <span className="rm-lane-meta">
-                    {ms.length} hitos ·{" "}
-                    {proximo ? (
-                      <>
-                        próximo: {proximo.id} el {fmtCorta(proximo.fechaObjetivo)} · <span className={`chip tone-${tono(proximo.estadoFinal)}`}>{proximo.estadoFinal.toLowerCase()}</span>
-                      </>
-                    ) : (
-                      "todos cumplidos"
-                    )}
+                    {canEdit ? <>
+                      {ms.length} hitos ·{" "}
+                      {proximo ? (
+                        <>
+                          próximo: {proximo.id} el {fmtCorta(proximo.fechaObjetivo)} · <span className={`chip tone-${tono(proximo.estadoFinal)}`}>{proximo.estadoFinal.toLowerCase()}</span>
+                        </>
+                      ) : "todos cumplidos"}
+                    </> : <>
+                      {ms.length} hitos · {proximo ? <>Próximo: {proximo.id}, {fmtCorta(proximo.fechaObjetivo)} · Estado: {proximo.estadoFinal}</> : "Todos cumplidos"}
+                    </>}
                     {canEdit && ` · avance ${fmtPct(progreso.pctReal)} vs ${fmtPct(progreso.pctPlan)} previsto · ponderado por días de sus tareas`}
                   </span>
                 </div>
@@ -187,7 +204,7 @@ export function Roadmap({ model, areaId, inicial, canEdit, isAdmin = false }: { 
                           <CompletionCheck complete={cierreVerificado} label={`${n.m.id}: entrega completa verificada`} id={n.m.id} />
                         </span>
                         <span className="rm-label">
-                          <span className="rm-kind">Milestone de entrega</span>
+                          <span className="rm-kind">{canEdit ? "Milestone de entrega" : "Hito de entrega"}</span>
                           <span className="rm-date">
                             {fmtDiaSemana(n.m.fechaObjetivo ?? INICIO)} {fmtCorta(n.m.fechaObjetivo)}
                           </span>
@@ -197,7 +214,7 @@ export function Roadmap({ model, areaId, inicial, canEdit, isAdmin = false }: { 
                             {n.sinTareas ? `Sin tareas de ${areaNombre}` : areaId ? `${areaNombre} · ${fmtPct(area?.pctReal ?? 0)}${canEdit ? ` vs ${fmtPct(area?.pctPlan ?? 0)} previsto` : ""}` : canEdit ? `Trabajo ${fmtPct(n.m.trabajo.pctReal)} vs ${fmtPct(n.m.trabajo.pctPlan)} previsto` : null}
                           </span>
                           {areaId && <span className="rm-comparison">Total milestone {fmtPct(n.m.pctPonderado)} · aporte del área {aporteArea.toFixed(1).replace(".", ",")} pts</span>}
-                          <span className="rm-comparison">{n.m.cierreVerificado ? "Milestone cumplido" : "Milestone pendiente"}</span>
+                          <span className="rm-comparison">{canEdit ? (n.m.cierreVerificado ? "Milestone cumplido" : "Milestone pendiente") : (cierreVerificado ? "Hito cumplido" : "Hito pendiente")}</span>
                         </span>
                       </RoadmapNode>
                     );
