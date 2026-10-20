@@ -4,23 +4,7 @@ import { useEffect, useId, useRef, useState, type MouseEvent as ReactMouseEvent,
 import { createPortal } from "react-dom";
 import { StatusBadge } from "@/components/ui";
 import type { CausaRiesgo, EstadoMilestone } from "@/lib/model";
-
-const MARGIN = 8;
-
-function placePopover(button: HTMLElement, panel: HTMLElement) {
-  const rect = button.getBoundingClientRect();
-  const width = Math.min(320, window.innerWidth - MARGIN * 2);
-  panel.style.width = `${width}px`;
-  let left = rect.left;
-  if (left + width > window.innerWidth - MARGIN) left = window.innerWidth - width - MARGIN;
-  if (left < MARGIN) left = MARGIN;
-  const height = panel.offsetHeight;
-  let top = rect.bottom + 6;
-  if (top + height > window.innerHeight - MARGIN && rect.top - height - 6 >= MARGIN) top = rect.top - height - 6;
-  panel.style.left = `${left}px`;
-  panel.style.top = `${Math.max(MARGIN, top)}px`;
-  panel.classList.add("is-placed");
-}
+import { placePopover } from "@/lib/popover-position";
 
 function CauseGroup({ titulo, causas }: { titulo: string; causas: CausaRiesgo[] }) {
   if (causas.length === 0) return null;

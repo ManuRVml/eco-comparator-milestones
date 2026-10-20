@@ -2,6 +2,7 @@
 
 import { createPortal } from "react-dom";
 import { createContext, type CSSProperties, type ReactNode, useCallback, useContext, useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { Tooltip } from "@/components/tooltip";
 
 interface PanelCtx {
   sel: string | null;
@@ -105,21 +106,22 @@ export function RoadmapNode({ id, href, className, style, title, children }: { i
   const { sel, toggle } = usePanel();
   const activo = sel === id;
   return (
-    <a
-      href={href}
-      className={`${className} ${activo ? "is-selected" : ""}`}
-      style={style}
-      title={title}
-      aria-expanded={activo}
-      data-testid={`node-${id}`}
-      onClick={(e) => {
-        if (e.metaKey || e.ctrlKey || e.shiftKey) return;
-        e.preventDefault();
-        toggle(id, e.currentTarget);
-      }}
-    >
-      {children}
-    </a>
+    <Tooltip label={title}>
+      <a
+        href={href}
+        className={`${className} ${activo ? "is-selected" : ""}`}
+        style={style}
+        aria-expanded={activo}
+        data-testid={`node-${id}`}
+        onClick={(e) => {
+          if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+          e.preventDefault();
+          toggle(id, e.currentTarget);
+        }}
+      >
+        {children}
+      </a>
+    </Tooltip>
   );
 }
 
@@ -168,10 +170,12 @@ export function LaneSlot({ lineaId, panels }: { lineaId: string; panels: Record<
 export function PanelClose() {
   const { close } = usePanel();
   return (
-    <button type="button" className="panel-x" onClick={close} aria-label="Cerrar panel (Esc)" title="Cerrar (Esc)">
-      <svg viewBox="0 0 20 20" aria-hidden="true">
-        <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-      </svg>
-    </button>
+    <Tooltip label="Cerrar panel (Esc)">
+      <button type="button" className="panel-x" onClick={close} aria-label="Cerrar panel (Esc)">
+        <svg viewBox="0 0 20 20" aria-hidden="true">
+          <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        </svg>
+      </button>
+    </Tooltip>
   );
 }

@@ -42,7 +42,7 @@ export function SprintCheckpointRow({ model, areaId, canEdit, position }: { mode
         {(() => {
           const left = position(inicio.sprint.fechaFin), color = colorEstado(inicio.estado);
           return (
-            <RoadmapNode id="S0" href="/lineas?m=S0" className={`rm-node ${left < 7 ? "is-left" : ""}`} style={{ left: `${left}%`, "--fila": 0, "--c": color } as CSSProperties} title={`${m.nombre} (clic para ver qué obtienes)`}>
+            <RoadmapNode id="S0" href="/lineas?m=S0" className={`rm-node ${left < 7 ? "is-left" : ""}`} style={{ left: `${left}%`, "--fila": 0, "--c": color } as CSSProperties} title={`${m.nombre} (clic para ver qué obtienes)${inicio.completo ? " · Cierre verificado" : ""}`}>
               <span className="rm-dot rm-milestone-dot">
                 <span style={{ display: "block", width: 20, height: 20, borderRadius: "50%", background: color }} />
                 <CompletionCheck complete={inicio.completo} label="Ambientes y arquitectura base desplegados" id="S0" />
@@ -76,7 +76,7 @@ export function SprintCheckpointRow({ model, areaId, canEdit, position }: { mode
           const left = position(c.sprint.fechaFin), color = colorEstado(c.estado);
           const align = left > 93 ? "is-right" : left < 7 ? "is-left" : "";
           return (
-            <RoadmapNode key={c.id} id={c.id} href={`/lineas?${areaId ? `area=${areaId}&` : ""}m=${c.id}`} className={`rm-node ${align} ${c.tareas.length ? "" : "is-muted"}`} style={{ left: `${left}%`, "--fila": index % 2, "--c": color } as CSSProperties} title={`Sprint ${c.sprint.numero} · Revisión del avance hacia milestones (clic para ver tareas)`}>
+            <RoadmapNode key={c.id} id={c.id} href={`/lineas?${areaId ? `area=${areaId}&` : ""}m=${c.id}`} className={`rm-node ${align} ${c.tareas.length ? "" : "is-muted"}`} style={{ left: `${left}%`, "--fila": index % 2, "--c": color } as CSSProperties} title={`Sprint ${c.sprint.numero} · Revisión del avance hacia milestones (clic para ver tareas)${c.completo ? " · Cierre verificado" : ""}`}>
               <span className="rm-dot"><Ring value={c.total.pctReal} plan={c.completo ? undefined : c.total.pctPlan} size={44} stroke={5} color={color} track="var(--color-border-default)"><span className="rm-dot-inner">{c.id}</span></Ring><CompletionCheck complete={c.completo} label={`Sprint ${c.sprint.numero}: cierre completo verificado`} id={c.id} /></span>
               <span className="rm-label">
                 <span className="rm-kind">{c.sprint.numero === 0 ? "Punto de partida" : "Milestone del sprint"}</span>
