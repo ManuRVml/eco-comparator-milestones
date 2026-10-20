@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { BarChartIcon, BookIcon, GaugeIcon, InfoIcon } from "./icons";
+import { Tooltip } from "./tooltip";
 
 const ICONS = { info: InfoIcon, book: BookIcon, gauge: GaugeIcon, chart: BarChartIcon } as const;
 
@@ -42,18 +43,18 @@ export function InfoToolbar({ items, label }: { items: InfoToolbarItem[]; label:
           const on = open === it.id;
           const panelId = `${uid}-${it.id}`;
           return (
-            <button
-              key={it.id}
-              type="button"
-              className={`info-toolbar-btn ${on ? "is-active" : ""}`}
-              aria-label={it.label}
-              title={it.label}
-              aria-expanded={on}
-              aria-controls={on ? panelId : undefined}
-              onClick={() => setOpen(on ? null : it.id)}
-            >
-              <Icon size={20} />
-            </button>
+            <Tooltip key={it.id} label={it.label}>
+              <button
+                type="button"
+                className={`info-toolbar-btn ${on ? "is-active" : ""}`}
+                aria-label={it.label}
+                aria-expanded={on}
+                aria-controls={on ? panelId : undefined}
+                onClick={() => setOpen(on ? null : it.id)}
+              >
+                <Icon size={20} />
+              </button>
+            </Tooltip>
           );
         })}
       </div>
