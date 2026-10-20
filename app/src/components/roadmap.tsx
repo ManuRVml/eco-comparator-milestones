@@ -103,7 +103,7 @@ export function Roadmap({ model, areaId, inicial, canEdit, isAdmin = false }: { 
             {model.sprints.map((sp) => {
               const numero = sp.id.match(/\d+/)?.[0] ?? String(sp.numero);
               const label = sp.numero === 0
-                ? "S0: Inicio del proyecto: ambientes y accesos listos antes del primer ciclo"
+                ? (canEdit ? "S0: Inicio del proyecto: ambientes y accesos listos antes del primer ciclo" : "Inicio del proyecto: ambientes y accesos listos antes del primer ciclo")
                 : `Ciclo de trabajo ${numero} (dos semanas): ${fmtCorta(sp.fechaInicio)} – ${fmtCorta(sp.fechaFin)}${sp.objetivo ? ` · ${sp.objetivo}` : ""}`;
               return (
                 <Tooltip key={sp.id} label={label}>
