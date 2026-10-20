@@ -376,7 +376,7 @@
 .tab { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 9px; color: var(--color-text-secondary); font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap; transition: all 150ms ease; }
 .tab span { padding: 1px 7px; border-radius: 999px; background: color-mix(in srgb, var(--color-text-heading) 6%, transparent); font-size: 11px; }
 .tab.is-on { color: var(--color-brand-primary-dark); background: var(--color-surface-card); box-shadow: 0 2px 8px color-mix(in srgb, var(--color-text-heading) 10%, transparent); }
-.tab:hover { background: var(--color-brand-primary-faint); }
+.tab:not(.is-on):hover { background: var(--color-brand-primary-faint); }
 .tab:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 2px; }
 .branches { display: flex; flex-direction: column; gap: 12px; }
 .branch { overflow: hidden; border: 1px solid var(--color-border-default); border-radius: 14px; background: var(--color-surface-card); box-shadow: var(--shadow-card); }

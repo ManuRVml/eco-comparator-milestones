@@ -21,6 +21,11 @@ export function textoExternoNoApto(titulo: string, detalle: string | null, respo
   return rechazoTextoExterno("externo", titulo, detalle, responsable) != null;
 }
 
+/** Whether an objective is safe to show in the read-only cycle tooltip. */
+export function puedeMostrarObjetivoCiclo(objetivo: string): boolean {
+  return !textoExternoNoApto("", objetivo);
+}
+
 export function filtrarVisibles<T extends { lado: string; titulo: string; detalle: string | null; responsable?: string | null }>(
   rows: readonly T[],
   canEdit: boolean,

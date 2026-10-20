@@ -10,6 +10,7 @@ import { progresoLinea } from "@/lib/line-progress";
 import { milestoneCompletado } from "@/lib/completion";
 import { CompletionCheck } from "@/components/completion-check";
 import { Tooltip } from "@/components/tooltip";
+import { puedeMostrarObjetivoCiclo } from "@/lib/client-vocab";
 
 const MIN_GAP = 22; // % mínimo entre nodos de una misma fila
 
@@ -102,9 +103,10 @@ export function Roadmap({ model, areaId, inicial, canEdit, isAdmin = false }: { 
           <div className="rm-axis">
             {model.sprints.map((sp) => {
               const numero = sp.id.match(/\d+/)?.[0] ?? String(sp.numero);
+              const objetivo = sp.objetivo && (canEdit || puedeMostrarObjetivoCiclo(sp.objetivo)) ? sp.objetivo : "";
               const label = sp.numero === 0
                 ? (canEdit ? "S0: Inicio del proyecto: ambientes y accesos listos antes del primer ciclo" : "Inicio del proyecto: ambientes y accesos listos antes del primer ciclo")
-                : `Ciclo de trabajo ${numero} (dos semanas): ${fmtCorta(sp.fechaInicio)} – ${fmtCorta(sp.fechaFin)}${sp.objetivo ? ` · ${sp.objetivo}` : ""}`;
+                : `Ciclo de trabajo ${numero} (dos semanas): ${fmtCorta(sp.fechaInicio)} – ${fmtCorta(sp.fechaFin)}${objetivo ? ` · ${objetivo}` : ""}`;
               return (
                 <Tooltip key={sp.id} label={label}>
                   <span

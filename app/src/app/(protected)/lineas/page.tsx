@@ -29,7 +29,7 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
 
   const inicioRoadmap = model.sprints.map((x) => x.fechaInicio).sort()[0];
   const finRoadmap = model.sprints.map((x) => x.fechaFin).sort().at(-1);
-  const kicker = inicioRoadmap && finRoadmap ? `PLAN ${fmtCorta(inicioRoadmap).toUpperCase()} – ${fmtCorta(finRoadmap).toUpperCase()} ${finRoadmap.slice(0, 4)}` : "PLAN";
+  const kicker = inicioRoadmap && finRoadmap ? `${session.canEdit ? "ROADMAP" : "PLAN"} ${fmtCorta(inicioRoadmap).toUpperCase()} – ${fmtCorta(finRoadmap).toUpperCase()} ${finRoadmap.slice(0, 4)}` : session.canEdit ? "ROADMAP" : "PLAN";
   // Previsión real registrada en la ficha del milestone; sin ella no se muestra la columna al cliente.
   const prevision = (id: string) => model.contratosMilestone?.[id]?.definicion?.fechaPrevision || null;
   const hayPrevision = model.milestones.some((m) => prevision(m.id));
