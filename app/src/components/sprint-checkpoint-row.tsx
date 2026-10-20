@@ -2,7 +2,7 @@ import type { CSSProperties } from "react";
 import type { Model } from "@/lib/model";
 import { sprintCheckpoint } from "@/lib/sprint-checkpoint";
 import { fmtCorta, fmtDiaSemana } from "@/lib/dates";
-import { colorEstado, fmtPct, tono } from "@/lib/format";
+import { colorEstado, fmtPct } from "@/lib/format";
 import { Ring } from "@/components/ui";
 import { LaneSlot, RoadmapNode } from "@/components/milestone-panel/panel-client";
 import { SprintCheckpointPanel } from "@/components/sprint-checkpoint-panel";
@@ -33,7 +33,7 @@ export function SprintCheckpointRow({ model, areaId, canEdit, position }: { mode
   const nota = m && inicio && (
     <div className="rm-row rm-lane" style={{ "--filas": 1, "--linea": "var(--color-brand-primary)" } as CSSProperties}>
       <div className="rm-lane-label">
-        <span className="rm-lane-id">S0</span>
+        <span className="rm-lane-id">Inicio</span>
         <strong>Inicio del proyecto</strong>
         <span className="rm-lane-meta">ambientes y arquitectura base</span>
       </div>
