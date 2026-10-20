@@ -165,6 +165,8 @@ export function Roadmap({ model, areaId, inicial, canEdit, isAdmin = false }: { 
                     const align = n.x > 93 ? "is-right" : n.x < 7 ? "is-left" : "";
                     const area = areaId ? n.m.areas.find((a) => a.areaId === areaId) : null;
                     const aporteArea = area && n.m.trabajo.dias ? (area.diasHechos / n.m.trabajo.dias) * 100 : 0;
+                    const cierreVerificado = n.m.cierreVerificado ?? milestoneCompletado(n.m, model);
+                    const tooltipTitle = `${n.m.id} · ${n.m.nombre} (clic para ver criterio y aceptación) · Deadline / Fin del Hito: ${fmtCorta(n.m.fechaObjetivo)}${cierreVerificado ? " · Cierre verificado" : ""}`;
                     return (
                       <RoadmapNode
                         key={n.m.id}
@@ -172,7 +174,7 @@ export function Roadmap({ model, areaId, inicial, canEdit, isAdmin = false }: { 
                         href={`/lineas?${areaId ? `area=${areaId}&` : ""}m=${n.m.id}`}
                         className={`rm-node ${align} ${n.sinTareas ? "is-muted" : ""}`}
                         style={{ left: `${n.x}%`, "--fila": n.fila, "--c": color, "--p": `${n.pct}%` } as CSSProperties}
-                        title={`${n.m.id} · ${n.m.nombre} (clic para ver criterio y aceptación)`}
+                        title={tooltipTitle}
                       >
                         <span className="rm-dot rm-milestone-dot">
                           {canEdit ? (
@@ -182,11 +184,11 @@ export function Roadmap({ model, areaId, inicial, canEdit, isAdmin = false }: { 
                           ) : (
                             <span style={{ display: "block", width: 20, height: 20, borderRadius: "50%", background: color }} />
                           )}
-                          <CompletionCheck complete={n.m.cierreVerificado ?? milestoneCompletado(n.m, model)} label={`${n.m.id}: entrega completa verificada`} id={n.m.id} />
+                          <CompletionCheck complete={cierreVerificado} label={`${n.m.id}: entrega completa verificada`} id={n.m.id} />
                         </span>
                         <span className="rm-label">
                           <span className="rm-kind">Milestone de entrega</span>
-                          <span className="rm-date" title="Deadline / Fin del Hito">
+                          <span className="rm-date">
                             {fmtDiaSemana(n.m.fechaObjetivo ?? INICIO)} {fmtCorta(n.m.fechaObjetivo)}
                           </span>
                           <span className="rm-name">{n.m.nombre}</span>

@@ -2,7 +2,7 @@
 
 import { cloneElement, useEffect, useId, useRef, useState, type ReactElement } from "react";
 import { createPortal } from "react-dom";
-import { placePopover } from "@/components/milestone-status";
+import { placePopover } from "@/lib/popover-position";
 
 type Side = "top" | "bottom";
 type TriggerProps = { "aria-describedby"?: string };
