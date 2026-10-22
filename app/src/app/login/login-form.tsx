@@ -94,7 +94,7 @@ export function LoginForm() {
             aria-invalid={Boolean(state.error)}
             aria-describedby={state.error ? "pin-error" : "pin-help"}
             placeholder="••••"
-            className="w-full rounded-nav border border-dark-input-border bg-dark-input-bg py-12 pl-14 pr-12 text-14 text-text-on-dark-heading outline-none placeholder:text-text-on-dark-caption focus:border-border-focus"
+            className="w-full rounded-nav border border-dark-input-border bg-dark-input-bg py-12 pl-14 pr-48 text-14 text-text-on-dark-heading outline-none placeholder:text-text-on-dark-caption focus:border-border-focus"
           />
           <button
             type="button"
