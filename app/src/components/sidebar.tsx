@@ -92,7 +92,7 @@ export function Sidebar({ canEdit, isAdmin }: { canEdit: boolean; isAdmin: boole
             const Icon = it.icon;
             return (
               <li key={it.href}>
-                <Link href={it.href} className={`app-nav-row ${active ? "is-active" : ""}`} aria-current={active ? "page" : undefined} title={collapsed ? (isAdmin && it.href === "/editor" ? "Administración" : it.label) : undefined}>
+                <Link href={it.href} data-testid={`sidebar-link-${it.href.replace(/^\//, "") || "resumen"}`} className={`app-nav-row ${active ? "is-active" : ""}`} aria-current={active ? "page" : undefined} title={collapsed ? (isAdmin && it.href === "/editor" ? "Administración" : it.label) : undefined}>
                   <Icon size={20} />
                   <span className="app-nav-label">{isAdmin && it.href === "/editor" ? "Administración" : it.label}</span>
                 </Link>

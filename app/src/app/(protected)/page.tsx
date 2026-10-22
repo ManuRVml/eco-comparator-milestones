@@ -121,61 +121,8 @@ export default async function DashboardPage() {
       <DeliveryNote equipo />
 
       {session.canEdit && (
-      <section className="kpi-grid" aria-label="Indicadores clave">
-        <article className="kpi">
-          <span className="kpi-label">Historias de usuario</span>
-          <div className="kpi-value">
-            {k.huTotal}
-            <small>HU</small>
-          </div>
-          <div className="stack-bar" aria-hidden="true">
-            {HU_ORDEN.filter((e) => k.huPorEstado[e]).map((e) => (
-              <span key={e} style={{ flex: k.huPorEstado[e], background: TONE_COLOR[tono(e)] }} title={`${e}: ${k.huPorEstado[e]}`} />
-            ))}
-          </div>
-          <ul className="kpi-legend">
-            {HU_ORDEN.slice(0, 4).map((e) => (
-              <li key={e}>
-                <i style={{ background: TONE_COLOR[tono(e)] }} />
-                {e} <b>{k.huPorEstado[e] ?? 0}</b>
-              </li>
-            ))}
-          </ul>
-          {k.huR2 > 0 && (
-            <p className="kpi-note" data-testid="kpi-r2">
-              Fuera del MVP (R2): {k.huR2} HU · {k.spR2} SP
-            </p>
-          )}
-        </article>
-
-        <article className="kpi">
-          <span className="kpi-label">Story points</span>
-          <div className="kpi-value">
-            {k.spTotal}
-            <small>SP</small>
-          </div>
-          <div className="stack-bar" aria-hidden="true">
-            {k.spCompletos > 0 && <span style={{ flex: k.spCompletos, background: TONE_COLOR.green }} />}
-            {k.spEnCurso > 0 && <span style={{ flex: k.spEnCurso, background: TONE_COLOR.cyan }} />}
-            {spNoIniciado > 0 && <span style={{ flex: spNoIniciado, background: TONE_COLOR.slate }} />}
-          </div>
-          <ul className="kpi-legend">
-            <li>
-              <i style={{ background: TONE_COLOR.green }} />
-              {model.config.progreso_incluye_lista_demo === "1" ? "Aceptados o en demo" : "Aceptados"} <b>{k.spCompletos}</b>
-            </li>
-            <li>
-              <i style={{ background: TONE_COLOR.cyan }} />
-              En construcción <b>{k.spEnCurso}</b>
-            </li>
-            <li>
-              <i style={{ background: TONE_COLOR.slate }} />
-              Sin iniciar <b>{spNoIniciado}</b>
-            </li>
-          </ul>
-          {k.spR2 > 0 && <p className="kpi-note">Alcance MVP; sin los {k.spR2} SP de R2</p>}
-        </article>
-
+      <>
+      <section className="kpi-grid" data-testid="overview-kpis" aria-label="Indicadores clave" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
         <article className="kpi kpi-countdown">
           <span className="kpi-label">Próximo weekly</span>
           <div className="kpi-value">
@@ -223,6 +170,65 @@ export default async function DashboardPage() {
           </ul>
         </article>
       </section>
+      <details className="timeline-kpis" data-testid="overview-detail">
+        <summary>Detalle</summary>
+        <section className="kpi-grid" aria-label="Historias de usuario y story points" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", padding: "0 12px 12px" }}>
+          <article className="kpi">
+            <span className="kpi-label">Historias de usuario</span>
+            <div className="kpi-value">
+              {k.huTotal}
+              <small>HU</small>
+            </div>
+            <div className="stack-bar" aria-hidden="true">
+              {HU_ORDEN.filter((e) => k.huPorEstado[e]).map((e) => (
+                <span key={e} style={{ flex: k.huPorEstado[e], background: TONE_COLOR[tono(e)] }} title={`${e}: ${k.huPorEstado[e]}`} />
+              ))}
+            </div>
+            <ul className="kpi-legend">
+              {HU_ORDEN.slice(0, 4).map((e) => (
+                <li key={e}>
+                  <i style={{ background: TONE_COLOR[tono(e)] }} />
+                  {e} <b>{k.huPorEstado[e] ?? 0}</b>
+                </li>
+              ))}
+            </ul>
+            {k.huR2 > 0 && (
+              <p className="kpi-note" data-testid="kpi-r2">
+                Fuera del MVP (R2): {k.huR2} HU · {k.spR2} SP
+              </p>
+            )}
+          </article>
+
+          <article className="kpi">
+            <span className="kpi-label">Story points</span>
+            <div className="kpi-value">
+              {k.spTotal}
+              <small>SP</small>
+            </div>
+            <div className="stack-bar" aria-hidden="true">
+              {k.spCompletos > 0 && <span style={{ flex: k.spCompletos, background: TONE_COLOR.green }} />}
+              {k.spEnCurso > 0 && <span style={{ flex: k.spEnCurso, background: TONE_COLOR.cyan }} />}
+              {spNoIniciado > 0 && <span style={{ flex: spNoIniciado, background: TONE_COLOR.slate }} />}
+            </div>
+            <ul className="kpi-legend">
+              <li>
+                <i style={{ background: TONE_COLOR.green }} />
+                {model.config.progreso_incluye_lista_demo === "1" ? "Aceptados o en demo" : "Aceptados"} <b>{k.spCompletos}</b>
+              </li>
+              <li>
+                <i style={{ background: TONE_COLOR.cyan }} />
+                En construcción <b>{k.spEnCurso}</b>
+              </li>
+              <li>
+                <i style={{ background: TONE_COLOR.slate }} />
+                Sin iniciar <b>{spNoIniciado}</b>
+              </li>
+            </ul>
+            {k.spR2 > 0 && <p className="kpi-note">Alcance MVP; sin los {k.spR2} SP de R2</p>}
+          </article>
+        </section>
+      </details>
+      </>
       )}
 
       <SprintReviews model={model} />
@@ -263,7 +269,7 @@ export default async function DashboardPage() {
         </Card>
       </div>
 
-      <section className="lines-grid" aria-label="Milestones por línea">
+      <section className="lines-grid" data-testid="overview-risks" aria-label="Milestones por línea">
         {model.lineas.map((l) => {
           const ms = model.milestones.filter((m) => m.lineaId === l.id);
           return (
