@@ -234,6 +234,10 @@ small { font-size: max(var(--text-label), .83em); }
 .ms-table th span[tabindex] { cursor: help; text-decoration: underline dotted var(--color-brand-primary-border); text-underline-offset: 3px; transition: color 120ms ease; }
 .ms-table th span[tabindex]:hover, .ms-table th span[tabindex]:focus-visible { color: var(--color-brand-primary-dark); }
 .ms-table th span[tabindex]:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 2px; }
+/* Fila elegida desde un nodo del timeline (replaceState no activa :target); el :target viejo cede ante ella. */
+tr.is-target td { background: var(--color-brand-primary-faint); }
+tr.is-target td:first-child { box-shadow: inset 3px 0 0 var(--color-brand-primary); }
+table[data-hl] tr:target:not(.is-target) td { background: none; box-shadow: none; }
 
 /* ---------- roadmap ---------- */
 .roadmap-scroll { overflow-x: auto; }
@@ -601,6 +605,7 @@ small { font-size: max(var(--text-label), .83em); }
 }
 @media (max-width: 980px) {
   .ms-table-wrap, .card-flush { max-width: 100%; min-width: 0; overflow-x: auto; overscroll-behavior-inline: contain; }
+  .card-flush { contain: paint; }
 }
 @media (max-width: 640px) {
   .page { gap: 16px; padding: 20px 14px; }
@@ -802,6 +807,8 @@ small { font-size: max(var(--text-label), .83em); }
   .workflow-field textarea, .workflow-form textarea { padding: 10px; }
   .workflow-form .btn, .checkpoint-content > form button { min-height: 44px; }
   .record-filters, .record-filters label, .record-filters input[type="search"] { width: 100%; }
+  .record-filters label { grid-template-columns: minmax(0, 1fr); }
+  .record-filters input, .record-filters select { width: 100%; min-width: 0; max-width: 100%; }
   .record-pagination { justify-content: space-between; }
   .record-pagination > span:first-child { width: 100%; }
   .timeline-kpis > summary { font-size: 13px; }

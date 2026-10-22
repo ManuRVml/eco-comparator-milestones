@@ -12,7 +12,7 @@ export function MilestoneContractEditor({ id, contract }: { id: string; contract
     {name:"fueraAlcance",label:"Qué queda fuera de alcance",multiline:true,value:d.fueraAlcance},
     {name:"responsable",label:"Responsable del milestone (nombre)",value:d.responsable},
     {name:"aprobador",label:"Aprobador del negocio (nombre)",value:d.aprobador},
-    {name:"fechaPrevision",label:"Previsión actual visible para el cliente",type:"date",value:d.fechaPrevision},
+    {name:"fechaPrevision",label:"Previsión actual visible para el Equipo Ecopetrol",type:"date",value:d.fechaPrevision},
     {name:"motivoPrevision",label:"Motivo público de la previsión",multiline:true,value:d.motivoPrevision},
   ];
   const metricFields=(m?:MilestoneContract["metricas"][number]):Field[]=>[
@@ -42,7 +42,7 @@ export function MilestoneContractEditor({ id, contract }: { id: string; contract
   ];
   return <section className="checkpoint-content" data-testid="contract-editor">
     <h3>Configuración de valor y aceptación · {id}</h3>
-    <p>Solo el administrador configura estos compromisos. Puedes guardar borradores incompletos; sus campos pendientes impiden certificar cumplimiento. La definición y la evidencia son visibles para el cliente.</p>
+    <p>Solo el administrador configura estos compromisos. Puedes guardar borradores incompletos; sus campos pendientes impiden certificar cumplimiento. La definición y la evidencia son visibles para el Equipo Ecopetrol.</p>
     {pending.length>0&&<p className="definition-pending" role="status">Pendiente: {pending.join(" · ")}</p>}
     <WorkflowForm title="Ficha del milestone" endpoint="/api/editor/milestone" fixed={{id,accion:"ficha"}} fields={fields.map(f=>({...f,required:false}))}/>
     <p>Las métricas activas deben vincularse a criterios obligatorios. Una tolerancia vacía equivale a cero; una muestra vacía no exige un tamaño mínimo. Cambiar la definición o una métrica devuelve la aceptación a revisión y conserva el historial.</p>

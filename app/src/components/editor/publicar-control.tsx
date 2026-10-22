@@ -5,6 +5,11 @@ import { usePost } from "./use-post";
 
 const VENTANA_DESHACER_MS = 8000;
 
+// Estado que debe sobrevivir al remount: al publicar, la fila pasa de la tabla «Por verificar» a «Visibles» y React la
+// desmonta. El aviso «Deshacer» (hasta cuándo) y el foco tras retirar viven aquí, no solo en el componente anterior.
+const ventanasDeshacer = new Map<string, number>();
+const enfocarRaiz = new Set<string>();
+
 function hoyLocal() {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Bogota" }).format(new Date());
 }
@@ -32,15 +37,30 @@ export function PublicarControl({
   const [texto, setTexto] = useState("");
   const [dia, setDia] = useState("");
   const [confirmarRetiro, setConfirmarRetiro] = useState(false);
-  const [deshacible, setDeshacible] = useState(false);
+  const clave = `${tipo}:${id}`;
+  const [expiraDeshacer, setExpiraDeshacer] = useState(() => {
+    const expira = ventanasDeshacer.get(clave) ?? 0;
+    if (expira <= Date.now()) {
+      ventanasDeshacer.delete(clave);
+      return 0;
+    }
+    return expira;
+  });
+  const deshacible = expiraDeshacer > 0;
   const { send, error, busy } = usePost("/api/editor/publicacion");
   const raizRef = useRef<HTMLDivElement>(null);
   const retirarRef = useRef<HTMLButtonElement>(null);
-  const timerDeshacerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
-  // Dónde devolver el foco cuando el diálogo se cierre: el disparador (cancelar) o la raíz estable (retiro hecho).
-  const foco = useRef<"disparador" | "raiz" | null>(null);
+  // Tras cancelar el diálogo de retiro, el foco vuelve al botón «Retirar publicación» (mismo componente).
+  const devolverFoco = useRef(false);
 
-  useEffect(() => () => clearTimeout(timerDeshacerRef.current), []);
+  useEffect(() => {
+    if (expiraDeshacer === 0) return;
+    const timer = setTimeout(() => {
+      if (ventanasDeshacer.get(clave) === expiraDeshacer) ventanasDeshacer.delete(clave);
+      setExpiraDeshacer(0);
+    }, Math.max(0, expiraDeshacer - Date.now()));
+    return () => clearTimeout(timer);
+  }, [clave, expiraDeshacer]);
 
   // Si la publicación cambia por otra vía (Deshacer, otro editor), el diálogo de retiro no debe quedar abierto.
   const [publicadaPrevia, setPublicadaPrevia] = useState(publicada);
@@ -50,30 +70,31 @@ export function PublicarControl({
   }
 
   useEffect(() => {
-    const destino = foco.current;
-    if (!destino || confirmarRetiro) return;
-    if (destino === "disparador" && publicada) {
-      retirarRef.current?.focus();
-      foco.current = null;
-    } else if (destino === "raiz" && !publicada) {
-      raizRef.current?.focus();
-      foco.current = null;
-    }
+    if (!devolverFoco.current || confirmarRetiro || !publicada) return;
+    retirarRef.current?.focus();
+    devolverFoco.current = false;
   }, [confirmarRetiro, publicada]);
 
+  // Tras retirar, la fila vuelve a «Por verificar» (otro componente): el foco va a la raíz estable.
+  useEffect(() => {
+    // Una entrada que sigue publicada tras montar es obsoleta: el retiro no llegó a reflejarse.
+    if (publicada) enfocarRaiz.delete(clave);
+    else if (enfocarRaiz.delete(clave)) raizRef.current?.focus();
+  }, [clave, publicada]);
+
   function mostrarDeshacer() {
-    clearTimeout(timerDeshacerRef.current);
-    setDeshacible(true);
-    timerDeshacerRef.current = setTimeout(() => setDeshacible(false), VENTANA_DESHACER_MS);
+    const expira = Date.now() + VENTANA_DESHACER_MS;
+    ventanasDeshacer.set(clave, expira);
+    setExpiraDeshacer(expira);
   }
 
   function ocultarDeshacer() {
-    clearTimeout(timerDeshacerRef.current);
-    setDeshacible(false);
+    ventanasDeshacer.delete(clave);
+    setExpiraDeshacer(0);
   }
 
   function cancelarRetiro() {
-    foco.current = "disparador";
+    devolverFoco.current = true;
     setConfirmarRetiro(false);
   }
 
@@ -131,7 +152,7 @@ export function PublicarControl({
                 disabled={busy}
                 onClick={async () => {
                   if (!(await send({ tipo, id, publicar: false }))) return;
-                  foco.current = "raiz";
+                  enfocarRaiz.add(clave);
                   ocultarDeshacer();
                   setConfirmarRetiro(false);
                 }}
