@@ -131,9 +131,9 @@ export default async function EditorPage({ searchParams }: PageProps<"/editor">)
                   className={`fchip ${ms === m.id ? "is-on" : ""}`}
                   data-testid={`editor-filter-${m.id}`}
                   data-state={ms === m.id ? "active" : "inactive"}
-                  style={{ maxWidth: 260, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
                 >
-                  {m.id} · {m.nombre}
+                  <span>{m.id} · </span>
+                  <span style={{ display: "inline-block", minWidth: 0, maxWidth: 220, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", verticalAlign: "bottom" }}>{m.nombre}</span>
                 </Link>
               </Tooltip>
             ))}
