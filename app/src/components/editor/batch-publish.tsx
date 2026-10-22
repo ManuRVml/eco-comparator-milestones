@@ -50,8 +50,10 @@ export function BatchPublish({ formId, items }: { formId: string; items: BatchIt
   const fechaId = useId();
   const tituloId = useId();
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const resultRef = useRef<HTMLDivElement>(null);
   const alive = useRef(true);
-  const skipRefresh = useRef(false);
+  const undoTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const focusResult = useRef(false);
   const [selected, setSelected] = useState<string[]>([]);
   const [abierto, setAbierto] = useState(false);
   const [texto, setTexto] = useState("");
@@ -60,7 +62,6 @@ export function BatchPublish({ formId, items }: { formId: string; items: BatchIt
   const [progreso, setProgreso] = useState(0);
   const [resultados, setResultados] = useState<Resultado[]>([]);
   const [undoLeft, setUndoLeft] = useState(0);
-  const [undoToken, setUndoToken] = useState(0);
   const max = hoyLocal();
   const elegidas = selected.flatMap((id) => items.filter((row) => row.id === id));
   const todas = items.length > 0 && elegidas.length === items.length;
@@ -70,6 +71,7 @@ export function BatchPublish({ formId, items }: { formId: string; items: BatchIt
     alive.current = true;
     return () => {
       alive.current = false;
+      if (undoTimer.current) clearInterval(undoTimer.current);
     };
   }, []);
 
@@ -86,23 +88,15 @@ export function BatchPublish({ formId, items }: { formId: string; items: BatchIt
     const dialog = dialogRef.current;
     if (!dialog) return;
     if (abierto && !dialog.open) dialog.showModal();
-    if (!abierto && dialog.open) dialog.close();
+    if (!abierto && dialog.open) {
+      dialog.close();
+      // Al cerrarse tras una corrida, el abridor queda deshabilitado (nada seleccionado): el foco pasa al resultado.
+      if (focusResult.current) {
+        focusResult.current = false;
+        resultRef.current?.focus();
+      }
+    }
   }, [abierto]);
-
-  // Cuenta regresiva de Deshacer; al terminar, la vista se refresca una vez para mostrar la cola real.
-  useEffect(() => {
-    if (undoToken === 0) return;
-    skipRefresh.current = false;
-    const started = Date.now();
-    const timer = setInterval(() => {
-      const left = Math.max(0, Math.ceil((UNDO_MS - (Date.now() - started)) / 1000));
-      setUndoLeft(left);
-      if (left > 0) return;
-      clearInterval(timer);
-      if (!skipRefresh.current) router.refresh();
-    }, 250);
-    return () => clearInterval(timer);
-  }, [undoToken, router]);
 
   function marcar(on: boolean) {
     for (const input of checkboxes(formId)) input.checked = on;
@@ -115,8 +109,21 @@ export function BatchPublish({ formId, items }: { formId: string; items: BatchIt
   }
 
   function cancelarUndo() {
-    skipRefresh.current = true;
+    if (undoTimer.current) clearInterval(undoTimer.current);
+    undoTimer.current = null;
     setUndoLeft(0);
+  }
+
+  // Cuenta regresiva de Deshacer, independiente de la lista: los ids publicados salen de `resultados`.
+  function iniciarUndo() {
+    cancelarUndo();
+    let left = UNDO_MS / 1000;
+    setUndoLeft(left);
+    undoTimer.current = setInterval(() => {
+      left -= 1;
+      if (left > 0) setUndoLeft(left);
+      else cancelarUndo();
+    }, 1000);
   }
 
   async function publicar() {
@@ -136,17 +143,19 @@ export function BatchPublish({ formId, items }: { formId: string; items: BatchIt
     }
     setResultados(out);
     setBusy(false);
+    focusResult.current = true;
     setAbierto(false);
     const publicadas = out.filter((row) => row.ok).map((row) => row.id);
-    if (publicadas.length === 0) return;
     desmarcar(publicadas);
-    setUndoLeft(UNDO_MS / 1000);
-    setUndoToken((token) => token + 1);
+    // Las filas publicadas salen de «Por verificar» de inmediato; Deshacer sigue disponible desde `resultados`.
+    router.refresh();
+    if (publicadas.length > 0) iniciarUndo();
   }
 
   async function deshacer() {
     const publicadas = resultados.filter((row) => row.ok);
     cancelarUndo();
+    resultRef.current?.focus();
     setBusy(true);
     const out: Resultado[] = [];
     for (const item of publicadas) {
@@ -235,7 +244,7 @@ export function BatchPublish({ formId, items }: { formId: string; items: BatchIt
       </dialog>
 
       {resultados.length > 0 && (
-        <div data-testid="batch-publish-result" role="status" aria-live="polite">
+        <div ref={resultRef} tabIndex={-1} data-testid="batch-publish-result" role="status" aria-live="polite">
           <p className="small">{`${okCount} correctas · ${failCount} con error`}</p>
           <ul className="small">
             {resultados.map((row) => (
