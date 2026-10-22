@@ -42,6 +42,11 @@ export function PublicarControl({
 
   useEffect(() => () => clearTimeout(timerDeshacerRef.current), []);
 
+  // Si la publicación cambia por otra vía (Deshacer, otro editor), el diálogo de retiro no debe quedar abierto.
+  useEffect(() => {
+    if (!publicada) setConfirmarRetiro(false);
+  }, [publicada]);
+
   useEffect(() => {
     const destino = foco.current;
     if (!destino || confirmarRetiro) return;
@@ -152,7 +157,10 @@ export function PublicarControl({
               className="btn btn-ghost btn-sm"
               disabled={busy}
               onClick={async () => {
-                if (await send({ tipo, id, publicar: false })) ocultarDeshacer();
+                if (await send({ tipo, id, publicar: false })) {
+                  ocultarDeshacer();
+                  setConfirmarRetiro(false);
+                }
               }}
             >
               Deshacer
