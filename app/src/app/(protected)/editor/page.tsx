@@ -86,7 +86,7 @@ export default async function EditorPage({ searchParams }: PageProps<"/editor">)
           </div>
         }
       >
-        {vista === "configuracion" ? "Define el resultado, las métricas y los criterios de cada milestone. Solo el administrador configura, registra la aceptación del negocio y publica el cumplimiento. El equipo Ecopetrol consulta los compromisos y las evidencias; cada cambio queda en la bitácora." : "El estado técnico y su evidencia son una sugerencia interna. El equipo Ecopetrol solo ve las tareas aprobadas y publicadas. La aceptación y publicación de milestones corresponde al administrador. Todo queda en la bitácora con rol, fecha y valor anterior y nuevo."}
+        {vista === "configuracion" ? "Define el resultado, las métricas y los criterios de cada milestone. Solo el administrador configura, registra la aceptación del negocio y publica el cumplimiento. El Equipo Ecopetrol consulta los compromisos y las evidencias; cada cambio queda en la bitácora." : "El estado técnico y su evidencia son una sugerencia interna. El Equipo Ecopetrol solo ve las tareas aprobadas y publicadas. La aceptación y publicación de milestones corresponde al administrador. Todo queda en la bitácora con rol, fecha y valor anterior y nuevo."}
       </PageHeading>
 
       <nav className="tabs" aria-label="Vistas del panel">
@@ -276,13 +276,13 @@ export default async function EditorPage({ searchParams }: PageProps<"/editor">)
 
       {vista === "visibilidad" && (
         <div className="grid-2">
-          <Card kicker="REGLAS" title="Qué ve el equipo Ecopetrol">
+          <Card kicker="REGLAS" title="Qué ve el Equipo Ecopetrol">
             {session.isAdmin ? <>
             <ConfigToggle
               clave="resumen_area_ecopetrol"
               activo={model.config.resumen_area_ecopetrol === "1"}
               titulo="Resumen planificado vs. real por área"
-              descripcion="Muestra al equipo Ecopetrol la comparación por área (dashboard y vista de áreas)."
+              descripcion="Muestra al Equipo Ecopetrol la comparación por área (dashboard y vista de áreas)."
             />
             <ConfigToggle
               clave="riesgos_ecopetrol"
