@@ -754,6 +754,15 @@
 .app-header-right { display: flex; align-items: center; gap: 10px; }
 .role-chip { display: inline-flex; align-items: center; gap: 8px; padding-right: 8px; color: var(--color-text-body); font-size: 13px; font-weight: 500; white-space: nowrap; }
 .role-avatar { display: grid; width: 32px; height: 32px; place-items: center; border-radius: var(--radius-pill); color: var(--color-text-inverse); background: var(--color-brand-primary); font-size: 13px; font-weight: 700; }
+.role-chip-cliente .role-avatar { background: var(--color-info-icon); }
+.role-chip-editor .role-avatar { background: var(--color-ai-text); }
+.role-chip-text { display: flex; flex-direction: column; line-height: 1.25; }
+.role-chip-permission { color: var(--color-text-muted); font-size: 11px; font-weight: 500; }
+.glossary-trigger { color: var(--color-text-body); background: var(--color-surface-card); border-color: var(--color-border-default); }
+.glossary-dialog { width: min(640px, calc(100vw - 32px)); max-height: calc(100vh - 48px); padding: 20px; border: 1px solid var(--color-border-default); border-radius: 12px; color: var(--color-text-body); background: var(--color-surface-card); }
+.glossary-dialog::backdrop { background: color-mix(in srgb, var(--color-text-heading) 40%, transparent); }
+.glossary-dialog-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.glossary-dialog-head h2 { margin: 0; color: var(--color-text-heading); font-size: 16px; font-weight: 600; }
 .app-content { flex: 1; min-width: 0; }
 .app-main .app-footer { width: 100%; max-width: none; padding: 8px var(--spacing-content-x) 24px; }
 .page { max-width: 1480px; padding: var(--spacing-content-top) var(--spacing-content-x) 40px; }
