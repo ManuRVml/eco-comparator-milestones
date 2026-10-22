@@ -26,18 +26,35 @@ function syncUrl(id: string | null) {
   window.history.pushState(window.history.state, "", `${u.pathname}${u.search}${u.hash}`);
 }
 
-/** replaceState no dispara :target; la fila de /lineas se resalta con la clase is-target (app.css). */
+/**
+ * replaceState no dispara :target; la fila de /lineas se resalta con la clase is-target (app.css).
+ * data-hl en la tabla hace que un :target nativo viejo (visita directa con hash) ceda ante la clase.
+ */
 function markRow(id: string | null) {
   for (const row of Array.from(document.querySelectorAll("tr.is-target"))) row.classList.remove("is-target");
-  if (id) document.getElementById(`milestone-${id}`)?.classList.add("is-target");
+  const row = id ? document.getElementById(`milestone-${id}`) : null;
+  if (!row) return;
+  row.classList.add("is-target");
+  row.closest("table")?.setAttribute("data-hl", "");
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  row.scrollIntoView({ block: "nearest", behavior: reduce ? "auto" : "smooth" });
+}
+
+function replaceHash(hash: string) {
+  const u = new URL(window.location.href);
+  u.hash = hash;
+  window.history.replaceState(window.history.state, "", `${u.pathname}${u.search}${u.hash}`);
 }
 
 function setRowHash(id: string) {
   if (!document.getElementById(`milestone-${id}`)) return; // nodos de sprint (S0…S6) no tienen fila
-  const u = new URL(window.location.href);
-  u.hash = `milestone-${id}`;
-  window.history.replaceState(window.history.state, "", `${u.pathname}${u.search}${u.hash}`);
+  replaceHash(`milestone-${id}`);
   markRow(id);
+}
+
+function clearRowHash() {
+  markRow(null);
+  if (window.location.hash.startsWith("#milestone-")) replaceHash("");
 }
 
 /** Estado del panel de entregables de la línea de tiempo: selección, Esc, deep link ?m=. */
@@ -50,6 +67,7 @@ export function PanelProvider({ initial, lineaDe, children }: { initial: string 
   const close = useCallback(() => {
     setSel(null);
     syncUrl(null);
+    clearRowHash();
   }, []);
 
   useEffect(() => {
@@ -94,6 +112,8 @@ export function PanelProvider({ initial, lineaDe, children }: { initial: string 
       setSel(next);
       if (next && element) setTrigger(element);
       syncUrl(next);
+      if (next) setRowHash(next);
+      else clearRowHash();
       if (lineaDe[id]) setUltimo((u) => ({ ...u, [lineaDe[id]]: id }));
     },
     [sel, lineaDe],
@@ -132,7 +152,6 @@ export function RoadmapNode({ id, href, className, style, title, children }: { i
           if (e.metaKey || e.ctrlKey || e.shiftKey) return;
           e.preventDefault();
           toggle(id, e.currentTarget);
-          if (!activo) setRowHash(id);
         }}
       >
         {children}

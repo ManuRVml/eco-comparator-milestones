@@ -235,7 +235,7 @@
 /* Fila elegida desde un nodo del timeline (replaceState no activa :target); el :target viejo cede ante ella. */
 tr.is-target td { background: var(--color-brand-primary-faint); }
 tr.is-target td:first-child { box-shadow: inset 3px 0 0 var(--color-brand-primary); }
-table:has(tr.is-target) tr:target:not(.is-target) td { background: none; box-shadow: none; }
+table[data-hl] tr:target:not(.is-target) td { background: none; box-shadow: none; }
 
 /* ---------- roadmap ---------- */
 .roadmap-scroll { overflow-x: auto; }
