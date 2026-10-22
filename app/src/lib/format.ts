@@ -52,7 +52,7 @@ export const TONE_TEXT_COLOR: Record<Tone, string> = {
 
 export const LINEA_COLOR: Record<string, string> = {
   L1: "var(--color-line-l1)",
-  L2: "var(--color-ai-text)",
+  L2: "var(--color-line-l2)",
   L3: "var(--color-chart-category-grupos-interes)",
 };
 
