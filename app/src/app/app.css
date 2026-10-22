@@ -10,6 +10,8 @@
 
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .muted { color: var(--color-text-muted); }
+/* <small> hereda el "smaller" del UA (~0.83×): sin esta regla cae por debajo de 11px dentro de texto de 10–13px. */
+small { font-size: max(var(--text-label), .83em); }
 .small { font-size: 12px; }
 .link-underline { text-decoration: underline; color: inherit; cursor: pointer; padding: 2px 0; }
 .link-underline:focus-visible { outline: 2px solid var(--color-brand-primary); outline-offset: 2px; }
