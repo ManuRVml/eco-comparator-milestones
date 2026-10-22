@@ -214,11 +214,7 @@ export function Roadmap({ model, areaId, inicial, canEdit, isAdmin = false }: { 
                     const cierreVerificado = n.m.cierreVerificado ?? milestoneCompletado(n.m, model);
                     const ancla = `milestone-${n.m.id}`;
                     return (
-                      <span key={n.m.id} data-testid={`roadmap-node-${n.m.id}`} data-state={n.m.estadoFinal} style={{ display: "contents" }} onClick={(event) => {
-                        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
-                        if (window.location.hash === `#${ancla}`) { document.getElementById(ancla)?.scrollIntoView({ block: "center" }); return; }
-                        window.location.hash = ancla;
-                      }}>
+                      <span key={n.m.id} data-testid={`roadmap-node-${n.m.id}`} data-state={n.m.estadoFinal} style={{ display: "contents" }}>
                       <RoadmapNode
                         id={n.m.id}
                         href={`#${ancla}`}
