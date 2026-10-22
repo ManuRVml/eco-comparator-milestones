@@ -52,11 +52,11 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
       {!resumen && (
         <div className="alert tone-slate" role="note" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
           <span><b>Detalle técnico</b> · información para el equipo</span>
-          <Link className="btn btn-ghost btn-sm" href={`/milestones/${m.id}`}>Volver al hito</Link>
+          <Link className="btn btn-ghost btn-sm" href={`/milestones/${m.id}`} data-testid="milestone-back-link">Volver al hito</Link>
         </div>
       )}
 
-      <section className="ms-hero milestone-focused" style={{ "--linea": colorLinea(m.lineaId), "--c": color } as CSSProperties}>
+      <section className="ms-hero milestone-focused" data-testid="milestone-hero" data-state={m.estadoFinal} style={{ "--linea": colorLinea(m.lineaId), "--c": color } as CSSProperties}>
         <div className="ms-hero-main">
           <div className="ms-hero-tags">
             <span className="line-pill" style={{ background: colorLinea(m.lineaId), color: textoLinea(m.lineaId) }}>
@@ -66,9 +66,9 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
             <MilestoneStatus m={m} />
             <span className="muted small">{session.canEdit ? (m.override ? "Estado ajustado por el editor" : "Estado sugerido automáticamente") : (m.override ? "Estado revisado por el equipo BenchHub" : "Estado calculado según el plan")}</span>
           </div>
-          <h2>{m.nombre}</h2>
-          <span className={`chip tone-${m.cierreVerificado ? "green" : "slate"}`}>{m.cierreVerificado ? "Cumplido y confirmado" : "Cumplimiento pendiente"}</span>
-          <dl className="ms-meta">
+          <h2 data-testid="milestone-title">{m.nombre}</h2>
+          <span className={`chip tone-${m.cierreVerificado ? "green" : "slate"}`} data-testid="milestone-compliance" data-state={m.cierreVerificado ? "confirmado" : "pendiente"}>{m.cierreVerificado ? "Cumplido y confirmado" : "Cumplimiento pendiente"}</span>
+          <dl className="ms-meta" data-testid="milestone-meta">
             <div>
               <dt>Deadline / Fin del Hito</dt>
               <dd>
@@ -85,7 +85,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
               <div>
                 <dt>Historias</dt>
                 <dd>
-                  <Link href={`/milestones/${m.id}?tab=hu${q}#historias`} className="link-underline">{m.huIds.length} HU · {m.spTotal} SP</Link>
+                  <Link href={`/milestones/${m.id}?tab=hu${q}#historias`} className="link-underline" data-testid="milestone-hu-link">{m.huIds.length} HU · {m.spTotal} SP</Link>
                 </dd>
               </div>
             )}
@@ -99,7 +99,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
                       return (
                         <Fragment key={code}>
                           {i > 0 && " · "}
-                          <Link href={`/milestones/${m.id}?tab=hu${q}#${epicAnchor(m.huIds, model, code)}`} className="link-underline">{code}</Link>
+                          <Link href={`/milestones/${m.id}?tab=hu${q}#${epicAnchor(m.huIds, model, code)}`} className="link-underline" data-testid={`milestone-epica-link-${code}`}>{code}</Link>
                         </Fragment>
                       );
                     })
@@ -109,7 +109,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
             )}
           </dl>
         </div>
-        <div className="ms-hero-gauge">
+        <div className="ms-hero-gauge" data-testid="milestone-gauge">
           <Ring value={m.pctPonderado} size={148} stroke={13} color={color}>
             <span className="gauge-pct is-dark">{fmtPct(m.pctPonderado, 1)}</span>
             <span className="gauge-sub is-dark">
@@ -155,16 +155,16 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
       <MilestoneDelivery m={m} model={model} canEdit={session.canEdit} />
       {session.canEdit && <MetricNote capa={model.capa} hoy={model.hoy} alcance={`${m.id} completo; el desglose por área usa las tareas de cada disciplina`} cliente={!session.canEdit} />}
       {(resumen || session.canEdit) && <CapabilityCards capacidades={capacidades} detalleHref={`/milestones/${m.id}?vista=detalle`} canEdit={session.canEdit} />}
-      {session.isAdmin && <Link className="btn btn-sm" href={`/editor?vista=configuracion&ms=${m.id}`}>Configurar valor, métricas y aceptación</Link>}
+      {session.isAdmin && <Link className="btn btn-sm" href={`/editor?vista=configuracion&ms=${m.id}`} data-testid="milestone-config-link">Configurar valor, métricas y aceptación</Link>}
       {session.canEdit && <CheckpointProgress total={m.trabajo} areas={m.areas} completo={!!m.cierreVerificado} areaId={areaFoco} alcance="milestone" />}
 
       {session.canEdit && m.criticasVencidas.length > 0 && (
-        <div className="alert tone-amber" role="status">
+        <div className="alert tone-amber" role="status" data-testid="milestone-critical-alert">
           <strong>Atención:</strong> {m.criticasVencidas.length === 1 ? "una tarea en ruta crítica venció" : `${m.criticasVencidas.length} tareas en ruta crítica vencieron`} sin cerrarse:{" "}
           {m.criticasVencidas.map((t, i) => (
             <span key={t}>
               {i > 0 && ", "}
-              <Link href={`/tareas/${t}`}>{t}</Link>
+              <Link href={`/tareas/${t}`} data-testid={`milestone-critical-task-${t}`}>{t}</Link>
               {model.tareaById.get(t)?.fechaFin ? ` (fin ${fmtCorta(model.tareaById.get(t)?.fechaFin)})` : ""}
             </span>
           ))}
@@ -183,7 +183,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
       )}
 
       {m.cierreVerificado && (
-        <div className="alert tone-green" role="status">
+        <div className="alert tone-green" role="status" data-testid="milestone-delivered" data-state="entregado">
           <strong>Entregado el {fmtLarga(m.fechaCierre)}:</strong> {m.evidencia}
         </div>
       )}
@@ -198,25 +198,25 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
       </div>}
 
       {!resumen && (
-      <div className="detail-layout">
+      <div className="detail-layout" data-testid="milestone-detail">
         <div className="detail-main">
-          <nav className="tabs" aria-label={`Información de ${m.id}`}>
-            <Link href={`/milestones/${m.id}?tab=area${q}`} aria-current={tab === "area" ? "page" : undefined} className={`tab ${tab === "area" ? "is-on" : ""}`}>
+          <nav className="tabs" aria-label={`Información de ${m.id}`} data-testid="milestone-tabs">
+            <Link href={`/milestones/${m.id}?tab=area${q}`} aria-current={tab === "area" ? "page" : undefined} className={`tab ${tab === "area" ? "is-on" : ""}`} data-testid="milestone-tab-area">
               Por área <span>{m.areas.length}</span>
             </Link>
-            <Link href={`/milestones/${m.id}?tab=hu${q}`} aria-current={tab === "hu" ? "page" : undefined} className={`tab ${tab === "hu" ? "is-on" : ""}`}>
+            <Link href={`/milestones/${m.id}?tab=hu${q}`} aria-current={tab === "hu" ? "page" : undefined} className={`tab ${tab === "hu" ? "is-on" : ""}`} data-testid="milestone-tab-hu">
               Por historia de usuario <span>{hus.length}</span>
             </Link>
           </nav>
 
           {tab === "area" ? (
-            <div className="branches">
+            <div className="branches" data-testid="milestone-branches">
               {m.areas.map((a) => {
                 const ts = tareas.filter((t) => t.areaId === a.areaId);
                 const { hechas, resto } = ordenar(ts);
                 return (
-                  <details key={a.areaId} className="branch" open={!areaFoco || areaFoco === a.areaId} style={{ "--a": colorArea(a.areaId) } as CSSProperties}>
-                    <summary>
+                  <details key={a.areaId} className="branch" data-testid={`milestone-area-${a.areaId}`} open={!areaFoco || areaFoco === a.areaId} style={{ "--a": colorArea(a.areaId) } as CSSProperties}>
+                    <summary data-testid={`milestone-area-toggle-${a.areaId}`}>
                       <span className="branch-name">
                         <AreaDot areaId={a.areaId} />
                         {a.nombre}
@@ -293,7 +293,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
                   const r = model.riesgoById.get(rid);
                   if (!r) return null;
                   return (
-                    <li key={r.id} className={r.interno ? "is-internal" : ""}>
+                    <li key={r.id} className={r.interno ? "is-internal" : ""} data-testid={`milestone-risk-${r.id}`} data-state={r.interno ? "interno" : "visible"}>
                       <div className="risk-head">
                         <b>{r.id}</b>
                         {r.probabilidad && <Chip tone="amber">Prob. {r.probabilidad}</Chip>}
@@ -341,7 +341,7 @@ function DepList({ titulo, ids, model, vacio }: { titulo: string; ids: string[];
             if (!dm) return null;
             return (
               <li key={d}>
-                <Link href={`/milestones/${d}`}>
+                <Link href={`/milestones/${d}`} data-testid={`milestone-dep-${d}`}>
                   <span className="dep-dot" style={{ background: colorEstado(dm.estadoFinal) }} />
                   <b>{d}</b>
                   <span className="dep-name">{dm.nombre}</span>
@@ -367,8 +367,8 @@ function HuItem({ h, model, canEdit }: { h: Historia; model: Model; canEdit: boo
   const weekly = model.weeklyPorHu.get(h.id);
   return (
     <li>
-      <details className="hu-item">
-        <summary>
+      <details className="hu-item" data-testid={`milestone-hu-${h.id}`}>
+        <summary data-testid={`milestone-hu-toggle-${h.id}`}>
           <span className="hu-id">
             <Link href={`/historias/${h.id}#descripcion`}>{h.id}</Link>
           </span>
@@ -419,12 +419,12 @@ function HuTab({ model, huIds, canEdit }: { model: Model; huIds: string[]; canEd
   // Las épicas del milestone (m.epicas) son códigos E#; se agrupa por epicaId, no por el nombre.
   const codes = Array.from(new Set(hus.map((h) => h.epicaId?.trim()).filter((c): c is string => !!c)));
   return (
-    <ul className="hu-list" id="historias">
+    <ul className="hu-list" id="historias" data-testid="milestone-hu-list">
       {codes.map((code) => {
         const group = hus.filter((h) => h.epicaId?.trim() === code);
         return (
           <Fragment key={code}>
-            <li id={`epica-${code}`}>
+            <li id={`epica-${code}`} data-testid={`milestone-epica-${code}`}>
               <h4 className="epica-heading">{code} · {group[0].epica}</h4>
             </li>
             {group.map((h) => <HuItem key={h.id} h={h} model={model} canEdit={canEdit} />)}
