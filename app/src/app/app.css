@@ -232,6 +232,10 @@
 .ms-table th span[tabindex] { cursor: help; text-decoration: underline dotted var(--color-brand-primary-border); text-underline-offset: 3px; transition: color 120ms ease; }
 .ms-table th span[tabindex]:hover, .ms-table th span[tabindex]:focus-visible { color: var(--color-brand-primary-dark); }
 .ms-table th span[tabindex]:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 2px; }
+/* Fila elegida desde un nodo del timeline (replaceState no activa :target); el :target viejo cede ante ella. */
+tr.is-target td { background: var(--color-brand-primary-faint); }
+tr.is-target td:first-child { box-shadow: inset 3px 0 0 var(--color-brand-primary); }
+table[data-hl] tr:target:not(.is-target) td { background: none; box-shadow: none; }
 
 /* ---------- roadmap ---------- */
 .roadmap-scroll { overflow-x: auto; }
