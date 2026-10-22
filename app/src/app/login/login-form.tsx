@@ -27,7 +27,7 @@ function EyeIcon({ size = 18 }: { size?: number }) {
 }
 
 function textoIntentos(restantes: number) {
-  if (restantes === 0) return "Próximo fallo bloqueará el acceso temporalmente.";
+  if (restantes === 0) return "Acceso bloqueado temporalmente por seguridad. Espera unos minutos e inténtalo de nuevo.";
   return `${restantes === 1 ? "Queda 1 intento" : `Quedan ${restantes} intentos`} antes de un bloqueo temporal.`;
 }
 
@@ -94,7 +94,7 @@ export function LoginForm() {
             aria-invalid={Boolean(state.error)}
             aria-describedby={state.error ? "pin-error" : "pin-help"}
             placeholder="••••"
-            className="w-full rounded-nav border border-dark-input-border bg-dark-input-bg py-12 pl-14 pr-[48px] text-14 text-text-on-dark-heading outline-none placeholder:text-text-on-dark-caption focus:border-border-focus"
+            className="w-full rounded-nav border border-dark-input-border bg-dark-input-bg py-12 pl-14 pr-12 text-14 text-text-on-dark-heading outline-none placeholder:text-text-on-dark-caption focus:border-border-focus"
           />
           <button
             type="button"
