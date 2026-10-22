@@ -20,6 +20,8 @@
 .live-pill { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 7px; padding: 5px 10px; border: 1px solid var(--color-ai-border); border-radius: 999px; color: var(--color-ai-text); background: var(--color-ai-bg); font-size: 11px; font-weight: 600; white-space: nowrap; }
 .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--color-status-success-base); animation: pulse 2s infinite; }
 .live-age { color: var(--color-ai-text); font-weight: 500; }
+.live-refresh { background: var(--color-status-warning-note-border); color: var(--color-status-warning-text); border: none; border-radius: 999px; padding: 2px 8px; font-size: 10px; cursor: pointer; }
+.live-refresh:hover { background: var(--color-status-warning-bg); }
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-status-success-base) 45%, transparent); } 70% { box-shadow: 0 0 0 7px color-mix(in srgb, var(--color-status-success-base) 0%, transparent); } 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-status-success-base) 0%, transparent); } }
 
 /* ---------- página ---------- */
