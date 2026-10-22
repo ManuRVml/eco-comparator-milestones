@@ -155,7 +155,7 @@ test("una tarea crítica vencida produce una causa técnica con su nombre y fech
   assert.deepEqual(causas(model), [
     {
       tipo: "tecnica",
-      texto: "Publicar contrato venció 2026-10-01",
+      texto: "Publicar contrato venció el 1 oct",
       ref: "T-1",
     },
   ]);
@@ -230,7 +230,7 @@ test("la vista cliente oculta el título de una tarea publicada que no es visibl
   const visibles = causas(client);
   assert.equal(JSON.stringify(visibles).includes("Secreto"), false);
   assert.deepEqual(visibles, [
-    { tipo: "tecnica", texto: "Título visible venció 2026-10-03", ref: "T-V" },
+    { tipo: "tecnica", texto: "Título visible venció el 3 oct", ref: "T-V" },
     { tipo: "tecnica", texto: "2 tareas críticas vencidas" },
   ]);
   assert.equal(visibles[1].ref, undefined);
