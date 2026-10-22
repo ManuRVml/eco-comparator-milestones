@@ -99,7 +99,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
                       return (
                         <Fragment key={code}>
                           {i > 0 && " · "}
-                          <Link href={`/milestones/${m.id}?tab=hu${q}#${epicAnchor(m.huIds, model, code)}`} className="link-underline" data-testid={`milestone-epica-link-${code}`}>{code}</Link>
+                          <Link href={`/milestones/${String(m.id).toLowerCase()}?tab=hu${String(q).toLowerCase()}#${epicAnchor(m.huIds, model, code)}`} className="link-underline" data-testid={`milestone-epica-link-${String(code).toLowerCase()}`}>{code}</Link>
                         </Fragment>
                       );
                     })
@@ -164,7 +164,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
           {m.criticasVencidas.map((t, i) => (
             <span key={t}>
               {i > 0 && ", "}
-              <Link href={`/tareas/${t}`} data-testid={`milestone-critical-task-${t}`}>{t}</Link>
+              <Link href={`/tareas/${String(t).toLowerCase()}`} data-testid={`milestone-critical-task-${String(t).toLowerCase()}`}>{t}</Link>
               {model.tareaById.get(t)?.fechaFin ? ` (fin ${fmtCorta(model.tareaById.get(t)?.fechaFin)})` : ""}
             </span>
           ))}
@@ -215,8 +215,8 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
                 const ts = tareas.filter((t) => t.areaId === a.areaId);
                 const { hechas, resto } = ordenar(ts);
                 return (
-                  <details key={a.areaId} className="branch" data-testid={`milestone-area-${a.areaId}`} open={!areaFoco || areaFoco === a.areaId} style={{ "--a": colorArea(a.areaId) } as CSSProperties}>
-                    <summary data-testid={`milestone-area-toggle-${a.areaId}`}>
+                  <details key={a.areaId} className="branch" data-testid={`milestone-area-${String(a.areaId).toLowerCase()}`} open={!areaFoco || areaFoco === a.areaId} style={{ "--a": colorArea(a.areaId) } as CSSProperties}>
+                    <summary data-testid={`milestone-area-toggle-${String(a.areaId).toLowerCase()}`}>
                       <span className="branch-name">
                         <AreaDot areaId={a.areaId} />
                         {a.nombre}
@@ -293,7 +293,7 @@ export default async function MilestonePage({ params, searchParams }: PageProps<
                   const r = model.riesgoById.get(rid);
                   if (!r) return null;
                   return (
-                    <li key={r.id} className={r.interno ? "is-internal" : ""} data-testid={`milestone-risk-${r.id}`} data-state={r.interno ? "interno" : "visible"}>
+                    <li key={r.id} className={r.interno ? "is-internal" : ""} data-testid={`milestone-risk-${String(r.id).toLowerCase()}`} data-state={r.interno ? "interno" : "visible"}>
                       <div className="risk-head">
                         <b>{r.id}</b>
                         {r.probabilidad && <Chip tone="amber">Prob. {r.probabilidad}</Chip>}
@@ -341,7 +341,7 @@ function DepList({ titulo, ids, model, vacio }: { titulo: string; ids: string[];
             if (!dm) return null;
             return (
               <li key={d}>
-                <Link href={`/milestones/${d}`} data-testid={`milestone-dep-${d}`}>
+                <Link href={`/milestones/${String(d).toLowerCase()}`} data-testid={`milestone-dep-${String(d).toLowerCase()}`}>
                   <span className="dep-dot" style={{ background: colorEstado(dm.estadoFinal) }} />
                   <b>{d}</b>
                   <span className="dep-name">{dm.nombre}</span>
@@ -367,8 +367,8 @@ function HuItem({ h, model, canEdit }: { h: Historia; model: Model; canEdit: boo
   const weekly = model.weeklyPorHu.get(h.id);
   return (
     <li>
-      <details className="hu-item" data-testid={`milestone-hu-${h.id}`}>
-        <summary data-testid={`milestone-hu-toggle-${h.id}`}>
+      <details className="hu-item" data-testid={`milestone-hu-${String(h.id).toLowerCase()}`}>
+        <summary data-testid={`milestone-hu-toggle-${String(h.id).toLowerCase()}`}>
           <span className="hu-id">
             <Link href={`/historias/${h.id}#descripcion`}>{h.id}</Link>
           </span>
@@ -424,7 +424,7 @@ function HuTab({ model, huIds, canEdit }: { model: Model; huIds: string[]; canEd
         const group = hus.filter((h) => h.epicaId?.trim() === code);
         return (
           <Fragment key={code}>
-            <li id={`epica-${code}`} data-testid={`milestone-epica-${code}`}>
+            <li id={`epica-${String(code).toLowerCase()}`} data-testid={`milestone-epica-${String(code).toLowerCase()}`}>
               <h4 className="epica-heading">{code} · {group[0].epica}</h4>
             </li>
             {group.map((h) => <HuItem key={h.id} h={h} model={model} canEdit={canEdit} />)}

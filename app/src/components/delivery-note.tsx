@@ -8,7 +8,7 @@ export function DeliveryNote({ defaultOpen, equipo }: { defaultOpen?: boolean; e
       <b>Glosario</b>
       <dl className="definition-grid" data-testid="delivery-note-glossary">
         {GLOSSARY_TERMS.map(({ slug, term, definition }) => (
-          <div key={slug} data-testid={`delivery-glossary-${slug}`}><dt>{term}</dt><dd>{definition}</dd></div>
+          <div key={slug} data-testid={`delivery-glossary-${String(slug).toLowerCase()}`}><dt>{term}</dt><dd>{definition}</dd></div>
         ))}
       </dl>
     </> : <>

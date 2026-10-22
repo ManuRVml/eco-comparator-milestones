@@ -94,9 +94,9 @@ function PendientesTable({ seccion, items, canEdit }: { seccion: "externo" | "in
   if (items.length === 0) return <Empty>No hay pendientes en esta sección.</Empty>;
 
   return (
-    <table className="table editor-table" data-testid={`pendientes-table-${seccion}`}>
+    <table className="table editor-table" data-testid={`pendientes-table-${String(seccion).toLowerCase()}`}>
       <thead>
-        <tr data-testid={`pendientes-table-head-${seccion}`}>
+        <tr data-testid={`pendientes-table-head-${String(seccion).toLowerCase()}`}>
           <th>Título</th>
           <th>Tipo</th>
           <th>Responsable</th>
@@ -108,7 +108,7 @@ function PendientesTable({ seccion, items, canEdit }: { seccion: "externo" | "in
       </thead>
       <tbody>
         {items.map((item) => (
-          <tr key={item.id} className={item.estado === "resuelto" ? "is-muted" : undefined} data-testid={`pendiente-row-${item.id}`} data-state={item.estado}>
+          <tr key={item.id} className={item.estado === "resuelto" ? "is-muted" : undefined} data-testid={`pendiente-row-${String(item.id).toLowerCase()}`} data-state={item.estado}>
             <td>
               {item.titulo}
               {canEdit && item.lado === "externo" && textoExternoNoApto(item.titulo, item.detalle, item.responsable) && (
@@ -119,12 +119,12 @@ function PendientesTable({ seccion, items, canEdit }: { seccion: "externo" | "in
             <td><Chip tone="slate">{etiquetaTipo(item.tipo)}</Chip></td>
             <td>{item.responsable || "—"}</td>
             <td className="nowrap">{fmtCorta(item.fechaLimite)}</td>
-            <td>{item.milestoneId ? <Link href={`/milestones/${item.milestoneId}`} data-testid={`pendiente-milestone-link-${item.id}`}>{item.milestoneId}</Link> : "—"}</td>
+            <td>{item.milestoneId ? <Link href={`/milestones/${String(item.milestoneId).toLowerCase()}`} data-testid={`pendiente-milestone-link-${String(item.id).toLowerCase()}`}>{item.milestoneId}</Link> : "—"}</td>
             <td><StatusBadge estado={item.estado === "abierto" ? "Abierto" : "Resuelto"} size="sm" /></td>
             {canEdit && <td>{item.estado === "abierto" && (
               <form action={resolvePendienteAction}>
                 <input type="hidden" name="id" value={item.id} />
-                <button className="btn btn-ghost btn-sm" type="submit" data-testid={`pendiente-resolve-${item.id}`}>Marcar resuelto</button>
+                <button className="btn btn-ghost btn-sm" type="submit" data-testid={`pendiente-resolve-${String(item.id).toLowerCase()}`}>Marcar resuelto</button>
               </form>
             )}</td>}
           </tr>
