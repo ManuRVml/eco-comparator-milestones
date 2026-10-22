@@ -20,8 +20,8 @@ function CauseGroup({ titulo, causas }: { titulo: string; causas: CausaRiesgo[] 
   );
 }
 
-/** Badge de milestone. "En riesgo" abre las causas; el resto se ve igual que StatusBadge. */
-export function MilestoneStatus({ m, size }: { m: { estadoFinal: EstadoMilestone; causasRiesgo: CausaRiesgo[] }; size?: "sm" | "md" }) {
+/** Badge de milestone. "En riesgo" abre las causas; la causa corta queda visible junto al badge. */
+export function MilestoneStatus({ m, size }: { m: { id: string; estadoFinal: EstadoMilestone; causasRiesgo: CausaRiesgo[] }; size?: "sm" | "md" }) {
   const [open, setOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -66,10 +66,19 @@ export function MilestoneStatus({ m, size }: { m: { estadoFinal: EstadoMilestone
     };
   }, [open]);
 
-  if (!riesgo) return <StatusBadge estado={m.estadoFinal} size={size} />;
+  const root = { "data-testid": `milestone-status-${m.id}`, "data-state": m.estadoFinal };
+
+  if (!riesgo) {
+    return (
+      <span {...root}>
+        <StatusBadge estado={m.estadoFinal} size={size} />
+      </span>
+    );
+  }
 
   const tecnicas = m.causasRiesgo.filter((c) => c.tipo === "tecnica");
   const negocio = m.causasRiesgo.filter((c) => c.tipo === "negocio");
+  const causaCorta = (tecnicas[0] ?? m.causasRiesgo[0]).texto;
 
   const guard = (e: ReactMouseEvent | ReactPointerEvent) => {
     e.preventDefault();
@@ -77,7 +86,7 @@ export function MilestoneStatus({ m, size }: { m: { estadoFinal: EstadoMilestone
   };
 
   return (
-    <>
+    <span {...root}>
       <button
         ref={buttonRef}
         type="button"
@@ -93,6 +102,7 @@ export function MilestoneStatus({ m, size }: { m: { estadoFinal: EstadoMilestone
       >
         <StatusBadge estado={m.estadoFinal} size={size} />
       </button>
+      <span className="muted"> {causaCorta}</span>
       {open &&
         createPortal(
           <div
@@ -112,6 +122,6 @@ export function MilestoneStatus({ m, size }: { m: { estadoFinal: EstadoMilestone
           </div>,
           document.body,
         )}
-    </>
+    </span>
   );
 }

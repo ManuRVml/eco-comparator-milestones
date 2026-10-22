@@ -27,7 +27,7 @@ import type {
   sprints,
   tareas,
 } from "../db/schema";
-import { addDays, daysBetween, isoWeekday } from "./dates";
+import { addDays, daysBetween, fmtCorta, isoWeekday } from "./dates";
 import type { Workflow } from "./workflow/types";
 import type { SprintPlan } from "./sprint-plan";
 import type { MilestoneContract } from "./milestone-contract/domain";
@@ -528,7 +528,7 @@ function textoCausaNegocio(r: Riesgo): string {
 }
 
 function causasDeMilestone(criticas: Array<Tarea & { fechaFin: string }>, riesgoIds: string[], riesgoById: Map<string, Riesgo>, capa: Capa): CausaRiesgo[] {
-  const tecnicas: CausaRiesgo[] = criticas.map((t) => ({ tipo: "tecnica", texto: `${t.nombre} venció ${t.fechaFin}`, ref: t.id }));
+  const tecnicas: CausaRiesgo[] = criticas.map((t) => ({ tipo: "tecnica", texto: `${t.nombre} venció el ${fmtCorta(t.fechaFin)}`, ref: t.id }));
   const negocio: CausaRiesgo[] = [];
   for (const id of riesgoIds) {
     const r = riesgoById.get(id);
