@@ -125,6 +125,7 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
       <p className="muted small timeline-scroll-hint">El timeline se desplaza horizontalmente. Desplaza dentro de esta sección para consultar fechas y entregas posteriores.</p>
       <p className="muted small">Las fechas de cada hito son su Deadline / Fin del Hito.</p>
 
+      <style>{`tr[id^="milestone-"] { scroll-margin-top: 80px; } tr[id^="milestone-"]:target td { background: var(--color-brand-primary-faint); } tr[id^="milestone-"]:target td:first-child { box-shadow: inset 3px 0 0 var(--color-brand-primary); }`}</style>
       <div className="ms-table-wrap" role="region" aria-label="Milestones: fecha y cumplimiento" tabIndex={0}>
         <Card kicker={areaId ? `FILTRO: ${model.areaById.get(areaId)?.nombre?.toUpperCase()}` : "DETALLE"} title="Milestones: fecha y cumplimiento">
           <table className="table ms-table">
@@ -161,7 +162,7 @@ export default async function LineasPage({ searchParams }: PageProps<"/lineas">)
                 const p = areaId ? (a?.pctReal ?? 0) : m.pctPonderado;
                 const lineaId = m.lineaId ?? "";
                 return (
-                  <tr key={m.id} className={areaId && !a ? "is-muted" : ""}>
+                  <tr key={m.id} id={`milestone-${m.id}`} data-testid={`lineas-row-${m.id}`} data-state={m.estadoFinal} className={areaId && !a ? "is-muted" : ""}>
                     <td>
                       <Link href={`/milestones/${m.id}${areaId ? `?area=${areaId}` : ""}`} className="ms-cell">
                         <b>{m.id}</b>
