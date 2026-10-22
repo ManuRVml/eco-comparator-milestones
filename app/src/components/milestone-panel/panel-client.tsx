@@ -26,6 +26,20 @@ function syncUrl(id: string | null) {
   window.history.pushState(window.history.state, "", `${u.pathname}${u.search}${u.hash}`);
 }
 
+/** replaceState no dispara :target; la fila de /lineas se resalta con la clase is-target (app.css). */
+function markRow(id: string | null) {
+  for (const row of Array.from(document.querySelectorAll("tr.is-target"))) row.classList.remove("is-target");
+  if (id) document.getElementById(`milestone-${id}`)?.classList.add("is-target");
+}
+
+function setRowHash(id: string) {
+  if (!document.getElementById(`milestone-${id}`)) return; // nodos de sprint (S0…S6) no tienen fila
+  const u = new URL(window.location.href);
+  u.hash = `milestone-${id}`;
+  window.history.replaceState(window.history.state, "", `${u.pathname}${u.search}${u.hash}`);
+  markRow(id);
+}
+
 /** Estado del panel de entregables de la línea de tiempo: selección, Esc, deep link ?m=. */
 export function PanelProvider({ initial, lineaDe, children }: { initial: string | null; lineaDe: Record<string, string>; children: ReactNode }) {
   const mounted = useMounted();
@@ -43,6 +57,7 @@ export function PanelProvider({ initial, lineaDe, children }: { initial: string 
       const id = new URLSearchParams(window.location.search).get("m");
       setSel(id && id in lineaDe ? id : null);
       setTrigger(null);
+      markRow(/^#milestone-(.+)$/.exec(window.location.hash)?.[1] ?? null);
     };
     window.addEventListener("popstate", onPopState);
     return () => window.removeEventListener("popstate", onPopState);
@@ -117,6 +132,7 @@ export function RoadmapNode({ id, href, className, style, title, children }: { i
           if (e.metaKey || e.ctrlKey || e.shiftKey) return;
           e.preventDefault();
           toggle(id, e.currentTarget);
+          if (!activo) setRowHash(id);
         }}
       >
         {children}
