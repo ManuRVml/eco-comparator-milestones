@@ -51,7 +51,7 @@ Generated from `git grep -n 'data-testid' -- app/src`. The data-testid column is
 | app/src/app/(protected)/milestones/[id]/page.tsx | app/src/app/(protected)/milestones/[id]/page.tsx:162 | `"milestone-critical-alert"` | `—` |
 | app/src/app/(protected)/milestones/[id]/page.tsx | app/src/app/(protected)/milestones/[id]/page.tsx:167 | `{`milestone-critical-task-${String(t).toLowerCase()}` | `—` |
 | app/src/app/(protected)/milestones/[id]/page.tsx | app/src/app/(protected)/milestones/[id]/page.tsx:176 | `"next-milestone"` | `—` |
-| app/src/app/(protected)/milestones/[id]/page.tsx | app/src/app/(protected)/milestones/[id]/page.tsx:186 | `"milestone-delivered"` | `—` |
+| app/src/app/(protected)/milestones/[id]/page.tsx | app/src/app/(protected)/milestones/[id]/page.tsx:186 | `"milestone-delivered"` | `"entregado"` |
 | app/src/app/(protected)/milestones/[id]/page.tsx | app/src/app/(protected)/milestones/[id]/page.tsx:201 | `"milestone-detail"` | `—` |
 | app/src/app/(protected)/milestones/[id]/page.tsx | app/src/app/(protected)/milestones/[id]/page.tsx:203 | `"milestone-tabs"` | `—` |
 | app/src/app/(protected)/milestones/[id]/page.tsx | app/src/app/(protected)/milestones/[id]/page.tsx:204 | `"milestone-tab-area"` | `—` |
@@ -91,10 +91,14 @@ Generated from `git grep -n 'data-testid' -- app/src`. The data-testid column is
 | app/src/app/(protected)/pendientes/page.tsx | app/src/app/(protected)/pendientes/page.tsx:127 | `{`pendiente-resolve-${String(item.id).toLowerCase()}` | `—` |
 | app/src/app/(protected)/reconciliacion/page.tsx | app/src/app/(protected)/reconciliacion/page.tsx:27 | `"reconciliacion"` | `—` |
 | app/src/app/(protected)/tareas/[id]/page.tsx | app/src/app/(protected)/tareas/[id]/page.tsx:34 | `"tarea"` | `—` |
-| app/src/app/(protected)/verificacion/page.tsx | app/src/app/(protected)/verificacion/page.tsx:31 | `{`verif-${t.id}` | `—` |
-| app/src/app/(protected)/verificacion/page.tsx | app/src/app/(protected)/verificacion/page.tsx:57 | `"verificacion"` | `—` |
-| app/src/app/(protected)/verificacion/page.tsx | app/src/app/(protected)/verificacion/page.tsx:82 | `"verif-pendientes"` | `—` |
-| app/src/app/(protected)/verificacion/page.tsx | app/src/app/(protected)/verificacion/page.tsx:100 | `"verif-publicadas"` | `—` |
+| app/src/app/(protected)/verificacion/page.tsx | app/src/app/(protected)/verificacion/page.tsx:62 | `{`verificacion-row-${kebabId(t.id)}` | `—` |
+| app/src/app/(protected)/verificacion/page.tsx | app/src/app/(protected)/verificacion/page.tsx:66 | `{`verificacion-select-${kebabId(t.id)}` | `—` |
+| app/src/app/(protected)/verificacion/page.tsx | app/src/app/(protected)/verificacion/page.tsx:89 | `{`verif-${t.id}` | `—` |
+| app/src/app/(protected)/verificacion/page.tsx | app/src/app/(protected)/verificacion/page.tsx:97 | `"verificacion"` | `—` |
+| app/src/app/(protected)/verificacion/page.tsx | app/src/app/(protected)/verificacion/page.tsx:121 | `"verificacion-filter-todos"` | `—` |
+| app/src/app/(protected)/verificacion/page.tsx | app/src/app/(protected)/verificacion/page.tsx:134 | `{`verificacion-filter-${kebabId(m.id)}` | `—` |
+| app/src/app/(protected)/verificacion/page.tsx | app/src/app/(protected)/verificacion/page.tsx:151 | `"verif-pendientes"` | `—` |
+| app/src/app/(protected)/verificacion/page.tsx | app/src/app/(protected)/verificacion/page.tsx:170 | `"verif-publicadas"` | `—` |
 | app/src/app/login/login-form.tsx | app/src/app/login/login-form.tsx:49 | `"login-form"` | `—` |
 | app/src/app/login/login-form.tsx | app/src/app/login/login-form.tsx:63 | `"login-error"` | `—` |
 | app/src/app/login/login-form.tsx | app/src/app/login/login-form.tsx:70 | `"login-attempts"` | `—` |
@@ -115,6 +119,18 @@ Generated from `git grep -n 'data-testid' -- app/src`. The data-testid column is
 | app/src/components/delivery-note.tsx | app/src/components/delivery-note.tsx:5 | `"delivery-note-details"` | `—` |
 | app/src/components/delivery-note.tsx | app/src/components/delivery-note.tsx:9 | `"delivery-note-glossary"` | `—` |
 | app/src/components/delivery-note.tsx | app/src/components/delivery-note.tsx:11 | `{`delivery-glossary-${String(slug).toLowerCase()}` | `—` |
+| app/src/components/editor/batch-publish.tsx | app/src/components/editor/batch-publish.tsx:177 | `"batch-publish"` | `—` |
+| app/src/components/editor/batch-publish.tsx | app/src/components/editor/batch-publish.tsx:182 | `"verificacion-select-all"` | `—` |
+| app/src/components/editor/batch-publish.tsx | app/src/components/editor/batch-publish.tsx:192 | `"batch-publish-open"` | `—` |
+| app/src/components/editor/batch-publish.tsx | app/src/components/editor/batch-publish.tsx:205 | `"batch-publish-dialog"` | `—` |
+| app/src/components/editor/batch-publish.tsx | app/src/components/editor/batch-publish.tsx:220 | `"batch-publish-note"` | `—` |
+| app/src/components/editor/batch-publish.tsx | app/src/components/editor/batch-publish.tsx:228 | `"batch-publish-date"` | `—` |
+| app/src/components/editor/batch-publish.tsx | app/src/components/editor/batch-publish.tsx:230 | `"batch-publish-preview"` | `—` |
+| app/src/components/editor/batch-publish.tsx | app/src/components/editor/batch-publish.tsx:236 | `"batch-publish-confirm"` | `—` |
+| app/src/components/editor/batch-publish.tsx | app/src/components/editor/batch-publish.tsx:239 | `"batch-publish-cancel"` | `—` |
+| app/src/components/editor/batch-publish.tsx | app/src/components/editor/batch-publish.tsx:247 | `"batch-publish-result"` | `—` |
+| app/src/components/editor/batch-publish.tsx | app/src/components/editor/batch-publish.tsx:251 | `{`batch-publish-result-${kebabId(row.id)}` | `—` |
+| app/src/components/editor/batch-publish.tsx | app/src/components/editor/batch-publish.tsx:257 | `"batch-publish-undo"` | `—` |
 | app/src/components/editor/config-toggle.tsx | app/src/components/editor/config-toggle.tsx:22 | `{`config-${clave}` | `—` |
 | app/src/components/editor/estado-control.tsx | app/src/components/editor/estado-control.tsx:37 | `{`estado-${id}` | `—` |
 | app/src/components/editor/milestone-configuration.tsx | app/src/components/editor/milestone-configuration.tsx:10 | `"admin-milestone-configuration"` | `—` |
@@ -131,7 +147,7 @@ Generated from `git grep -n 'data-testid' -- app/src`. The data-testid column is
 | app/src/components/editor/publicar-control.tsx | app/src/components/editor/publicar-control.tsx:190 | `"publish-control-approve"` | `—` |
 | app/src/components/editor/publicar-control.tsx | app/src/components/editor/publicar-control.tsx:205 | `"publish-control-preview"` | `—` |
 | app/src/components/editor/publicar-control.tsx | app/src/components/editor/publicar-control.tsx:213 | `"publish-control-publish"` | `—` |
-| app/src/components/editor/visibilidad-toggle.tsx | app/src/components/editor/visibilidad-toggle.tsx:27 | `{`vis-${tipo}` | `—` |
+| app/src/components/editor/visibilidad-toggle.tsx | app/src/components/editor/visibilidad-toggle.tsx:27 | `{`vis-${tipo}-${id}` | `—` |
 | app/src/components/glossary-button.tsx | app/src/components/glossary-button.tsx:15 | `"header-glossary-button"` | `—` |
 | app/src/components/glossary-button.tsx | app/src/components/glossary-button.tsx:24 | `"glossary-dialog"` | `—` |
 | app/src/components/glossary-button.tsx | app/src/components/glossary-button.tsx:40 | `{`glossary-term-${slug}` | `—` |
@@ -149,18 +165,18 @@ Generated from `git grep -n 'data-testid' -- app/src`. The data-testid column is
 | app/src/components/milestone-overview.tsx | app/src/components/milestone-overview.tsx:11 | `"hitos-resumen"` | `—` |
 | app/src/components/milestone-overview.tsx | app/src/components/milestone-overview.tsx:17 | `"milestone-overview"` | `—` |
 | app/src/components/milestone-overview.tsx | app/src/components/milestone-overview.tsx:21 | `"next-milestone"` | `—` |
-| app/src/components/milestone-panel/panel-client.tsx | app/src/components/milestone-panel/panel-client.tsx:53 | `"slot-${lineaDe[sel]}` | `—` |
+| app/src/components/milestone-panel/panel-client.tsx | app/src/components/milestone-panel/panel-client.tsx:53 | `"slot-${lineaDe[sel]}"` | `—` |
 | app/src/components/milestone-panel/panel-client.tsx | app/src/components/milestone-panel/panel-client.tsx:115 | `{`node-${id}` | `—` |
 | app/src/components/milestone-panel/panel-client.tsx | app/src/components/milestone-panel/panel-client.tsx:163 | `{`slot-${lineaId}` | `—` |
 | app/src/components/milestone-panel/panel.tsx | app/src/components/milestone-panel/panel.tsx:35 | `{`ms-panel-${m.id}` | `—` |
 | app/src/components/milestone-panel/panel.tsx | app/src/components/milestone-panel/panel.tsx:89 | `{`entregado-${m.id}` | `—` |
-| app/src/components/milestone-status.tsx | app/src/components/milestone-status.tsx:69 | `` | `—` |
+| app/src/components/milestone-status.tsx | app/src/components/milestone-status.tsx:69 | `milestone-status-${m.id}` | `m.estadoFinal` |
 | app/src/components/notas.tsx | app/src/components/notas.tsx:26 | `"nota-list"` | `—` |
 | app/src/components/roadmap.tsx | app/src/components/roadmap.tsx:101 | `"roadmap"` | `—` |
 | app/src/components/roadmap.tsx | app/src/components/roadmap.tsx:184 | `{`roadmap-lane-${l.id}` | `{proximo?.estadoFinal ?? "Cumplido"}` |
 | app/src/components/roadmap.tsx | app/src/components/roadmap.tsx:217 | `{`roadmap-node-${n.m.id}` | `{n.m.estadoFinal}` |
-| app/src/components/sidebar.tsx | app/src/components/sidebar.tsx:95 | `{`sidebar-link-${it.href.replace(/^\//, "` | `—` |
-| app/src/components/sidebar.tsx | app/src/components/sidebar.tsx:126 | `"app-title"` | `—` |
+| app/src/components/sidebar.tsx | app/src/components/sidebar.tsx:95 | `{`sidebar-link-${it.href.replace(/^\//, "") \|\| "resumen"}` | `—` |
+| app/src/components/sidebar.tsx | app/src/components/sidebar.tsx:131 | `"app-title"` | `—` |
 | app/src/components/sprint-checkpoint-panel.tsx | app/src/components/sprint-checkpoint-panel.tsx:20 | `{`ms-panel-${id}` | `—` |
 | app/src/components/sprint-checkpoint-panel.tsx | app/src/components/sprint-checkpoint-panel.tsx:34 | `{`expected-${id}` | `—` |
 | app/src/components/sprint-checkpoint-panel.tsx | app/src/components/sprint-checkpoint-panel.tsx:40 | `{`enables-${id}` | `—` |
