@@ -24,7 +24,9 @@ export function GlossaryButton() {
         data-testid="glossary-dialog"
         aria-labelledby="glossary-dialog-title"
         onClick={(event) => {
-          if (event.target === event.currentTarget) event.currentTarget.close();
+          const box = event.currentTarget.getBoundingClientRect();
+          const fueraDelCuadro = event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom;
+          if (fueraDelCuadro) event.currentTarget.close();
         }}
       >
         <div className="glossary-dialog-head">
