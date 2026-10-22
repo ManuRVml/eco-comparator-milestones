@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { usePost } from "./use-post";
 
 const VENTANA_DESHACER_MS = 8000;
@@ -34,21 +34,72 @@ export function PublicarControl({
   const [confirmarRetiro, setConfirmarRetiro] = useState(false);
   const [deshacible, setDeshacible] = useState(false);
   const { send, error, busy } = usePost("/api/editor/publicacion");
+  const raizRef = useRef<HTMLDivElement>(null);
+  const retirarRef = useRef<HTMLButtonElement>(null);
+  const timerDeshacerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  // Dónde devolver el foco cuando el diálogo se cierre: el disparador (cancelar) o la raíz estable (retiro hecho).
+  const foco = useRef<"disparador" | "raiz" | null>(null);
+
+  useEffect(() => () => clearTimeout(timerDeshacerRef.current), []);
 
   useEffect(() => {
-    if (!deshacible) return;
-    const timer = setTimeout(() => setDeshacible(false), VENTANA_DESHACER_MS);
-    return () => clearTimeout(timer);
-  }, [deshacible]);
+    const destino = foco.current;
+    if (!destino || confirmarRetiro) return;
+    if (destino === "disparador" && publicada) {
+      retirarRef.current?.focus();
+      foco.current = null;
+    } else if (destino === "raiz" && !publicada) {
+      raizRef.current?.focus();
+      foco.current = null;
+    }
+  }, [confirmarRetiro, publicada]);
+
+  function mostrarDeshacer() {
+    clearTimeout(timerDeshacerRef.current);
+    setDeshacible(true);
+    timerDeshacerRef.current = setTimeout(() => setDeshacible(false), VENTANA_DESHACER_MS);
+  }
+
+  function ocultarDeshacer() {
+    clearTimeout(timerDeshacerRef.current);
+    setDeshacible(false);
+  }
+
+  function cancelarRetiro() {
+    foco.current = "disparador";
+    setConfirmarRetiro(false);
+  }
+
+  // Diálogo modal: Tab y Shift+Tab ciclan dentro de sus botones; Escape cancela.
+  function atraparFoco(e: KeyboardEvent<HTMLDivElement>) {
+    if (e.key === "Escape") {
+      cancelarRetiro();
+      return;
+    }
+    if (e.key !== "Tab") return;
+    e.preventDefault();
+    const botones = Array.from(e.currentTarget.querySelectorAll<HTMLButtonElement>("button:not([disabled])"));
+    if (botones.length === 0) return;
+    const i = botones.indexOf(document.activeElement as HTMLButtonElement);
+    const siguiente = e.shiftKey ? (i <= 0 ? botones.length - 1 : i - 1) : i === -1 || i === botones.length - 1 ? 0 : i + 1;
+    botones[siguiente].focus();
+  }
 
   if (publicada) {
     return (
-      <div className="pub-control" data-testid={`pub-${id}`}>
+      <div className="pub-control" data-testid={`pub-${id}`} ref={raizRef} tabIndex={-1}>
         <span className="chip tone-green" title={nota ?? ""}>
           Publicada {fecha ? `${fecha.slice(8, 10)}/${fecha.slice(5, 7)}` : ""}
         </span>
         {!confirmarRetiro ? (
-          <button type="button" className="btn btn-ghost btn-sm" data-testid="publish-control-retract" onClick={() => setConfirmarRetiro(true)} disabled={busy}>
+          <button
+            ref={retirarRef}
+            type="button"
+            className="btn btn-ghost btn-sm"
+            data-testid="publish-control-retract"
+            onClick={() => setConfirmarRetiro(true)}
+            disabled={busy}
+          >
             Retirar publicación
           </button>
         ) : (
@@ -59,9 +110,7 @@ export function PublicarControl({
             aria-describedby={`pub-retirar-desc-${id}`}
             className="evidencia-box pub-box"
             data-testid="publish-confirm-dialog"
-            onKeyDown={(e) => {
-              if (e.key === "Escape") setConfirmarRetiro(false);
-            }}
+            onKeyDown={atraparFoco}
           >
             <strong id={`pub-retirar-titulo-${id}`}>¿Retirar la publicación?</strong>
             <p id={`pub-retirar-desc-${id}`} className="small">
@@ -74,12 +123,22 @@ export function PublicarControl({
                 data-testid="publish-confirm-retract"
                 disabled={busy}
                 onClick={async () => {
-                  if (await send({ tipo, id, publicar: false })) setConfirmarRetiro(false);
+                  if (!(await send({ tipo, id, publicar: false }))) return;
+                  foco.current = "raiz";
+                  ocultarDeshacer();
+                  setConfirmarRetiro(false);
                 }}
               >
                 {busy ? "…" : "Sí, retirar"}
               </button>
-              <button type="button" className="btn btn-ghost btn-sm" data-testid="publish-confirm-cancel" autoFocus onClick={() => setConfirmarRetiro(false)} disabled={busy}>
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                data-testid="publish-confirm-cancel"
+                autoFocus
+                onClick={cancelarRetiro}
+                disabled={busy}
+              >
                 Cancelar
               </button>
             </div>
@@ -93,7 +152,7 @@ export function PublicarControl({
               className="btn btn-ghost btn-sm"
               disabled={busy}
               onClick={async () => {
-                if (await send({ tipo, id, publicar: false })) setDeshacible(false);
+                if (await send({ tipo, id, publicar: false })) ocultarDeshacer();
               }}
             >
               Deshacer
@@ -113,7 +172,7 @@ export function PublicarControl({
   }
   const max = hoyLocal();
   return (
-    <div className="pub-control" data-testid={`pub-${id}`}>
+    <div className="pub-control" data-testid={`pub-${id}`} ref={raizRef} tabIndex={-1}>
       {!abierto ? (
         <button
           type="button"
@@ -146,7 +205,7 @@ export function PublicarControl({
               onClick={async () => {
                 if (await send({ tipo, id, publicar: true, nota: texto, fecha: dia })) {
                   setAbierto(false);
-                  setDeshacible(true);
+                  mostrarDeshacer();
                 }
               }}
             >
