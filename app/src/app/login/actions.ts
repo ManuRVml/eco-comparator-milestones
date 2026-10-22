@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { clearSession, setSession } from "@/lib/auth";
 import type { UserRole } from "@/lib/auth-constants";
 
-export type LoginState = { error: string | null };
+export type LoginState = { error: string | null; remaining?: number };
 
 const ROLE_PIN_ENV: Record<UserRole, string> = {
   cliente: "PIN_CLIENTE",
@@ -47,8 +47,9 @@ async function registrarFallo(ip: string): Promise<LoginState> {
   const f = FALLOS.get(ip);
   if (!f || Date.now() - f.desde > VENTANA_MS) FALLOS.set(ip, { n: 1, desde: Date.now() });
   else f.n++;
+  const intentos = FALLOS.get(ip)?.n ?? MAX_FALLOS;
   await new Promise((r) => setTimeout(r, 800));
-  return { error: "PIN incorrecto" };
+  return { error: "PIN incorrecto", remaining: Math.max(0, MAX_FALLOS - intentos) };
 }
 
 export async function loginWithPin(_previous: LoginState, formData: FormData): Promise<LoginState> {
