@@ -13,6 +13,31 @@ import { Tooltip } from "@/components/tooltip";
 import { puedeMostrarObjetivoCiclo } from "@/lib/client-vocab";
 
 const MIN_GAP = 22; // % mínimo entre nodos de una misma fila
+const FORMAS_LINEA = ["circle", "square", "diamond"] as const;
+type FormaLinea = (typeof FORMAS_LINEA)[number];
+/** Forma por línea, además del color: no depende solo del tono. */
+const FORMA_LINEA: Record<string, FormaLinea> = { L1: "circle", L2: "square", L3: "diamond" };
+
+function formaDeLinea(id: string, index: number): FormaLinea {
+  return FORMA_LINEA[id] ?? FORMAS_LINEA[index % FORMAS_LINEA.length];
+}
+
+function causaCorta(m: MilestoneView): string {
+  const texto = m.causasRiesgo[0]?.texto?.replace(/\s+/g, " ").trim();
+  if (!texto) return "Sin causa de riesgo";
+  return texto.length <= 72 ? texto : `${texto.slice(0, 69).trimEnd()}…`;
+}
+
+function tarjetaNodo(n: Nodo): string {
+  return [n.m.nombre, `Deadline / Fin del Hito: ${fmtCorta(n.m.fechaObjetivo)}`, `Estado: ${n.m.estadoFinal}`, `Causa: ${causaCorta(n.m)}`, `Avance: ${fmtPct(n.pct)}`].join(" · ");
+}
+
+function MarcadorLinea({ forma, color, style }: { forma: FormaLinea; color: string; style?: CSSProperties }) {
+  const lado = forma === "diamond" ? 8 : 10;
+  return (
+    <span aria-hidden="true" data-shape={forma} style={{ display: "inline-block", width: lado, height: lado, flexShrink: 0, background: color, borderRadius: forma === "circle" ? "50%" : forma === "square" ? 1 : 0, transform: forma === "diamond" ? "rotate(45deg)" : undefined, boxShadow: "0 0 0 1px var(--color-surface-card)", ...style }} />
+  );
+}
 
 /** Eje temporal derivado de los datos: desde el inicio del primer sprint hasta el domingo de la semana del último cierre o hito. */
 function escala(model: Model) {
@@ -149,17 +174,21 @@ export function Roadmap({ model, areaId, inicial, canEdit, isAdmin = false }: { 
           </div>
 
           <SprintCheckpointRow model={model} areaId={areaId} canEdit={canEdit} position={x} />
-          {model.lineas.map((l) => {
+          {model.lineas.map((l, index) => {
             const ms = model.milestones.filter((m) => m.lineaId === l.id);
             const { nodos, filas } = ubicar(ms, areaId, INICIO, x);
             const progreso = progresoLinea(model, l.id, areaId);
+            const forma = formaDeLinea(l.id, index);
             const proximo = ms.filter((m) => !m.cierreVerificado && m.fechaObjetivo && m.fechaObjetivo >= model.hoy).sort((a, b) => a.fechaObjetivo!.localeCompare(b.fechaObjetivo!))[0];
             return (
-              <div className="rm-row rm-lane" key={l.id} style={{ "--filas": filas, "--linea": colorLinea(l.id), "--linea-text": textoLinea(l.id) } as CSSProperties}>
+              <div className="rm-row rm-lane" key={l.id} data-testid={`roadmap-lane-${l.id}`} data-state={proximo?.estadoFinal ?? "Cumplido"} style={{ "--filas": filas, "--linea": colorLinea(l.id), "--linea-text": textoLinea(l.id) } as CSSProperties}>
                 <div className="rm-lane-label">
-                  <Tooltip label={`Línea de valor ${l.id.replace(/^L/, "")}: ${l.nombre}`}>
-                    <span className="rm-lane-id" aria-label={`Línea de valor ${l.id.replace(/^L/, "")}: ${l.nombre}`} tabIndex={0}>{l.id}</span>
-                  </Tooltip>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 6, width: "fit-content" }}>
+                    <MarcadorLinea forma={forma} color={colorLinea(l.id)} />
+                    <Tooltip label={`Línea de valor ${l.id.replace(/^L/, "")}: ${l.nombre}`}>
+                      <span className="rm-lane-id" aria-label={`Línea de valor ${l.id.replace(/^L/, "")}: ${l.nombre}`} tabIndex={0}>{l.id}</span>
+                    </Tooltip>
+                  </span>
                   <strong>{l.nombre}</strong>
                   <span className="rm-lane-meta">
                     {canEdit ? <>
@@ -183,17 +212,18 @@ export function Roadmap({ model, areaId, inicial, canEdit, isAdmin = false }: { 
                     const area = areaId ? n.m.areas.find((a) => a.areaId === areaId) : null;
                     const aporteArea = area && n.m.trabajo.dias ? (area.diasHechos / n.m.trabajo.dias) * 100 : 0;
                     const cierreVerificado = n.m.cierreVerificado ?? milestoneCompletado(n.m, model);
-                    const tooltipTitle = `${n.m.id} · ${n.m.nombre} (clic para ver criterio y aceptación) · Deadline / Fin del Hito: ${fmtCorta(n.m.fechaObjetivo)}${cierreVerificado ? " · Cierre verificado" : ""}`;
+                    const ancla = `milestone-${n.m.id}`;
                     return (
+                      <span key={n.m.id} data-testid={`roadmap-node-${n.m.id}`} data-state={n.m.estadoFinal} style={{ display: "contents" }}>
                       <RoadmapNode
-                        key={n.m.id}
                         id={n.m.id}
-                        href={`/lineas?${areaId ? `area=${areaId}&` : ""}m=${n.m.id}`}
+                        href={`#${ancla}`}
                         className={`rm-node ${align} ${n.sinTareas ? "is-muted" : ""}`}
                         style={{ left: `${n.x}%`, "--fila": n.fila, "--c": color, "--p": `${n.pct}%` } as CSSProperties}
-                        title={tooltipTitle}
+                        title={tarjetaNodo(n)}
                       >
                         <span className="rm-dot rm-milestone-dot">
+                          <MarcadorLinea forma={forma} color={colorLinea(n.m.lineaId)} style={{ position: "absolute", top: -1, left: -1, zIndex: 2 }} />
                           {canEdit ? (
                             <Ring value={n.pct} size={44} stroke={5} color={color} track="var(--color-border-default)">
                               <span className="rm-dot-inner">{n.m.id.replace("M-", "M")}</span>
@@ -217,6 +247,7 @@ export function Roadmap({ model, areaId, inicial, canEdit, isAdmin = false }: { 
                           <span className="rm-comparison">{canEdit ? (n.m.cierreVerificado ? "Milestone cumplido" : "Milestone pendiente") : (cierreVerificado ? "Hito cumplido" : "Hito pendiente")}</span>
                         </span>
                       </RoadmapNode>
+                      </span>
                     );
                   })}
                 </div>
