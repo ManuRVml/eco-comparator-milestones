@@ -12,6 +12,7 @@ import { fmtCorta } from "@/lib/dates";
 import { colorLinea } from "@/lib/format";
 import { ESTADOS_MILESTONE } from "@/lib/model";
 import { RecordPagination } from "@/components/record-pagination";
+import { Tooltip } from "@/components/tooltip";
 
 const VISTAS = [
   { id: "tareas", label: "Tareas" },
@@ -124,9 +125,17 @@ export default async function EditorPage({ searchParams }: PageProps<"/editor">)
               Todos los milestones
             </Link>
             {model.milestones.map((m) => (
-              <Link key={m.id} href={base({ ms: m.id })} className={`fchip ${ms === m.id ? "is-on" : ""}`}>
-                {m.id}
-              </Link>
+              <Tooltip key={m.id} label={m.nombre}>
+                <Link
+                  href={base({ ms: m.id })}
+                  className={`fchip ${ms === m.id ? "is-on" : ""}`}
+                  data-testid={`editor-filter-${m.id}`}
+                  data-state={ms === m.id ? "active" : "inactive"}
+                  style={{ maxWidth: 260, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+                >
+                  {m.id} · {m.nombre}
+                </Link>
+              </Tooltip>
             ))}
           </nav>
         </div>
