@@ -13,6 +13,8 @@ export default async function AgendaPage() {
   const fechas = [...new Set([...model.agendaWeekly.map((w) => w.fecha), ...model.milestones.map((m) => m.fechaObjetivo ?? "")])].filter(Boolean).sort();
   const proxima = fechas.find((f) => f >= model.hoy) ?? null;
   const totalHu = model.historias.filter((h) => model.weeklyPorHu.has(h.id)).length;
+  const huById = new Map(model.historias.map((h) => [h.id, h]));
+  const listasDe = (huIds: string[]) => huIds.filter((id) => ["Lista para demo", "Aceptada"].includes(huById.get(id)?.estado ?? "")).length;
 
   return (
     <main className="page" data-testid="agenda">
@@ -70,13 +72,14 @@ export default async function AgendaPage() {
                 {ms.length > 0 && (
                   <div className="agenda-ms">
                     {ms.map((m) => (
-                      <div key={m.id} className="agenda-ms-item" style={{ "--linea": colorLinea(m.lineaId) } as CSSProperties}>
+                      <div key={m.id} className="agenda-ms-item" data-testid={`agenda-milestone-${m.id}`} style={{ "--linea": colorLinea(m.lineaId) } as CSSProperties}>
                         <span className="agenda-ms-head">
                           <span className="line-pill" style={{ background: colorLinea(m.lineaId), color: textoLinea(m.lineaId) }}>
                             {m.lineaId}
                           </span>
                           <b>{m.id}</b>
                           <MilestoneStatus m={m} size="sm" />
+                          {session.canEdit && <span className="muted small" data-testid={`agenda-ready-count-${m.id}`}>{listasDe(m.huIds)} de {m.huIds.length} listas</span>}
                           {!session.canEdit && <em>Milestone {m.cierreVerificado ? "cumplido" : "pendiente"}</em>}
                           {session.canEdit && <em>Trabajo {Math.round(m.pctPonderado)} % · {m.cierreVerificado ? "Milestone cumplido" : "Milestone pendiente"}</em>}
                         </span>
