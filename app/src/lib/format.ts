@@ -52,7 +52,7 @@ export const TONE_TEXT_COLOR: Record<Tone, string> = {
 
 export const LINEA_COLOR: Record<string, string> = {
   L1: "var(--color-line-l1)",
-  L2: "var(--color-ai-accent)",
+  L2: "var(--color-ai-text)",
   L3: "var(--color-chart-category-grupos-interes)",
 };
 
@@ -61,16 +61,16 @@ export function colorLinea(id: string | null | undefined) {
 }
 
 export function textoLinea(id: string | null | undefined) {
-  return id === "L1" ? "var(--color-text-inverse)" : "var(--color-dark-bg)";
+  return id === "L1" || id === "L2" ? "var(--color-text-inverse)" : "var(--color-dark-bg)";
 }
 
 /** Áreas: serie de gráficos del arquetipo (tokens brand-*, ai-accent, chart-*, status-*). */
 export const AREA_COLOR: Record<string, string> = {
   backend: "var(--color-area-backend)",
-  frontend: "var(--color-ai-accent)",
+  frontend: "var(--color-ai-text)",
   datos: "var(--color-chart-series-1)",
-  qa: "var(--color-status-warning-base)",
-  infra: "var(--color-brand-indigo)",
+  qa: "var(--color-area-qa)",
+  infra: "var(--color-area-infra)",
   arquitectura: "var(--color-brand-nav-active)",
   gestion: "var(--color-text-secondary)",
 };
