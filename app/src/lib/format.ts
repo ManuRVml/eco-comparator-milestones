@@ -51,7 +51,7 @@ export const TONE_TEXT_COLOR: Record<Tone, string> = {
 };
 
 export const LINEA_COLOR: Record<string, string> = {
-  L1: "var(--color-brand-primary)",
+  L1: "var(--color-line-l1)",
   L2: "var(--color-ai-accent)",
   L3: "var(--color-chart-category-grupos-interes)",
 };
@@ -66,7 +66,7 @@ export function textoLinea(id: string | null | undefined) {
 
 /** Áreas: serie de gráficos del arquetipo (tokens brand-*, ai-accent, chart-*, status-*). */
 export const AREA_COLOR: Record<string, string> = {
-  backend: "var(--color-brand-primary)",
+  backend: "var(--color-area-backend)",
   frontend: "var(--color-ai-accent)",
   datos: "var(--color-chart-series-1)",
   qa: "var(--color-status-warning-base)",

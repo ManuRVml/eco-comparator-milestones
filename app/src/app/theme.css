@@ -19,6 +19,8 @@
   --color-brand-primary-divider: #E4DDF7;
   --color-brand-logo-yellow: #FFDD00;
   --color-ai-accent: #49BCD8;
+  --color-area-backend: #C2185B;
+  --color-line-l1: #1E3A8A;
   --color-ai-text: #0E7490;
   --color-ai-bg: #E3F6FA;
   --color-ai-border: #A8E6EC;
@@ -31,7 +33,7 @@
   --color-text-body: #424E63;
   --color-text-secondary: #59667C;
   --color-text-eyebrow: #59667C;
-  --color-text-muted: #667285;
+  --color-text-muted: #424E63;
   --color-text-inverse: #FFFFFF;
   --color-text-link: #672DBD;
   --color-text-link-hover: #0E7490;
