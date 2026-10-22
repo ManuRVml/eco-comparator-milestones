@@ -38,7 +38,14 @@ export function PublicarControl({
   const [dia, setDia] = useState("");
   const [confirmarRetiro, setConfirmarRetiro] = useState(false);
   const clave = `${tipo}:${id}`;
-  const [expiraDeshacer, setExpiraDeshacer] = useState(() => ventanasDeshacer.get(clave) ?? 0);
+  const [expiraDeshacer, setExpiraDeshacer] = useState(() => {
+    const expira = ventanasDeshacer.get(clave) ?? 0;
+    if (expira <= Date.now()) {
+      ventanasDeshacer.delete(clave);
+      return 0;
+    }
+    return expira;
+  });
   const deshacible = expiraDeshacer > 0;
   const { send, error, busy } = usePost("/api/editor/publicacion");
   const raizRef = useRef<HTMLDivElement>(null);
@@ -70,7 +77,9 @@ export function PublicarControl({
 
   // Tras retirar, la fila vuelve a «Por verificar» (otro componente): el foco va a la raíz estable.
   useEffect(() => {
-    if (!publicada && enfocarRaiz.delete(clave)) raizRef.current?.focus();
+    // Una entrada que sigue publicada tras montar es obsoleta: el retiro no llegó a reflejarse.
+    if (publicada) enfocarRaiz.delete(clave);
+    else if (enfocarRaiz.delete(clave)) raizRef.current?.focus();
   }, [clave, publicada]);
 
   function mostrarDeshacer() {
