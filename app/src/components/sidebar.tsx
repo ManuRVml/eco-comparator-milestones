@@ -119,9 +119,14 @@ export function Sidebar({ canEdit, isAdmin }: { canEdit: boolean; isAdmin: boole
   );
 }
 
-export function HeaderTitle({ isAdmin }: { isAdmin: boolean }) {
+export function HeaderTitle({ canEdit, isAdmin }: { canEdit: boolean; isAdmin: boolean }) {
   const pathname = usePathname();
-  const titulo = pathname.startsWith("/editor") && isAdmin ? "Administración" : TITULOS.find(([re]) => re.test(pathname))?.[1] ?? "Seguimiento";
+  const titulo =
+    pathname.startsWith("/editor") && isAdmin
+      ? "Administración"
+      : pathname.startsWith("/agenda") && !canEdit
+        ? "Entregas por fecha"
+        : TITULOS.find(([re]) => re.test(pathname))?.[1] ?? "Seguimiento";
   return (
     <h1 className="app-title" data-testid="app-title">
       {titulo}
