@@ -86,7 +86,7 @@ export default async function EditorPage({ searchParams }: PageProps<"/editor">)
           </div>
         }
       >
-        {vista === "configuracion" ? "Define el resultado, las métricas y los criterios de cada milestone. Solo el administrador configura, registra la aceptación del negocio y publica el cumplimiento. El cliente consulta los compromisos y las evidencias; cada cambio queda en la bitácora." : "El estado técnico y su evidencia son una sugerencia interna. El equipo Ecopetrol solo ve las tareas aprobadas y publicadas. La aceptación y publicación de milestones corresponde al administrador. Todo queda en la bitácora con rol, fecha y valor anterior y nuevo."}
+        {vista === "configuracion" ? "Define el resultado, las métricas y los criterios de cada milestone. Solo el administrador configura, registra la aceptación del negocio y publica el cumplimiento. El equipo Ecopetrol consulta los compromisos y las evidencias; cada cambio queda en la bitácora." : "El estado técnico y su evidencia son una sugerencia interna. El equipo Ecopetrol solo ve las tareas aprobadas y publicadas. La aceptación y publicación de milestones corresponde al administrador. Todo queda en la bitácora con rol, fecha y valor anterior y nuevo."}
       </PageHeading>
 
       <nav className="tabs" aria-label="Vistas del panel">
