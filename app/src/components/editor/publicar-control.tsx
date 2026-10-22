@@ -43,9 +43,11 @@ export function PublicarControl({
   useEffect(() => () => clearTimeout(timerDeshacerRef.current), []);
 
   // Si la publicación cambia por otra vía (Deshacer, otro editor), el diálogo de retiro no debe quedar abierto.
-  useEffect(() => {
+  const [publicadaPrevia, setPublicadaPrevia] = useState(publicada);
+  if (publicada !== publicadaPrevia) {
+    setPublicadaPrevia(publicada);
     if (!publicada) setConfirmarRetiro(false);
-  }, [publicada]);
+  }
 
   useEffect(() => {
     const destino = foco.current;
