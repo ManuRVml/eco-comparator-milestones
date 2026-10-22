@@ -23,7 +23,7 @@ export default async function ProtectedLayout({ children }: { children: ReactNod
         <header className="app-header">
           <div className="app-header-strip" aria-hidden="true" />
           <div className="app-header-bar">
-            <HeaderTitle isAdmin={role === "admin"} />
+            <HeaderTitle canEdit={canEdit} isAdmin={role === "admin"} />
             <div className="app-header-right">
               <LiveSync />
               <span className="partner-logo" title="Ecopetrol">
