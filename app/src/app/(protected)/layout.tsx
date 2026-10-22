@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
+import { GlossaryButton } from "@/components/glossary-button";
 import { LiveSync } from "@/components/live-sync";
 import { HeaderTitle, Sidebar } from "@/components/sidebar";
 import { getRole } from "@/lib/auth";
@@ -29,11 +30,15 @@ export default async function ProtectedLayout({ children }: { children: ReactNod
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/brand/logo-ecopetrol.png" alt="Ecopetrol" />
               </span>
-              <span className="role-chip" data-testid="role-badge">
+              <GlossaryButton />
+              <span className={`role-chip role-chip-${role}`} data-testid="header-role-badge">
                 <span className="role-avatar" aria-hidden="true">
                   {ROLE_LABELS[role].slice(0, 1)}
                 </span>
-                {ROLE_LABELS[role]}
+                <span className="role-chip-text">
+                  <span>{ROLE_LABELS[role]}</span>
+                  <span className="role-chip-permission">{canEdit ? "Puede publicar" : "Solo lectura"}</span>
+                </span>
               </span>
             </div>
           </div>
