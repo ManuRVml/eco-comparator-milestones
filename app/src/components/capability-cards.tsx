@@ -17,18 +17,18 @@ export function CapabilityCards({ capacidades, detalleHref, canEdit }: { capacid
       ) : (
         <ul className="capability-grid" data-testid="capability-cards">
           {visibles.map((c) => (
-            <li key={c.id} className="capability-card">
+            <li key={c.id} className="capability-card" data-testid={`capability-card-${String(c.id).toLowerCase()}`} data-state={c.estado}>
               <div className="capability-head">
-                <h4>{c.titulo}</h4>
+                <h4 data-testid={`capability-title-${String(c.id).toLowerCase()}`}>{c.titulo}</h4>
                 <Chip tone={TONO_ESTADO[c.estado]}>{ETIQUETA_ESTADO[c.estado]}</Chip>
               </div>
-              {canEdit ? <p className="capability-desc">{c.descripcion}</p> : <Tooltip label={c.descripcion}><p className="capability-desc" tabIndex={0} aria-label={c.descripcion}>{c.descripcion}</p></Tooltip>}
+              {canEdit ? <p className="capability-desc">{c.descripcion}</p> : <Tooltip label={c.descripcion}><p className="capability-desc" tabIndex={0} aria-label={c.descripcion} data-testid={`capability-desc-${String(c.id).toLowerCase()}`}>{c.descripcion}</p></Tooltip>}
               {canEdit && c.borrador && <Chip tone="amber" title="Solo visible para el equipo hasta que se confirme">borrador</Chip>}
             </li>
           ))}
         </ul>
       )}
-      {canEdit && <Link className="btn btn-sm" href={detalleHref}>Ver detalle completo</Link>}
+      {canEdit && <Link className="btn btn-sm" href={detalleHref} data-testid="capability-detail-link">Ver detalle completo</Link>}
     </Card>
   );
 }

@@ -32,71 +32,71 @@ export default async function PendientesPage() {
 
       {session.canEdit && (
         <Card kicker="NUEVO" title="Registrar pendiente">
-          <form action={createPendienteAction} className="workflow-form">
+          <form action={createPendienteAction} className="workflow-form" data-testid="pendientes-form">
             <fieldset>
               <legend className="sr-only">Registrar pendiente</legend>
               <label className="workflow-field" htmlFor="pendiente-titulo">
                 <span>Título</span>
-                <input id="pendiente-titulo" name="titulo" required maxLength={200} />
+                <input id="pendiente-titulo" name="titulo" required maxLength={200} data-testid="pendientes-field-titulo" />
               </label>
               <label className="workflow-field" htmlFor="pendiente-lado">
                 <span>Lado</span>
-                <select className="select" id="pendiente-lado" name="lado" defaultValue="externo" required>
+                <select className="select" id="pendiente-lado" name="lado" defaultValue="externo" required data-testid="pendientes-field-lado">
                   <option value="externo">Equipo Ecopetrol</option>
                   <option value="interno">Interno del equipo</option>
                 </select>
               </label>
               <label className="workflow-field" htmlFor="pendiente-tipo">
                 <span>Tipo</span>
-                <select className="select" id="pendiente-tipo" name="tipo" defaultValue="otro" required>
+                <select className="select" id="pendiente-tipo" name="tipo" defaultValue="otro" required data-testid="pendientes-field-tipo">
                   {Object.entries(TIPO_LABEL).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
                 </select>
               </label>
               <label className="workflow-field" htmlFor="pendiente-responsable">
                 <span>Responsable</span>
-                <input id="pendiente-responsable" name="responsable" maxLength={200} />
+                <input id="pendiente-responsable" name="responsable" maxLength={200} data-testid="pendientes-field-responsable" />
               </label>
               <label className="workflow-field" htmlFor="pendiente-fecha">
                 <span>Fecha límite</span>
-                <input id="pendiente-fecha" type="date" name="fecha_limite" />
+                <input id="pendiente-fecha" type="date" name="fecha_limite" data-testid="pendientes-field-fecha" />
               </label>
               <label className="workflow-field" htmlFor="pendiente-milestone">
                 <span>Milestone</span>
-                <select className="select" id="pendiente-milestone" name="milestone_id" defaultValue="">
+                <select className="select" id="pendiente-milestone" name="milestone_id" defaultValue="" data-testid="pendientes-field-milestone">
                   <option value="">Sin asignar</option>
                   {model.milestones.map((milestone) => <option key={milestone.id} value={milestone.id}>{milestone.id} · {milestone.nombre}</option>)}
                 </select>
               </label>
               <label className="workflow-field" htmlFor="pendiente-detalle">
                 <span>Detalle</span>
-                <textarea id="pendiente-detalle" name="detalle" rows={2} maxLength={2000} />
+                <textarea id="pendiente-detalle" name="detalle" rows={2} maxLength={2000} data-testid="pendientes-field-detalle" />
               </label>
-              <button className="btn btn-primary btn-sm" type="submit">Crear pendiente</button>
+              <button className="btn btn-primary btn-sm" type="submit" data-testid="pendientes-create-submit">Crear pendiente</button>
             </fieldset>
           </form>
         </Card>
       )}
 
       <Card kicker={session.canEdit ? "EXTERNO" : "LO QUE NECESITAMOS DE ECOPETROL"} title="Pendientes de Equipo Ecopetrol" className="card-flush">
-        <PendientesTable items={externos} canEdit={session.canEdit} />
+        <PendientesTable seccion="externo" items={externos} canEdit={session.canEdit} />
       </Card>
 
       {session.canEdit && (
         <Card kicker="INTERNO" title="Pendientes internos del equipo" className="card-flush">
-          <PendientesTable items={internos} canEdit={session.canEdit} />
+          <PendientesTable seccion="interno" items={internos} canEdit={session.canEdit} />
         </Card>
       )}
     </main>
   );
 }
 
-function PendientesTable({ items, canEdit }: { items: Awaited<ReturnType<typeof pendientesVisibles>>; canEdit: boolean }) {
+function PendientesTable({ seccion, items, canEdit }: { seccion: "externo" | "interno"; items: Awaited<ReturnType<typeof pendientesVisibles>>; canEdit: boolean }) {
   if (items.length === 0) return <Empty>No hay pendientes en esta sección.</Empty>;
 
   return (
-    <table className="table editor-table">
+    <table className="table editor-table" data-testid={`pendientes-table-${String(seccion).toLowerCase()}`}>
       <thead>
-        <tr>
+        <tr data-testid={`pendientes-table-head-${String(seccion).toLowerCase()}`}>
           <th>Título</th>
           <th>Tipo</th>
           <th>Responsable</th>
@@ -108,7 +108,7 @@ function PendientesTable({ items, canEdit }: { items: Awaited<ReturnType<typeof 
       </thead>
       <tbody>
         {items.map((item) => (
-          <tr key={item.id} className={item.estado === "resuelto" ? "is-muted" : undefined}>
+          <tr key={item.id} className={item.estado === "resuelto" ? "is-muted" : undefined} data-testid={`pendiente-row-${String(item.id).toLowerCase()}`} data-state={item.estado}>
             <td>
               {item.titulo}
               {canEdit && item.lado === "externo" && textoExternoNoApto(item.titulo, item.detalle, item.responsable) && (
@@ -119,12 +119,12 @@ function PendientesTable({ items, canEdit }: { items: Awaited<ReturnType<typeof 
             <td><Chip tone="slate">{etiquetaTipo(item.tipo)}</Chip></td>
             <td>{item.responsable || "—"}</td>
             <td className="nowrap">{fmtCorta(item.fechaLimite)}</td>
-            <td>{item.milestoneId ? <Link href={`/milestones/${item.milestoneId}`}>{item.milestoneId}</Link> : "—"}</td>
+            <td>{item.milestoneId ? <Link href={`/milestones/${String(item.milestoneId).toLowerCase()}`} data-testid={`pendiente-milestone-link-${String(item.id).toLowerCase()}`}>{item.milestoneId}</Link> : "—"}</td>
             <td><StatusBadge estado={item.estado === "abierto" ? "Abierto" : "Resuelto"} size="sm" /></td>
             {canEdit && <td>{item.estado === "abierto" && (
               <form action={resolvePendienteAction}>
                 <input type="hidden" name="id" value={item.id} />
-                <button className="btn btn-ghost btn-sm" type="submit">Marcar resuelto</button>
+                <button className="btn btn-ghost btn-sm" type="submit" data-testid={`pendiente-resolve-${String(item.id).toLowerCase()}`}>Marcar resuelto</button>
               </form>
             )}</td>}
           </tr>

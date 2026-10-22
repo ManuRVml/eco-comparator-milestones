@@ -2,13 +2,13 @@ import { GLOSSARY_TERMS } from "@/lib/glossary";
 
 export function DeliveryNote({ defaultOpen, equipo }: { defaultOpen?: boolean; equipo?: boolean } = {}) {
   return <div className="metric-note" role="note" aria-label={equipo ? "Hitos y revisión de sprints" : "Hitos y revisiones de avance"} data-testid="delivery-note">
-    <details open={defaultOpen}><summary>{equipo ? "Cómo leer milestones, revisiones y aceptación" : "Cómo leer hitos, revisiones y aceptación"}</summary>
+    <details open={defaultOpen} data-testid="delivery-note-details"><summary data-testid="delivery-note-summary">{equipo ? "Cómo leer milestones, revisiones y aceptación" : "Cómo leer hitos, revisiones y aceptación"}</summary>
     {!equipo ? <>
       <p>Revisiones de avance (Ciclo 1, 2…): al cierre de cada ciclo de trabajo de dos semanas revisamos con el equipo Ecopetrol lo entregado.</p>
       <b>Glosario</b>
-      <dl className="definition-grid">
+      <dl className="definition-grid" data-testid="delivery-note-glossary">
         {GLOSSARY_TERMS.map(({ slug, term, definition }) => (
-          <div key={slug}><dt>{term}</dt><dd>{definition}</dd></div>
+          <div key={slug} data-testid={`delivery-glossary-${String(slug).toLowerCase()}`}><dt>{term}</dt><dd>{definition}</dd></div>
         ))}
       </dl>
     </> : <>
